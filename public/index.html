@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repcast — Trainer Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     LANDING PAGE (shown first to all visitors)
+══════════════════════════════════════ -->
+<div id="screen-landing" class="screen active">
+  <div class="auth-bg">
+    <div class="auth-orb auth-orb-1"></div>
+    <div class="auth-orb auth-orb-2"></div>
+    <div class="auth-orb auth-orb-3"></div>
+    <div class="auth-grid"></div>
+  </div>
+
+  <!-- Landing Nav -->
+  <nav class="landing-nav">
+    <div class="landing-nav-brand">
+      <div class="logo-mark-sm"><i class="ti ti-barbell"></i></div>
+      <span class="logo-name">Repcast</span>
+    </div>
+    <div class="landing-nav-actions">
+      <button class="btn btn-ghost btn-sm" onclick="showScreen('auth'); showLogin()">Sign In</button>
+      <button class="btn btn-primary btn-sm" onclick="showScreen('auth'); showRegister()">
+        Start Free Trial
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="landing-hero">
+    <div class="landing-hero-content">
+      <div class="landing-badge">
+        <i class="ti ti-star-filled"></i> 7-day free trial · No credit card needed
+      </div>
+      <h1 class="landing-headline">
+        Build &amp; Share<br>
+        Exercise Routines<br>
+        <span>in Seconds</span>
+      </h1>
+      <p class="landing-subheadline">
+        The all-in-one platform for Personal Trainers and Physiotherapists.
+        Prescribe, share and track client routines with a beautifully simple workflow.
+      </p>
+      <div class="landing-cta-row">
+        <button class="btn btn-primary landing-cta-primary" onclick="showScreen('auth'); showRegister()">
+          <i class="ti ti-rocket"></i> Start Free Trial — It's Free
+        </button>
+        <button class="btn btn-ghost landing-cta-secondary" onclick="showScreen('auth'); showLogin()">
+          Already have an account? Sign in
+        </button>
+      </div>
+      <div class="landing-social-proof">
+        <div class="landing-proof-avatars">
+          <div class="proof-av" style="background:rgba(126,232,162,0.2);color:var(--accent)">JD</div>
+          <div class="proof-av" style="background:rgba(96,165,250,0.2);color:#60A5FA">SM</div>
+          <div class="proof-av" style="background:rgba(244,114,182,0.2);color:#F472B6">TK</div>
+          <div class="proof-av" style="background:rgba(167,139,250,0.2);color:#A78BFA">RN</div>
+        </div>
+        <span>Trusted by <strong>200+</strong> trainers &amp; physios</span>
+      </div>
+    </div>
+
+    <!-- Feature preview cards -->
+    <div class="landing-preview">
+      <div class="landing-preview-card">
+        <div class="lp-card-header">
+          <i class="ti ti-layout-grid" style="color:var(--accent)"></i>
+          <span>Exercise Library</span>
+          <span class="lp-card-badge">30+ exercises</span>
+        </div>
+        <div class="lp-card-grid">
+          <div class="lp-ex-pill chest"><span class="lp-dot"></span>Bench Press</div>
+          <div class="lp-ex-pill legs"><span class="lp-dot"></span>Bulgarian Squat</div>
+          <div class="lp-ex-pill back"><span class="lp-dot"></span>Pull-Up</div>
+          <div class="lp-ex-pill shoulders"><span class="lp-dot"></span>Face Pull</div>
+          <div class="lp-ex-pill arms"><span class="lp-dot"></span>Barbell Curl</div>
+          <div class="lp-ex-pill core"><span class="lp-dot"></span>Dead Bug</div>
+        </div>
+      </div>
+      <div class="landing-preview-card">
+        <div class="lp-card-header">
+          <i class="ti ti-send" style="color:var(--accent2)"></i>
+          <span>Send to Client</span>
+        </div>
+        <div class="lp-routine-preview">
+          <div class="lp-routine-item">
+            <span class="lp-rx">3×12</span>
+            <span>Incline Dumbbell Press</span>
+          </div>
+          <div class="lp-routine-item">
+            <span class="lp-rx">4×8</span>
+            <span>Romanian Deadlift</span>
+          </div>
+          <div class="lp-routine-item">
+            <span class="lp-rx">3×15</span>
+            <span>Lateral Raise</span>
+          </div>
+        </div>
+        <div class="lp-share-row">
+          <span style="font-size:11px;color:var(--muted)">Share via</span>
+          <span class="lp-share-chip whatsapp"><i class="ti ti-brand-whatsapp"></i> WhatsApp</span>
+          <span class="lp-share-chip email"><i class="ti ti-mail"></i> Email</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Row -->
+  <section class="landing-features">
+    <div class="landing-feature">
+      <div class="lf-icon"><i class="ti ti-database"></i></div>
+      <h3>Master Library</h3>
+      <p>30+ professionally categorised exercises with coaching cues, organised by muscle group.</p>
+    </div>
+    <div class="landing-feature">
+      <div class="lf-icon" style="background:rgba(62,207,207,0.1);color:var(--accent2)"><i class="ti ti-cloud-upload"></i></div>
+      <h3>Custom Uploads</h3>
+      <p>Upload your own exercise videos to Firebase Storage and build a personalised library.</p>
+    </div>
+    <div class="landing-feature">
+      <div class="lf-icon" style="background:rgba(167,139,250,0.1);color:#A78BFA"><i class="ti ti-list-check"></i></div>
+      <h3>Routine Builder</h3>
+      <p>Add exercises to a cart, prescribe sets and reps, then send a shareable link — no client login needed.</p>
+    </div>
+    <div class="landing-feature">
+      <div class="lf-icon" style="background:rgba(251,191,36,0.1);color:var(--warn)"><i class="ti ti-brand-whatsapp"></i></div>
+      <h3>One-Click Share</h3>
+      <p>Send routines directly via WhatsApp or Email with a pre-formatted message and a client-facing link.</p>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section class="landing-pricing">
+    <div class="landing-pricing-header">
+      <h2>Simple, honest pricing</h2>
+      <p>Start free. Upgrade when you're ready.</p>
+    </div>
+    <div class="landing-pricing-grid">
+      <div class="landing-pricing-card">
+        <div class="lpc-tier">Free</div>
+        <div class="lpc-price">$0<span>/mo</span></div>
+        <p class="lpc-desc">Everything you need to get started</p>
+        <ul class="lpc-features">
+          <li><i class="ti ti-check"></i> 20 master library exercises</li>
+          <li><i class="ti ti-check"></i> עד 10 העלאות סרטון מותאמות</li>
+          <li><i class="ti ti-check"></i> Unlimited client routines</li>
+          <li><i class="ti ti-check"></i> WhatsApp &amp; Email sharing</li>
+          <li class="off"><i class="ti ti-x"></i> Full library access</li>
+          <li class="off"><i class="ti ti-x"></i> Unlimited uploads</li>
+        </ul>
+        <button class="btn btn-ghost btn-full" onclick="showScreen('auth'); showRegister()">
+          Start for Free
+        </button>
+      </div>
+      <div class="landing-pricing-card featured">
+        <div class="lpc-popular">Most Popular</div>
+        <div class="lpc-tier">Premium</div>
+        <div class="lpc-price">₪25<span>/mo</span></div>
+        <p class="lpc-desc">For serious trainers and growing practices</p>
+        <ul class="lpc-features">
+          <li><i class="ti ti-check"></i> Full library — 200+ expert videos</li>
+          <li><i class="ti ti-check"></i> Unlimited custom uploads</li>
+          <li><i class="ti ti-check"></i> Unlimited client routines</li>
+          <li><i class="ti ti-check"></i> WhatsApp &amp; Email sharing</li>
+          <li><i class="ti ti-check"></i> Priority support</li>
+          <li><i class="ti ti-check"></i> Client analytics</li>
+        </ul>
+        <button class="btn btn-primary btn-full" onclick="showScreen('auth'); showRegister()">
+          <i class="ti ti-rocket"></i> Start 7-Day Free Trial
+        </button>
+        <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px">No credit card needed for trial</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="landing-footer">
+    <div class="landing-footer-brand">
+      <div class="logo-mark-sm"><i class="ti ti-barbell"></i></div>
+      <span class="logo-name">Repcast</span>
+    </div>
+    <p style="font-size:12px;color:var(--muted2)">© 2025 Repcast. The trainer &amp; physio platform. repcast.co.il</p>
+    <div style="display:flex;gap:14px">
+      <a href="#" onclick="showManagerLogin(); showScreen('auth')" style="font-size:11.5px;color:var(--muted2)">Admin</a>
+    </div>
+  </footer>
+</div>
+
+<!-- ══════════════════════════════════════
+     AUTH SCREEN
+══════════════════════════════════════ -->
+<div id="screen-auth" class="screen">
+  <div class="auth-bg">
+    <div class="auth-orb auth-orb-1"></div>
+    <div class="auth-orb auth-orb-2"></div>
+    <div class="auth-orb auth-orb-3"></div>
+    <div class="auth-grid"></div>
+  </div>
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="logo-mark"><i class="ti ti-barbell"></i></div>
+        <div>
+          <h1>Repcast</h1>
+          <p>Trainer &amp; Physio Platform</p>
+        </div>
+      </div>
+
+      <!-- Login Form -->
+      <div id="auth-login" class="auth-form">
+        <h2>Welcome back</h2>
+        <p class="auth-subtitle">Sign in to your trainer dashboard</p>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" placeholder="trainer@studio.com" id="login-email">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input" type="password" placeholder="••••••••" id="login-pass">
+        </div>
+        <button class="btn btn-primary btn-full" onclick="doLogin()">
+          <i class="ti ti-login"></i> Sign In
+        </button>
+        <div class="auth-divider"><span>or</span></div>
+        <button class="btn btn-google btn-full" onclick="doGoogleLogin()">
+          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,19.001,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+          Continue with Google
+        </button>
+        <div class="auth-divider" style="margin:14px 0 10px"><span>New here?</span></div>
+        <button class="btn btn-ghost btn-full" onclick="showRegister()">
+          <i class="ti ti-user-plus"></i> Create a free account
+        </button>
+        <p class="auth-switch" style="margin-top:4px">
+          <a href="#" onclick="showScreen('landing')" style="color:var(--muted2);font-size:12px">
+            <i class="ti ti-arrow-left" style="font-size:11px"></i> Back to home
+          </a>
+        </p>
+        <p class="auth-switch" style="margin-top:4px">
+          <a href="#" onclick="showManagerLogin()" style="color:var(--muted);font-size:12px">
+            <i class="ti ti-shield-lock" style="font-size:12px"></i> Manager / Admin login
+          </a>
+        </p>
+      </div>
+
+      <!-- Register Form -->
+      <div id="auth-register" class="auth-form" style="display:none">
+        <h2>Create your account</h2>
+        <p class="auth-subtitle">Create your account and get started</p>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input class="form-input" type="text" placeholder="Jordan Davis" id="reg-name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Business Name</label>
+            <input class="form-input" type="text" placeholder="Peak Performance" id="reg-biz">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" placeholder="trainer@studio.com" id="reg-email">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input" type="password" placeholder="Min 8 characters" id="reg-pass">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Specialty</label>
+          <select class="form-select" id="reg-specialty">
+            <option>Personal Trainer</option>
+            <option>Physiotherapist</option>
+            <option>Sports Therapist</option>
+            <option>Rehab Specialist</option>
+          </select>
+        </div>
+        <div class="trial-info-box" style="background:rgba(96,165,250,0.07);border-color:rgba(96,165,250,0.18)">
+          <i class="ti ti-info-circle" style="color:#60A5FA"></i>
+          <div>
+            <strong style="display:block;margin-bottom:2px;color:var(--text)">Free account — limited access</strong>
+            <span style="color:var(--muted)">You'll get limited library access. Once inside, you can activate a <strong style="color:var(--accent)">free 7-day trial</strong> for full access — no card needed.</span>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="doRegister()">
+          <i class="ti ti-user-plus"></i> Create Free Account
+        </button>
+        <p class="auth-switch">Already have an account? <a href="#" onclick="showLogin()">Sign in</a></p>
+        <p class="auth-switch" style="margin-top:4px">
+          <a href="#" onclick="showScreen('landing')" style="color:var(--muted2);font-size:12px">
+            <i class="ti ti-arrow-left" style="font-size:11px"></i> Back to home
+          </a>
+        </p>
+      </div>
+
+      <!-- Manager Login Form -->
+      <div id="auth-manager" class="auth-form" style="display:none">
+        <div class="manager-login-badge">
+          <i class="ti ti-shield-lock"></i> Manager Access
+        </div>
+        <h2>Admin Login</h2>
+        <p class="auth-subtitle">Full control over the master exercise library</p>
+        <div class="form-group">
+          <label class="form-label">Admin Email</label>
+          <input class="form-input" type="email" placeholder="manager@fitflowpro.com" id="manager-email">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Admin Password</label>
+          <input class="form-input" type="password" placeholder="••••••••" id="manager-pass">
+        </div>
+        <button class="btn btn-manager btn-full" onclick="doManagerLogin()">
+          <i class="ti ti-shield-check"></i> Sign In as Manager
+        </button>
+        <p class="auth-switch"><a href="#" onclick="showLogin()">← Back to trainer login</a></p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     TRAINER APP
+══════════════════════════════════════ -->
+<div id="screen-app" class="screen">
+
+  <!-- TOP NAVIGATION BAR -->
+  <nav class="topnav" id="topnav">
+    <div class="topnav-brand">
+      <div class="logo-mark-sm"><i class="ti ti-barbell"></i></div>
+      <span class="logo-name">Repcast</span>
+    </div>
+    <div class="topnav-links">
+      <a class="topnav-link active" id="tnav-library" onclick="setView('library',this)" href="#">
+        <i class="ti ti-layout-grid"></i> Library
+      </a>
+      <a class="topnav-link" id="tnav-routines" onclick="setView('routines',this)" href="#">
+        <i class="ti ti-list-check"></i> Routines
+        <span class="tnav-badge" id="tnav-routines-badge">0</span>
+      </a>
+      <a class="topnav-link" id="tnav-profile" onclick="setView('profile',this)" href="#">
+        <i class="ti ti-user-circle"></i> Profile
+      </a>
+      <a class="topnav-link" id="tnav-billing" onclick="setView('billing',this)" href="#">
+        <i class="ti ti-credit-card"></i> Billing
+      </a>
+    </div>
+    <div class="topnav-right">
+      <div class="trial-pill-top" id="trial-pill-top">
+        <i class="ti ti-star-filled"></i>
+        Trial — <strong id="trial-days-top">5</strong> days left
+        <button class="upgrade-btn-top" onclick="showUpgrade()">Upgrade</button>
+      </div>
+      <div class="topnav-user" onclick="setView('profile', document.getElementById('tnav-profile'))">
+        <div class="user-avatar-sm" id="topnav-avatar">JD</div>
+        <span id="topnav-name">Jordan Davis</span>
+        <i class="ti ti-chevron-down" style="font-size:12px;color:var(--muted)"></i>
+      </div>
+      <button class="btn-icon-nav" onclick="doLogout()" title="Sign out">
+        <i class="ti ti-logout"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- UPGRADE NUDGE BANNER -->
+  <div class="upgrade-nudge-banner" id="upgrade-nudge-banner">
+    <div class="upgrade-nudge-inner">
+      <i class="ti ti-star-filled" style="color:var(--warn);font-size:15px;flex-shrink:0"></i>
+      <span id="upgrade-nudge-text">Your free trial ends in <strong id="nudge-days">5</strong> days — upgrade to keep unlimited access.</span>
+      <button class="btn btn-primary btn-sm" onclick="showUpgrade()">
+        <i class="ti ti-arrow-up-circle"></i> Upgrade to Pro — ₪25/mo
+      </button>
+      <button class="nudge-dismiss" onclick="dismissNudge()" title="Dismiss">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="app-layout">
+    <!-- Sidebar (muscle filters only) -->
+    <aside class="sidebar" id="sidebar">
+      <div class="muscle-filter-panel" id="muscle-panel">
+        <div class="nav-section-label" style="padding:0 8px;margin-bottom:10px">Filter by Muscle</div>
+        <div id="muscle-filter-list"></div>
+        <button class="clear-filter-btn" id="clear-filter-btn" onclick="clearFilters()" style="display:none">
+          <i class="ti ti-x"></i> Clear filters
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+      <!-- LIBRARY VIEW -->
+      <div class="view active" id="view-library">
+        <div class="view-topbar">
+          <div class="topbar-left">
+            <div class="lib-tabs">
+              <button class="lib-tab active" id="tab-master" onclick="switchLibTab('master', this)">
+                <i class="ti ti-database"></i> Master Library
+                <span class="tab-count" id="master-count">30</span>
+              </button>
+              <button class="lib-tab" id="tab-custom" onclick="switchLibTab('custom', this)">
+                <i class="ti ti-cloud-upload"></i> My Videos
+                <span class="tab-count" id="custom-count">0</span>
+              </button>
+            </div>
+          </div>
+          <div class="topbar-right">
+            <div class="search-wrap">
+              <i class="ti ti-search"></i>
+              <input type="text" placeholder="Search exercises… (⌘K)" id="search-input" oninput="handleSearch(this.value)">
+              <span class="search-clear" id="search-clear" onclick="clearSearch()" style="display:none">
+                <i class="ti ti-x"></i>
+              </span>
+            </div>
+            <button class="btn btn-primary" onclick="openModal('upload')">
+              <i class="ti ti-upload"></i> Upload Video
+            </button>
+          </div>
+        </div>
+        <div class="library-body" id="library-body"></div>
+      </div>
+
+      <!-- ROUTINES VIEW -->
+      <div class="view" id="view-routines">
+        <div class="view-topbar">
+          <div class="topbar-left"><h2 class="view-title">Sent Routines</h2></div>
+        </div>
+        <div class="routines-body" id="routines-body">
+          <div class="empty-state">
+            <div class="empty-icon"><i class="ti ti-list-check"></i></div>
+            <h3>No routines sent yet</h3>
+            <p>Build a routine from the Exercise Library and send it to a client.</p>
+            <button class="btn btn-primary" onclick="setView('library',document.getElementById('tnav-library'))">
+              <i class="ti ti-layout-grid"></i> Browse Library
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROFILE VIEW -->
+      <div class="view" id="view-profile">
+        <div class="view-topbar">
+          <div class="topbar-left"><h2 class="view-title">Profile &amp; Settings</h2></div>
+          <div class="topbar-right">
+            <button class="btn btn-primary" onclick="saveProfile()"><i class="ti ti-check"></i> Save Changes</button>
+          </div>
+        </div>
+        <div class="profile-body">
+          <div class="profile-hero">
+            <div class="profile-avatar-wrap">
+              <div class="profile-avatar" id="profile-avatar">JD</div>
+              <button class="avatar-upload-btn" onclick="document.getElementById('avatar-file').click()"><i class="ti ti-camera"></i></button>
+              <input type="file" id="avatar-file" accept="image/*" style="display:none" onchange="handleAvatarUpload(this)">
+            </div>
+            <div class="profile-hero-info">
+              <h3 id="profile-display-name">Jordan Davis, PT</h3>
+              <p id="profile-display-biz">Peak Performance Physio</p>
+              <div class="profile-stats">
+                <div class="pstat"><span id="pstat-videos">0</span><em>Custom Videos</em></div>
+                <div class="pstat"><span id="pstat-routines">0</span><em>Routines Sent</em></div>
+                <div class="pstat"><span id="pstat-clients">0</span><em>Clients Reached</em></div>
+              </div>
+            </div>
+          </div>
+          <div class="tier-status-card" id="tier-status-card">
+            <div class="tier-icon"><i class="ti ti-lock"></i></div>
+            <div class="tier-info">
+              <strong id="tier-status-title">Limited Free Access — Start your 7-day trial</strong>
+              <span id="tier-status-sub">You have access to 1-2 exercises per muscle group. Start the free trial to unlock everything.</span>
+            </div>
+            <button class="btn btn-primary btn-sm" id="tier-status-btn" onclick="openModal('start-trial')">
+              Start Free Trial
+            </button>
+          </div>
+          <div class="profile-form-grid">
+            <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="pf-name" value="Jordan Davis"></div>
+            <div class="form-group"><label class="form-label">Phone Number</label><input class="form-input" id="pf-phone" value="+972 50 123 4567"></div>
+            <div class="form-group"><label class="form-label">Business Name</label><input class="form-input" id="pf-biz" value="Peak Performance Physio"></div>
+            <div class="form-group">
+              <label class="form-label">Specialty</label>
+              <select class="form-select" id="pf-specialty">
+                <option selected>Physiotherapist</option>
+                <option>Personal Trainer</option>
+                <option>Sports Therapist</option>
+                <option>Rehab Specialist</option>
+              </select>
+            </div>
+            <div class="form-group full-span">
+              <label class="form-label">Professional Bio</label>
+              <textarea class="form-textarea" id="pf-bio" rows="3">Helping athletes recover faster and perform better. Specialising in sports rehabilitation and corrective exercise programming.</textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BILLING VIEW -->
+      <div class="view" id="view-billing">
+        <div class="view-topbar">
+          <div class="topbar-left"><h2 class="view-title">Billing &amp; Subscription</h2></div>
+        </div>
+        <div class="billing-body">
+          <div class="billing-current">
+            <div class="billing-badge trial"><i class="ti ti-star-filled"></i> Free Trial</div>
+            <h3>7-Day Free Trial</h3>
+            <p>You have <strong id="billing-days">5 ימים</strong> remaining. Upgrade to keep unlimited access.</p>
+          </div>
+          <div class="pricing-grid" style="grid-template-columns:1fr 1fr 1fr">
+            <div class="pricing-card">
+              <div class="pricing-tier">Limited Free</div>
+              <div class="pricing-price">₪0<span>/mo</span></div>
+              <ul class="pricing-features">
+                <li><i class="ti ti-check"></i> 1-2 exercises per sub-group</li>
+                <li><i class="ti ti-check"></i> עד 10 העלאות סרטון</li>
+                <li><i class="ti ti-check"></i> שליחת רוטינות ללקוחות</li>
+                <li class="off"><i class="ti ti-x"></i> Full library access</li>
+                <li class="off"><i class="ti ti-x"></i> Unlimited uploads</li>
+              </ul>
+              <div class="pricing-current-label" id="billing-current-plan">Current Plan</div>
+            </div>
+            <div class="pricing-card" style="border-color:rgba(62,207,207,0.3)">
+              <div class="pricing-tier">Free Trial</div>
+              <div class="pricing-price">₪0<span>/7 ימים</span></div>
+              <ul class="pricing-features">
+                <li><i class="ti ti-check"></i> Full library — 143+ exercises</li>
+                <li><i class="ti ti-check"></i> Unlimited uploads</li>
+                <li><i class="ti ti-check"></i> כל הפיצ'רים הפרימיום</li>
+                <li><i class="ti ti-check"></i> No credit card needed</li>
+                <li><i class="ti ti-check"></i> 7 ימים מלאים</li>
+              </ul>
+              <button class="btn btn-full" onclick="openModal('start-trial')"
+                style="background:rgba(62,207,207,0.12);color:var(--accent2);border:1px solid rgba(62,207,207,0.3)">
+                <i class="ti ti-rocket"></i> Start Free Trial
+              </button>
+            </div>
+            <div class="pricing-card featured">
+              <div class="pricing-popular">Best Value</div>
+              <div class="pricing-tier">Pro</div>
+              <div class="pricing-price">₪25<span>/mo</span></div>
+              <ul class="pricing-features">
+                <li><i class="ti ti-check"></i> Full library — 143+ exercises</li>
+                <li><i class="ti ti-check"></i> Unlimited custom uploads</li>
+                <li><i class="ti ti-check"></i> Unlimited routines</li>
+                <li><i class="ti ti-check"></i> Priority support</li>
+                <li><i class="ti ti-check"></i> Client analytics</li>
+              </ul>
+              <button class="btn btn-primary btn-full" onclick="handleGrowPayment()">
+                <i class="ti ti-credit-card"></i> Subscribe — ₪25/mo
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- FLOATING CART BAR -->
+  <div class="cart-bar" id="cart-bar">
+    <div class="cart-info">
+      <div class="cart-badge-wrap">
+        <div class="cart-badge" id="cart-count">0</div>
+      </div>
+      <span id="cart-label">exercises selected</span>
+    </div>
+    <div class="cart-actions">
+      <button class="btn btn-ghost-sm" onclick="clearCart()"><i class="ti ti-trash"></i> Clear</button>
+      <button class="btn btn-accent" onclick="openModal('checkout')">Review &amp; Send <i class="ti ti-arrow-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MANAGER / ADMIN PANEL
+══════════════════════════════════════ -->
+<div id="screen-manager" class="screen">
+
+  <!-- Manager Top Nav -->
+  <nav class="topnav manager-nav" id="manager-topnav">
+    <div class="topnav-brand">
+      <div class="logo-mark-sm manager-logo-mark"><i class="ti ti-shield-lock"></i></div>
+      <span class="logo-name">Repcast <span class="manager-badge-nav">Admin</span></span>
+    </div>
+    <div class="topnav-links">
+      <a class="topnav-link active" id="mnav-exercises" onclick="setAdminView('exercises',this)" href="#">
+        <i class="ti ti-database"></i> Master Library
+      </a>
+      <a class="topnav-link" id="mnav-users" onclick="setAdminView('users',this)" href="#">
+        <i class="ti ti-users"></i> Users
+      </a>
+      <a class="topnav-link" id="mnav-stats" onclick="setAdminView('stats',this)" href="#">
+        <i class="ti ti-chart-bar"></i> Stats
+      </a>
+    </div>
+    <div class="topnav-right">
+      <div class="manager-badge-top"><i class="ti ti-shield-check"></i> Manager: Reem Kabra</div>
+      <button class="btn-icon-nav" onclick="doLogout()" title="Sign out"><i class="ti ti-logout"></i></button>
+    </div>
+  </nav>
+
+  <!-- Manager Content -->
+  <div class="manager-content">
+
+    <!-- EXERCISES ADMIN VIEW -->
+    <div class="admin-view active" id="admin-view-exercises">
+      <div class="view-topbar">
+        <div class="topbar-left">
+          <h2 class="view-title">Master Exercise Library</h2>
+          <span class="count-chip" id="admin-exercise-count">30 exercises</span>
+        </div>
+        <div class="topbar-right">
+          <div class="search-wrap">
+            <i class="ti ti-search"></i>
+            <input type="text" placeholder="Search exercises…" id="admin-search" oninput="handleAdminSearch(this.value)">
+          </div>
+          <button class="btn btn-primary" onclick="openAdminModal('add')">
+            <i class="ti ti-plus"></i> Add Exercise
+          </button>
+        </div>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table" id="admin-table">
+          <thead>
+            <tr>
+              <th>Exercise</th>
+              <th>Muscle</th>
+              <th>Sub-category</th>
+              <th>Difficulty</th>
+              <th>Tier</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- USERS ADMIN VIEW -->
+    <div class="admin-view" id="admin-view-users">
+      <div class="view-topbar">
+        <div class="topbar-left">
+          <h2 class="view-title">Registered Users</h2>
+        </div>
+      </div>
+      <div style="padding:24px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <button class="btn btn-primary btn-sm" onclick="loadAdminUsers()">
+            <i class="ti ti-refresh"></i> Load Users from Firebase
+          </button>
+          <span style="font-size:12px;color:var(--muted)">Reads directly from your Firestore users collection</span>
+        </div>
+        <div class="admin-users-grid" id="admin-users-list">
+          <p style="color:var(--muted);font-size:13px">Click "Load Users" to fetch real users from Firebase.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS ADMIN VIEW -->
+    <div class="admin-view" id="admin-view-stats">
+      <div class="view-topbar">
+        <div class="topbar-left"><h2 class="view-title">Platform Stats</h2></div>
+      </div>
+      <div style="padding:24px">
+        <div class="admin-stats-grid">
+          <div class="admin-stat-card">
+            <i class="ti ti-database" style="font-size:22px;color:var(--accent2)"></i>
+            <div class="admin-stat-val" id="stat-total-exercises">30</div>
+            <div class="admin-stat-label">Total Exercises</div>
+          </div>
+          <div class="admin-stat-card">
+            <i class="ti ti-users" style="font-size:22px;color:var(--accent)"></i>
+            <div class="admin-stat-val" id="stat-total-users">—</div>
+            <div class="admin-stat-label">Registered Trainers</div>
+          </div>
+          <div class="admin-stat-card">
+            <i class="ti ti-list-check" style="font-size:22px;color:#A78BFA"></i>
+            <div class="admin-stat-val" id="stat-total-routines">0</div>
+            <div class="admin-stat-label">Routines Created</div>
+          </div>
+          <div class="admin-stat-card">
+            <i class="ti ti-star-filled" style="font-size:22px;color:var(--warn)"></i>
+            <div class="admin-stat-val">1</div>
+            <div class="admin-stat-label">Premium Subscribers</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SHARED ROUTINE PAGE (public)
+══════════════════════════════════════ -->
+<div id="screen-shared" class="screen">
+  <div class="shared-bg">
+    <div class="auth-orb auth-orb-1"></div>
+    <div class="auth-orb auth-orb-2"></div>
+  </div>
+  <div class="shared-container">
+    <div class="shared-header">
+      <div class="auth-logo" style="justify-content:center">
+        <div class="logo-mark"><i class="ti ti-barbell"></i></div>
+        <div><h1>Repcast</h1><p>Your Personalised Routine</p></div>
+      </div>
+      <div class="shared-meta">
+        <div class="shared-meta-item"><i class="ti ti-user"></i><span>From: <strong id="shared-trainer">Your Trainer</strong></span></div>
+        <div class="shared-meta-item"><i class="ti ti-calendar"></i><span id="shared-date">Sent today</span></div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="backFromShared()" style="margin-top:14px">
+        <i class="ti ti-arrow-left"></i> Back
+      </button>
+    </div>
+    <div id="shared-exercises" class="shared-exercises"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MODALS
+══════════════════════════════════════ -->
+<div class="modal-backdrop" id="modal-backdrop" onclick="closeAllModals()"></div>
+
+<!-- Upload Modal (trainer) -->
+<div class="modal" id="modal-upload">
+  <div class="modal-header">
+    <h3><i class="ti ti-cloud-upload"></i> Upload Custom Video</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('video-file-input').click()"
+         ondragover="handleDragOver(event)" ondrop="handleDrop(event)" ondragleave="handleDragLeave(event)">
+      <div class="upload-zone-inner" id="upload-zone-inner">
+        <i class="ti ti-cloud-upload"></i>
+        <p>Drag &amp; drop your video here</p>
+        <span>or <em>browse files</em></span>
+        <small>MP4, MOV, WebM · max 500 MB</small>
+      </div>
+      <input type="file" id="video-file-input" accept="video/mp4,video/quicktime,video/webm" style="display:none" onchange="handleVideoSelect(this)">
+    </div>
+    <div class="upload-progress-wrap" id="upload-progress-wrap" style="display:none">
+      <div class="upload-progress-bar"><div id="upload-progress-fill"></div></div>
+      <span id="upload-progress-label">Uploading… 0%</span>
+    </div>
+    <div class="form-group" style="margin-top:18px">
+      <label class="form-label">Exercise Title *</label>
+      <input class="form-input" id="upload-title" placeholder="e.g. Cable Crossover Fly">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Primary Muscle Group *</label>
+        <select class="form-select" id="upload-muscle" onchange="populateSubcats('upload-muscle','upload-subcat')">
+          <option value="">Select muscle…</option>
+          <option value="chest">Chest</option>
+          <option value="back">Back</option>
+          <option value="legs">Legs</option>
+          <option value="shoulders">Shoulders</option>
+          <option value="arms">Arms</option>
+          <option value="core">Core</option>
+          <option value="fullbody">Full Body</option>
+          <option value="physio">Physiotherapy</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sub-category *</label>
+        <select class="form-select" id="upload-subcat"><option value="">Select group first</option></select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description / Coaching Cues</label>
+      <textarea class="form-textarea" id="upload-desc" placeholder="e.g. Keep elbows slightly bent. Squeeze at peak contraction…" rows="3"></textarea>
+    </div>
+
+    <!-- Visibility Toggle -->
+    <div class="visibility-toggle-wrap">
+      <div class="visibility-option active" id="vis-private" onclick="setVisibility('private')">
+        <div class="vis-icon"><i class="ti ti-lock"></i></div>
+        <div class="vis-text">
+          <strong>Private</strong>
+          <span>Only visible in your library</span>
+        </div>
+        <div class="vis-check"><i class="ti ti-check"></i></div>
+      </div>
+      <div class="visibility-option" id="vis-public" onclick="setVisibility('public')">
+        <div class="vis-icon" style="background:rgba(62,207,207,0.1);color:var(--accent2)"><i class="ti ti-world"></i></div>
+        <div class="vis-text">
+          <strong>Public</strong>
+          <span>Visible in the shared master library</span>
+        </div>
+        <div class="vis-check"><i class="ti ti-check"></i></div>
+      </div>
+    </div>
+    <input type="hidden" id="upload-visibility" value="private">
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-primary" onclick="submitUpload()"><i class="ti ti-cloud-upload"></i> Save to My Videos</button>
+  </div>
+</div>
+
+<!-- Checkout Modal -->
+<div class="modal modal-wide" id="modal-checkout">
+  <div class="modal-header">
+    <div>
+      <h3><i class="ti ti-clipboard-list"></i> Review Routine</h3>
+      <p class="modal-subtitle" id="checkout-subtitle">Prescribe sets, reps and notes for each exercise</p>
+    </div>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+    <div class="checkout-client-row">
+      <div class="form-group" style="flex:1">
+        <label class="form-label">Client Name</label>
+        <input class="form-input" id="checkout-client" placeholder="e.g. Sarah Mitchell">
+      </div>
+    </div>
+    <div id="checkout-list"></div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">Back</button>
+    <button class="btn btn-whatsapp" onclick="shareViaWhatsApp()"><i class="ti ti-brand-whatsapp"></i> WhatsApp</button>
+    <button class="btn btn-ghost" onclick="shareViaEmail()"><i class="ti ti-mail"></i> Email</button>
+    <button class="btn btn-primary" onclick="sendRoutine()"><i class="ti ti-send"></i> Send Routine</button>
+  </div>
+  <div class="share-result" id="share-result" style="display:none">
+    <div class="share-result-inner">
+      <i class="ti ti-circle-check" style="color:var(--accent);font-size:18px"></i>
+      <span>Routine created!</span>
+      <code id="share-url" class="share-url">https://repcast.co.il?routine=rtn_abc123</code>
+      <button class="btn btn-ghost-sm" onclick="copyShareUrl()"><i class="ti ti-copy"></i> Copy</button>
+      <span id="copy-done" style="display:none;color:var(--accent);font-size:12px"><i class="ti ti-check"></i> Copied</span>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Add/Edit Modal -->
+<div class="modal modal-wide" id="modal-admin-exercise">
+  <div class="modal-header">
+    <h3 id="admin-modal-title"><i class="ti ti-plus"></i> Add Exercise to Master Library</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+    <input type="hidden" id="admin-edit-id">
+    <div class="form-group">
+      <label class="form-label">Exercise Title *</label>
+      <input class="form-input" id="admin-ex-title" placeholder="e.g. Incline Dumbbell Press">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Primary Muscle Group *</label>
+        <select class="form-select" id="admin-ex-muscle" onchange="populateSubcats('admin-ex-muscle','admin-ex-subcat')">
+          <option value="">Select muscle…</option>
+          <option value="chest">Chest</option>
+          <option value="back">Back</option>
+          <option value="legs">Legs</option>
+          <option value="shoulders">Shoulders</option>
+          <option value="arms">Arms</option>
+          <option value="core">Core</option>
+          <option value="fullbody">Full Body</option>
+          <option value="physio">Physiotherapy</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sub-category *</label>
+        <select class="form-select" id="admin-ex-subcat"><option value="">Select group first</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Difficulty</label>
+        <select class="form-select" id="admin-ex-diff">
+          <option>Beginner</option>
+          <option>Intermediate</option>
+          <option>Advanced</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Duration (e.g. 45s)</label>
+        <input class="form-input" id="admin-ex-duration" placeholder="45s">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description / Coaching Cues *</label>
+      <textarea class="form-textarea" id="admin-ex-desc" rows="4" placeholder="Step-by-step instructions and coaching cues…"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label" style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <input type="checkbox" id="admin-ex-premium" style="width:16px;height:16px;accent-color:var(--warn)">
+        Premium only (hidden from free tier)
+      </label>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Video URL (Firebase Storage, YouTube, or paste direct link)</label>
+      <input class="form-input" id="admin-ex-video" placeholder="https://… or leave blank to upload a file below">
+    </div>
+    <div class="form-group">
+      <label class="form-label">— or — Upload Video from Computer</label>
+      <div class="admin-file-upload-zone" onclick="document.getElementById('admin-ex-file').click()">
+        <i class="ti ti-cloud-upload"></i>
+        <span id="admin-file-label">Choose video file…</span>
+        <small>MP4, MOV, WebM · max 500 MB · overwrites URL field above</small>
+        <input type="file" id="admin-ex-file" accept="video/mp4,video/quicktime,video/webm"
+          style="display:none" onchange="handleAdminFileSelect(this)">
+      </div>
+      <div class="upload-progress-wrap" id="admin-upload-progress" style="display:none;margin-top:8px">
+        <div class="upload-progress-bar"><div id="admin-upload-fill"></div></div>
+        <span id="admin-upload-label">Uploading…</span>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-primary" id="admin-modal-save-btn" onclick="saveAdminExercise()">
+      <i class="ti ti-check"></i> Save Exercise
+    </button>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal" id="modal-confirm-delete">
+  <div class="modal-header">
+    <h3 style="color:var(--danger)"><i class="ti ti-trash"></i> Delete Exercise</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body" style="text-align:center;padding:28px 24px">
+    <div style="width:56px;height:56px;background:rgba(255,107,107,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:26px;color:var(--danger)"><i class="ti ti-trash"></i></div>
+    <h4 style="font-size:17px;margin-bottom:8px">Are you sure?</h4>
+    <p style="color:var(--muted);font-size:13.5px" id="delete-confirm-text">This exercise will be permanently removed from the master library.</p>
+  </div>
+  <div class="modal-footer" style="justify-content:center;gap:12px">
+    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-danger-solid" id="confirm-delete-btn" onclick="confirmDeleteExercise()">
+      <i class="ti ti-trash"></i> Yes, Delete
+    </button>
+  </div>
+</div>
+
+<!-- Start Free Trial Modal -->
+<div class="modal" id="modal-start-trial">
+  <div class="modal-header">
+    <h3><i class="ti ti-rocket" style="color:var(--accent)"></i> Start Your Free Trial</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body" style="text-align:center;padding:28px 24px" id="trial-modal-body">
+    <div style="width:64px;height:64px;background:rgba(126,232,162,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:30px;color:var(--accent)">
+      <i class="ti ti-rocket"></i>
+    </div>
+    <h4 style="font-size:20px;font-weight:700;margin-bottom:8px">7 Days of Full Access</h4>
+    <p style="color:var(--muted);font-size:13.5px;margin-bottom:22px;line-height:1.6">
+      No credit card needed. Instant access to everything — free for 7 days.
+    </p>
+    <ul style="list-style:none;text-align:left;display:inline-block;margin-bottom:22px">
+      <li style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13.5px"><i class="ti ti-check" style="color:var(--accent);font-size:15px"></i> Full master library — 143+ exercises</li>
+      <li style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13.5px"><i class="ti ti-check" style="color:var(--accent);font-size:15px"></i> Unlimited custom video uploads</li>
+      <li style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13.5px"><i class="ti ti-check" style="color:var(--accent);font-size:15px"></i> Unlimited client routines &amp; sharing</li>
+      <li style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13.5px"><i class="ti ti-check" style="color:var(--accent);font-size:15px"></i> One-time per account</li>
+    </ul>
+    <button class="btn btn-primary btn-full" onclick="activateFreeTrial()" style="font-size:15px;padding:12px" id="trial-activate-btn">
+      <i class="ti ti-rocket"></i> Activate My Free Trial Now
+    </button>
+    <p style="font-size:12px;color:var(--muted2);margin-top:10px">After 7 days you return to the limited free plan unless you upgrade to Pro (₪25/mo).</p>
+  </div>
+</div>
+
+<!-- Upgrade Modal -->
+<div class="modal" id="modal-upgrade">
+  <div class="modal-header">
+    <h3><i class="ti ti-star-filled" style="color:var(--warn)"></i> Upgrade to Premium</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body" style="text-align:center;padding:30px 24px">
+    <div class="upgrade-price">$29<span>/month</span></div>
+    <p style="color:var(--muted);font-size:13.5px;margin-bottom:20px">מחויב חודשי. ניתן לביטול בכל עת.</p>
+    <ul class="upgrade-list">
+      <li><i class="ti ti-check"></i> Full master library — 200+ expert videos</li>
+      <li><i class="ti ti-check"></i> Unlimited custom video uploads</li>
+      <li><i class="ti ti-check"></i> Unlimited client routines</li>
+      <li><i class="ti ti-check"></i> Shareable client links</li>
+      <li><i class="ti ti-check"></i> Priority support</li>
+    </ul>
+    <button class="btn btn-primary btn-full" onclick="handleGrowPayment()" style="margin-top:20px">
+      <i class="ti ti-credit-card"></i> Subscribe via Grow — ₪25/mo
+    </button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════════════════════
+     FIREBASE SDK
+     FIX 1: Version pinned to 10.12.0 (was "10.x.x" which is invalid)
+     FIX 2: Added missing imports: collection, addDoc, onAuthStateChanged, signOut
+     FIX 3: All functions exposed on window._firebase so app.js can use them
+     FIX 4: app.js loads AFTER the module script via defer, preventing race condition
+══════════════════════════════════════ -->
+<script type="module">
+  import { initializeApp }                                          from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword,
+           createUserWithEmailAndPassword, GoogleAuthProvider,
+           signInWithPopup, signOut,
+           onAuthStateChanged }                                     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, getDoc,
+           collection, addDoc, query, where, getDocs }              from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getStorage, ref, uploadBytesResumable,
+           getDownloadURL }                                         from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyCFh4Zou7cgrpmOkCeo7Dg75tYd4S0FGq8",
+    authDomain:        "repcast-7e325.firebaseapp.com",
+    projectId:         "repcast-7e325",
+    storageBucket:     "repcast-7e325.firebasestorage.app",
+    messagingSenderId: "1055475395403",
+    appId:             "1:1055475395403:web:b8b2ca224efaea3bf496ce",
+    measurementId:     "G-50SWBR5993"
+  };
+
+  const app = initializeApp(firebaseConfig);
+
+  window._auth    = getAuth(app);
+  window._db      = getFirestore(app);
+  window._storage = getStorage(app);
+
+  // Expose all needed Firebase functions in one object
+  window._firebase = {
+    // Auth
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    GoogleAuthProvider,
+    signInWithPopup,
+    signOut,
+    onAuthStateChanged,
+    // Firestore
+    doc,
+    setDoc,
+    getDoc,
+    collection,
+    addDoc,
+    query,
+    where,
+    getDocs,
+    // Storage
+    ref,
+    uploadBytesResumable,
+    getDownloadURL,
+  };
+
+  // Signal app.js that Firebase is ready
+  window._firebaseReady = true;
+  window.dispatchEvent(new Event('firebaseReady'));
+</script>
+
+<script src="app.js" defer></script>
+</body>
+</html>
