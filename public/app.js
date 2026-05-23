@@ -216,7 +216,9 @@
    ];
    
    let customExercises    = [];
-   let _customVideosUnsubscribe = null; // Firestore real-time listener cleanup
+   let _customVideosUnsubscribe = null;
+   let _publicVideosUnsubscribe  = null;
+   let publicVideos              = [];
    let sentRoutines       = JSON.parse(localStorage.getItem('repcast_routines') || '[]');
    let adminDeleteTargetId = null;
    let adminSearchQuery   = '';
@@ -236,13 +238,22 @@
    /* ── PERSIST MASTER LIBRARY ─────────────────────────────── */
    function saveMasterLibrary() {
      localStorage.setItem('repcast_master', JSON.stringify(MASTER_EXERCISES));
-     // Also sync to Firestore so all trainers see changes immediately
      if (window._firebase && window._db) {
        const { setDoc, doc } = window._firebase;
        setDoc(doc(window._db, 'config', 'masterLibrary'), {
          exercises: MASTER_EXERCISES,
          updatedAt: new Date().toISOString(),
-       }).catch(e => console.warn('Firestore sync failed:', e));
+       }).then(function() {
+         console.log('[RepCast] Master library saved to Firestore:', MASTER_EXERCISES.length, 'exercises');
+         showToast('Library saved to cloud (' + MASTER_EXERCISES.length + ' exercises)');
+       }).catch(function(e) {
+         console.error('[RepCast] Firestore save FAILED:', e.code, e.message);
+         // Common fix: ensure config/masterLibrary rule is: allow write: if true;
+         showToast('Saved locally but cloud sync failed: ' + e.code);
+       });
+     } else {
+       console.warn('[RepCast] saveMasterLibrary: window._firebase or window._db not ready');
+       showToast('Saved locally (cloud not connected)');
      }
    }
    
@@ -460,8 +471,10 @@
    async function doLogout() {
      // Cancel real-time listeners and timers before signing out
      if (_customVideosUnsubscribe) { _customVideosUnsubscribe(); _customVideosUnsubscribe = null; }
+     if (_publicVideosUnsubscribe)  { _publicVideosUnsubscribe();  _publicVideosUnsubscribe  = null; }
      stopTierExpiryChecker();
      customExercises = [];
+     publicVideos    = [];
      try {
        await window._firebase.signOut(window._auth);
      } catch (e) { /* ignore */ }
@@ -562,8 +575,13 @@
    
      // Sync master library from Firestore (picks up manager changes)
      await syncMasterLibraryFromFirestore();
-     // Start real-time listener for custom videos (sync function, no await needed)
+
+     // Start video listeners — called here after _bootFromFirebaseUser
+     // which itself is called from onAuthStateChanged, so by this point
+     // the Firebase Auth token IS fully ready and attached.
+     // onAuthStateChanged guarantees token validity before calling _bootFromFirebaseUser.
      loadCustomVideosFromFirestore(u.uid);
+     loadPublicVideosFromFirestore();
    
      renderLibrary();
      updateStats();
@@ -575,7 +593,17 @@
    /* ── Load user's custom videos from Firestore (real-time) ── */
    function loadCustomVideosFromFirestore(uid) {
      if (!window._firebase || !window._db) return;
-   
+
+     // CRITICAL: Firestore rules check request.auth.uid == userId.
+     // If currentUser is null when listener starts, the rule fails.
+     // Retry until Firebase Auth has fully restored the session.
+     var currentUser = window._auth && window._auth.currentUser;
+     if (!currentUser) {
+       console.warn('[RepCast] Auth not ready — retrying in 1s for uid:', uid);
+       setTimeout(function() { loadCustomVideosFromFirestore(uid); }, 1000);
+       return;
+     }
+
      // Cancel any previous listener
      if (_customVideosUnsubscribe) {
        _customVideosUnsubscribe();
@@ -585,6 +613,8 @@
      var db         = window._db;
      var fb         = window._firebase;
      var colRef     = fb.collection(db, 'customVideos', uid, 'videos');
+
+
    
      if (!fb.onSnapshot) {
        // Fallback for older SDK
@@ -676,6 +706,87 @@
      }
    }
    
+   /* ── Load ALL public videos from all trainers (real-time) ── */
+   function loadPublicVideosFromFirestore() {
+     if (!window._firebase || !window._db) return;
+     if (_publicVideosUnsubscribe) { _publicVideosUnsubscribe(); _publicVideosUnsubscribe = null; }
+     var col = window._firebase.collection(window._db, 'publicVideos');
+     if (!window._firebase.onSnapshot) return;
+     _publicVideosUnsubscribe = window._firebase.onSnapshot(col,
+       function(snap) {
+         var vids = [];
+         snap.forEach(function(d) {
+           var data = d.data();
+           vids.push({
+             id:       d.id,
+             title:    data.title    || '',
+             muscle:   data.muscle   || 'fullbody',
+             sub:      data.sub      || '',
+             desc:     data.desc     || '',
+             diff:     data.diff     || 'Custom',
+             duration: data.duration || '—',
+             videoURL: data.videoURL || '',
+             isPublic: true,
+             custom:   true,
+             ownerId:  data.ownerId  || '',
+             premium:  false,
+           });
+         });
+         publicVideos = vids;
+         console.log('[RepCast] Public videos:', vids.length);
+         renderLibrary();
+       },
+       function(err) { console.error('[RepCast] publicVideos error:', err.code); }
+     );
+   }
+
+   /* ── Delete a custom video (Storage + Firestore + publicVideos) ── */
+   async function deleteCustomVideo(id, event) {
+     event.stopPropagation();
+     if (!state.user || !window._firebase || !window._db) return;
+
+     var ex = customExercises.find(function(e) { return e.id === id; });
+     if (!ex) return;
+
+     // Confirm before deleting
+     if (!confirm('Delete "' + ex.title + '"? This cannot be undone.')) return;
+
+     var fb = window._firebase;
+     var db = window._db;
+
+     try {
+       // 1. Delete from Firestore customVideos
+       await fb.deleteDoc(fb.doc(db, 'customVideos', state.user.uid, 'videos', id));
+
+       // 2. If public, also delete from publicVideos collection
+       if (ex.isPublic) {
+         await fb.deleteDoc(fb.doc(db, 'publicVideos', id)).catch(function(){});
+       }
+
+       // 3. Delete from Firebase Storage if we have the path
+       if (ex.storagePath && window._storage && fb.ref && fb.deleteObject) {
+         fb.deleteObject(fb.ref(window._storage, ex.storagePath)).catch(function(e){
+           console.warn('Storage delete failed (file may already be gone):', e.code);
+         });
+       }
+
+       showToast('"' + ex.title + '" deleted.');
+       // onSnapshot will automatically update customExercises and re-render
+
+     } catch(e) {
+       console.error('deleteCustomVideo error:', e.code, e.message);
+       showToast('Could not delete video — try again.');
+     }
+   }
+
+   function reloadMyVideos() {
+     if (!state.user) return;
+     showToast('Reloading your videos…');
+     customExercises = [];
+     loadCustomVideosFromFirestore(state.user.uid);
+     setTimeout(function() { renderLibrary(); updateStats(); }, 2000);
+   }
+
    /* ── Tier expiry checker — runs on boot and every 30 min ── */
    function checkTierExpiry() {
      if (!state.user || !window._firebase || !window._db) return;
@@ -758,8 +869,13 @@
      if (!window._auth || !window._firebase) return;
      window._firebase.onAuthStateChanged(window._auth, async (user) => {
        if (user && !state.user && !state.isManager) {
+         // Session restored on page refresh — boot the full app
          await _bootFromFirebaseUser(user);
        }
+       // Note: bootTrainerApp (called inside _bootFromFirebaseUser) starts
+       // the Firestore listeners. By the time we reach this callback,
+       // Firebase Auth has confirmed the token is valid and attached,
+       // so Firestore reads will succeed.
      });
    }
    
@@ -1031,10 +1147,8 @@
        // free_limited shows ALL exercises but cards will show lock icon
        // (isExerciseLocked handles per-sub 2-visible logic in the card)
    
-       // Add ALL public custom videos to master tab (including owner's own public ones)
-       // This is what makes the "make public" button actually show the video in master library
-       const publicCustom = customExercises.filter(e => e.isPublic === true);
-       pool = [...masterPool, ...publicCustom];
+       // Use shared publicVideos collection — includes all trainers' public videos
+       pool = [...masterPool, ...publicVideos];
      } else {
        // "My Videos" tab: only show exercises owned by THIS user (by ownerId)
        pool = customExercises.filter(e => e.ownerId === state.user?.uid);
@@ -1139,6 +1253,10 @@
                  title="${ex.isPublic ? 'Make Private' : 'Make Public'}">
                  <i class="ti ti-${ex.isPublic ? 'world' : 'lock'}"></i>
                  ${ex.isPublic ? 'Public' : 'Private'}
+               </button>
+               <button class="vis-toggle-btn private" onclick="deleteCustomVideo('${ex.id}', event)"
+                 title="Delete this video" style="color:var(--danger);border-color:rgba(255,107,107,0.25)">
+                 <i class="ti ti-trash"></i>
                </button>` : ''}
              ${isLocked
                ? `<button class="add-to-cart-btn" onclick="promptTrialOrUpgrade()" style="color:var(--warn);border-color:rgba(251,191,36,0.3)">
@@ -1373,51 +1491,45 @@
    async function toggleVideoVisibility(id, event) {
      event.stopPropagation();
      if (!state.user || !window._firebase || !window._db) return;
-   
      var ex = customExercises.find(function(e) { return e.id === id; });
      if (!ex) return;
-   
      var newIsPublic = !ex.isPublic;
-   
+     var fb = window._firebase; var db = window._db;
      try {
-       // Save to Firestore — onSnapshot listener will automatically
-       // rebuild customExercises and call renderLibrary()
-       await window._firebase.setDoc(
-         window._firebase.doc(window._db, 'customVideos', state.user.uid, 'videos', id),
-         { isPublic: newIsPublic },
-         { merge: true }
-       );
-   
-       // Clear filters so user sees the change in context
-       state.filterMuscle = null;
-       state.filterSub    = null;
-       document.querySelectorAll('.muscle-sub-item').forEach(function(el) {
-         el.classList.remove('active');
-       });
-       var clearBtn = document.getElementById('clear-filter-btn');
-       if (clearBtn) clearBtn.style.display = 'none';
-   
+       await fb.setDoc(fb.doc(db,'customVideos',state.user.uid,'videos',id),{isPublic:newIsPublic},{merge:true});
        if (newIsPublic) {
-         showToast('🌐 Video is now Public — visible in Master Library');
-         // Switch to master tab so trainer sees it appeared there
-         state.activeTab = 'master';
+         await fb.setDoc(fb.doc(db,'publicVideos',id),{
+           id:id,title:ex.title,muscle:ex.muscle,sub:ex.sub,desc:ex.desc,
+           diff:ex.diff||'Custom',duration:ex.duration||'-',videoURL:ex.videoURL||'',
+           isPublic:true,custom:true,ownerId:state.user.uid,
+           ownerName:state.user.fullName||'',addedAt:new Date().toISOString()
+         });
+         showToast('Video is now Public - added to Master Library!');
+         state.activeTab='master';
          document.getElementById('tab-master').classList.add('active');
          document.getElementById('tab-custom').classList.remove('active');
        } else {
-         showToast('🔒 Video is now Private — removed from Master Library');
-         state.activeTab = 'custom';
+         await fb.deleteDoc(fb.doc(db,'publicVideos',id));
+         showToast('Video is now Private - removed from Master Library');
+         state.activeTab='custom';
          document.getElementById('tab-custom').classList.add('active');
          document.getElementById('tab-master').classList.remove('active');
        }
-       // renderLibrary() will be called automatically by onSnapshot after Firestore updates
-   
-     } catch(e) {
-       console.error('Visibility toggle error:', e);
-       showToast('Could not update visibility — try again.');
-     }
+       state.filterMuscle=null; state.filterSub=null;
+       document.querySelectorAll('.muscle-sub-item').forEach(function(el){el.classList.remove('active');});
+       var cb=document.getElementById('clear-filter-btn'); if(cb) cb.style.display='none';
+     } catch(e) { console.error('toggleVideoVisibility error:',e.code,e.message); showToast('Could not update visibility.'); }
    }
-   
-   function populateSubcats(muscleSelectId, subcatSelectId) {
+
+   function reloadMyVideos() {
+     if (!state.user) return;
+     showToast('Reloading your videos...');
+     customExercises = [];
+     loadCustomVideosFromFirestore(state.user.uid);
+     setTimeout(function(){ renderLibrary(); updateStats(); }, 2000);
+   }
+
+      function populateSubcats(muscleSelectId, subcatSelectId) {
      const muscle = document.getElementById(muscleSelectId).value;
      const sc     = document.getElementById(subcatSelectId);
      if (!muscle) { sc.innerHTML = '<option value="">Select group first</option>'; return; }

@@ -422,6 +422,10 @@
                 <i class="ti ti-x"></i>
               </span>
             </div>
+            <button class="btn btn-ghost btn-sm" onclick="reloadMyVideos()" id="reload-videos-btn"
+              title="Videos not showing? Click to reload from Firebase">
+              <i class="ti ti-refresh"></i> Reload Videos
+            </button>
             <button class="btn btn-primary" onclick="openModal('upload')">
               <i class="ti ti-upload"></i> Upload Video
             </button>
@@ -1010,9 +1014,9 @@
            onAuthStateChanged, sendEmailVerification }              from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { getFirestore, doc, setDoc, getDoc,
            collection, addDoc, query, where, getDocs,
-           onSnapshot }                                             from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+           onSnapshot, deleteDoc }                                   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getStorage, ref, uploadBytesResumable,
-           getDownloadURL }                                         from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+           getDownloadURL, deleteObject }                           from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
   const firebaseConfig = {
     apiKey:            "AIzaSyCFh4Zou7cgrpmOkCeo7Dg75tYd4S0FGq8",
@@ -1027,8 +1031,12 @@
   const app = initializeApp(firebaseConfig);
 
   window._auth    = getAuth(app);
-  window._db      = getFirestore(app);
   window._storage = getStorage(app);
+
+  // Initialize Firestore — auth token is automatically attached
+  // to every request when the user is signed in via getAuth(app)
+  const db = getFirestore(app);
+  window._db = db;
 
   // Expose all needed Firebase functions in one object
   window._firebase = {
@@ -1050,10 +1058,12 @@
     where,
     getDocs,
     onSnapshot,
+    deleteDoc,
     // Storage
     ref,
     uploadBytesResumable,
     getDownloadURL,
+    deleteObject,
   };
 
   // Signal app.js that Firebase is ready
