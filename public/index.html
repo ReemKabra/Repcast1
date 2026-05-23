@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Repcast — Trainer Platform</title>
+<title>RepCast — Trainer Platform</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
@@ -27,7 +27,7 @@
   <nav class="landing-nav">
     <div class="landing-nav-brand">
       <div class="logo-mark-sm"><i class="ti ti-barbell"></i></div>
-      <span class="logo-name">Repcast</span>
+      <span class="logo-name">RepCast</span>
     </div>
     <div class="landing-nav-actions">
       <button class="btn btn-ghost btn-sm" onclick="showScreen('auth'); showLogin()">Sign In</button>
@@ -188,9 +188,9 @@
   <footer class="landing-footer">
     <div class="landing-footer-brand">
       <div class="logo-mark-sm"><i class="ti ti-barbell"></i></div>
-      <span class="logo-name">Repcast</span>
+      <span class="logo-name">RepCast</span>
     </div>
-    <p style="font-size:12px;color:var(--muted2)">© 2025 Repcast. The trainer &amp; physio platform. repcast.co.il</p>
+    <p style="font-size:12px;color:var(--muted2)">© 2025 RepCast. The trainer &amp; physio platform. repcast.co.il</p>
     <div style="display:flex;gap:14px">
       <a href="#" onclick="showManagerLogin(); showScreen('auth')" style="font-size:11.5px;color:var(--muted2)">Admin</a>
     </div>
@@ -212,7 +212,7 @@
       <div class="auth-logo">
         <div class="logo-mark"><i class="ti ti-barbell"></i></div>
         <div>
-          <h1>Repcast</h1>
+          <h1>RepCast</h1>
           <p>Trainer &amp; Physio Platform</p>
         </div>
       </div>
@@ -336,7 +336,7 @@
   <nav class="topnav" id="topnav">
     <div class="topnav-brand">
       <div class="logo-mark-sm"><i class="ti ti-barbell"></i></div>
-      <span class="logo-name">Repcast</span>
+      <span class="logo-name">RepCast</span>
     </div>
     <div class="topnav-links">
       <a class="topnav-link active" id="tnav-library" onclick="setView('library',this)" href="#">
@@ -588,7 +588,7 @@
   <nav class="topnav manager-nav" id="manager-topnav">
     <div class="topnav-brand">
       <div class="logo-mark-sm manager-logo-mark"><i class="ti ti-shield-lock"></i></div>
-      <span class="logo-name">Repcast <span class="manager-badge-nav">Admin</span></span>
+      <span class="logo-name">RepCast <span class="manager-badge-nav">Admin</span></span>
     </div>
     <div class="topnav-links">
       <a class="topnav-link active" id="mnav-exercises" onclick="setAdminView('exercises',this)" href="#">
@@ -710,7 +710,7 @@
     <div class="shared-header">
       <div class="auth-logo" style="justify-content:center">
         <div class="logo-mark"><i class="ti ti-barbell"></i></div>
-        <div><h1>Repcast</h1><p>Your Personalised Routine</p></div>
+        <div><h1>RepCast</h1><p>Your Personalised Routine</p></div>
       </div>
       <div class="shared-meta">
         <div class="shared-meta-item"><i class="ti ti-user"></i><span>From: <strong id="shared-trainer">Your Trainer</strong></span></div>
@@ -977,7 +977,7 @@
     <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
   </div>
   <div class="modal-body" style="text-align:center;padding:30px 24px">
-    <div class="upgrade-price">$29<span>/month</span></div>
+    <div class="upgrade-price">₪25<span>/month</span></div>
     <p style="color:var(--muted);font-size:13.5px;margin-bottom:20px">מחויב חודשי. ניתן לביטול בכל עת.</p>
     <ul class="upgrade-list">
       <li><i class="ti ti-check"></i> Full master library — 200+ expert videos</li>
@@ -1007,9 +1007,10 @@
   import { getAuth, signInWithEmailAndPassword,
            createUserWithEmailAndPassword, GoogleAuthProvider,
            signInWithPopup, signOut,
-           onAuthStateChanged }                                     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+           onAuthStateChanged, sendEmailVerification }              from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { getFirestore, doc, setDoc, getDoc,
-           collection, addDoc, query, where, getDocs }              from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+           collection, addDoc, query, where, getDocs,
+           onSnapshot }                                             from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getStorage, ref, uploadBytesResumable,
            getDownloadURL }                                         from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
@@ -1038,6 +1039,7 @@
     signInWithPopup,
     signOut,
     onAuthStateChanged,
+    sendEmailVerification,
     // Firestore
     doc,
     setDoc,
@@ -1047,6 +1049,7 @@
     query,
     where,
     getDocs,
+    onSnapshot,
     // Storage
     ref,
     uploadBytesResumable,

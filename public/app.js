@@ -216,6 +216,7 @@
    ];
    
    let customExercises    = [];
+   let _customVideosUnsubscribe = null; // Firestore real-time listener cleanup
    let sentRoutines       = JSON.parse(localStorage.getItem('repcast_routines') || '[]');
    let adminDeleteTargetId = null;
    let adminSearchQuery   = '';
@@ -321,25 +322,45 @@
    }
    
    /* ── Google login ───────────────────────────────────────── */
-   async function doGoogleLogin() {
-     try {
-       const provider  = new window._firebase.GoogleAuthProvider();
-       const { user }  = await window._firebase.signInWithPopup(window._auth, provider);
-       const profile   = await loadUserProfile(user.uid);
-       // First time signing in with Google — create their Firestore doc
-       if (!profile) {
-         await createUserProfile(user.uid, {
-           fullName:     user.displayName || 'Trainer',
-           email:        user.email,
-           businessName: 'My Studio',
-           phone:        '',
-           specialty:    'Personal Trainer',
-         });
-       }
-       await _bootFromFirebaseUser(user);
-     } catch (e) {
-       showToast('❌ ' + friendlyError(e.code));
+   function doGoogleLogin() {
+     // signInWithPopup MUST be called synchronously from a user gesture.
+     // Do not await anything before calling it — browsers block popups
+     // that open after async operations.
+     if (!window._auth || !window._firebase) {
+       showToast('Firebase not loaded yet. Please wait a moment and try again.');
+       return;
      }
+     var provider = new window._firebase.GoogleAuthProvider();
+     provider.addScope('email');
+     provider.addScope('profile');
+   
+     window._firebase.signInWithPopup(window._auth, provider)
+       .then(async function(result) {
+         var user    = result.user;
+         var profile = await loadUserProfile(user.uid);
+         if (!profile) {
+           await createUserProfile(user.uid, {
+             fullName:     user.displayName || 'Trainer',
+             email:        user.email,
+             businessName: 'My Studio',
+             phone:        '',
+             specialty:    'Personal Trainer',
+           });
+         }
+         await _bootFromFirebaseUser(user);
+       })
+       .catch(function(e) {
+         console.error('Google login error:', e.code, e.message);
+         if (e.code === 'auth/popup-blocked') {
+           showToast('Popup was blocked. Please allow popups for this site and try again.');
+         } else if (e.code === 'auth/popup-closed-by-user') {
+           showToast('Google sign-in was cancelled.');
+         } else if (e.code === 'auth/unauthorized-domain') {
+           showToast('This domain is not authorised in Firebase. Add it in Firebase Console → Authentication → Settings → Authorised domains.');
+         } else {
+           showToast('❌ Google sign-in failed: ' + friendlyError(e.code));
+         }
+       });
    }
    
    /* ── Register ───────────────────────────────────────────── */
@@ -352,11 +373,20 @@
      if (!name || !email || !pass) { showToast('Please fill in all fields.'); return; }
      try {
        const { user } = await window._firebase.createUserWithEmailAndPassword(window._auth, email, pass);
+   
+       // Send email verification
+       try {
+         await window._firebase.sendEmailVerification(user);
+       } catch(verErr) {
+         console.warn('Could not send verification email:', verErr);
+       }
+   
        await createUserProfile(user.uid, {
          fullName: name, businessName: biz, email,
          phone: '', specialty: spec,
        });
        await _bootFromFirebaseUser(user);
+       showToast('✅ Account created! Check your email to verify your address.');
      } catch (e) {
        showToast('❌ ' + friendlyError(e.code));
      }
@@ -428,6 +458,10 @@
    
    /* ── Logout — signs out of Firebase, returns to landing ── */
    async function doLogout() {
+     // Cancel real-time listeners and timers before signing out
+     if (_customVideosUnsubscribe) { _customVideosUnsubscribe(); _customVideosUnsubscribe = null; }
+     stopTierExpiryChecker();
+     customExercises = [];
      try {
        await window._firebase.signOut(window._auth);
      } catch (e) { /* ignore */ }
@@ -528,37 +562,194 @@
    
      // Sync master library from Firestore (picks up manager changes)
      await syncMasterLibraryFromFirestore();
-     // Load this user's custom videos from Firestore
-     await loadCustomVideosFromFirestore(u.uid);
+     // Start real-time listener for custom videos (sync function, no await needed)
+     loadCustomVideosFromFirestore(u.uid);
    
      renderLibrary();
      updateStats();
      renderRoutinesHistory();
      updateNudgeBanner();
+     startTierExpiryChecker();
    }
    
-   /* ── Load user's custom videos from Firestore ───────────── */
-   async function loadCustomVideosFromFirestore(uid) {
+   /* ── Load user's custom videos from Firestore (real-time) ── */
+   function loadCustomVideosFromFirestore(uid) {
      if (!window._firebase || !window._db) return;
+   
+     // Cancel any previous listener
+     if (_customVideosUnsubscribe) {
+       _customVideosUnsubscribe();
+       _customVideosUnsubscribe = null;
+     }
+   
+     var db         = window._db;
+     var fb         = window._firebase;
+     var colRef     = fb.collection(db, 'customVideos', uid, 'videos');
+   
+     if (!fb.onSnapshot) {
+       // Fallback for older SDK
+       _loadCustomVideosFallback(uid);
+       return;
+     }
+   
+     // onSnapshot fires immediately with cached data, then again on any change.
+     // Path customVideos/{uid}/videos is already scoped to this user only.
+     _customVideosUnsubscribe = fb.onSnapshot(
+       colRef,
+       function(snap) {
+         // Build clean array from snapshot — single update, no async race
+         var videos = [];
+         snap.forEach(function(docSnap) {
+           var data = docSnap.data();
+           videos.push({
+             id:          data.id          || docSnap.id,
+             title:       data.title       || 'Untitled',
+             muscle:      data.muscle      || 'fullbody',
+             sub:         data.sub         || '',
+             desc:        data.desc        || '',
+             diff:        data.diff        || 'Custom',
+             duration:    data.duration    || '—',
+             videoURL:    data.videoURL    || '',
+             storagePath: data.storagePath || '',
+             isPublic:    data.isPublic    === true,
+             ownerId:     uid,
+             custom:      true,
+             premium:     false,
+             createdAt:   data.createdAt   || '',
+           });
+         });
+   
+         // Single clean assignment — no race condition
+         customExercises = videos;
+   
+         console.log('[RepCast] Custom videos loaded:', videos.length, 'for', uid);
+   
+         // Update counter
+         var countEl = document.getElementById('custom-count');
+         if (countEl) countEl.textContent = videos.length;
+   
+         // Re-render if on custom tab or master tab (public videos affect master)
+         renderLibrary();
+         updateStats();
+       },
+       function(err) {
+         console.error('[RepCast] Video listener error:', err.code, err.message);
+         if (err.code === 'permission-denied') {
+           showToast('Cannot load videos — check Firestore rule for customVideos/{userId}/videos/{videoId}');
+         }
+       }
+     );
+   }
+   
+   // Fallback: getDocs one-time read
+   async function _loadCustomVideosFallback(uid) {
      try {
-       const { getDocs, collection } = window._firebase;
-       const snap = await getDocs(collection(window._db, 'customVideos', uid, 'videos'));
-       customExercises = [];
-       snap.forEach(docSnap => {
-         const data = docSnap.data();
-         // Ensure ownerId is always set correctly
-         customExercises.push({
-           ...data,
-           id:      data.id || docSnap.id,
-           ownerId: data.ownerId || uid,
-           custom:  true,
+       var snap = await window._firebase.getDocs(
+         window._firebase.collection(window._db, 'customVideos', uid, 'videos')
+       );
+       var videos = [];
+       snap.forEach(function(docSnap) {
+         var data = docSnap.data();
+         videos.push({
+           id:          data.id          || docSnap.id,
+           title:       data.title       || 'Untitled',
+           muscle:      data.muscle      || 'fullbody',
+           sub:         data.sub         || '',
+           desc:        data.desc        || '',
+           diff:        data.diff        || 'Custom',
+           duration:    data.duration    || '—',
+           videoURL:    data.videoURL    || '',
+           storagePath: data.storagePath || '',
+           isPublic:    data.isPublic    === true,
+           ownerId:     uid,
+           custom:      true,
+           premium:     false,
          });
        });
-       const countEl = document.getElementById('custom-count');
-       if (countEl) countEl.textContent = customExercises.length;
-     } catch (e) {
-       console.warn('Could not load custom videos:', e);
+       customExercises = videos;
+       var countEl = document.getElementById('custom-count');
+       if (countEl) countEl.textContent = videos.length;
+       renderLibrary();
+       updateStats();
+     } catch(e) {
+       console.error('[RepCast] Fallback load error:', e.code, e.message);
      }
+   }
+   
+   /* ── Tier expiry checker — runs on boot and every 30 min ── */
+   function checkTierExpiry() {
+     if (!state.user || !window._firebase || !window._db) return;
+     const tier = state.user.tier;
+   
+     // Check trial expiry
+     if (tier === 'trial' && state.user.trialDaysLeft <= 0) {
+       console.log('Trial expired — downgrading to free_limited');
+       window._firebase.setDoc(
+         window._firebase.doc(window._db, 'users', state.user.uid),
+         { tier: 'free_limited', trialExpiredAt: new Date().toISOString() },
+         { merge: true }
+       ).then(() => {
+         state.user.tier = 'free_limited';
+         state.user.trialDaysLeft = 0;
+         renderLibrary();
+         updateNudgeBanner();
+         updateStats();
+         showToast('Your free trial has ended. Upgrade to Pro to restore full access.');
+       }).catch(e => console.warn('Tier downgrade error:', e));
+       return;
+     }
+   
+     // Re-fetch profile from Firestore to catch server-side changes
+     // (e.g. Morning webhook upgraded or cancelled the user)
+     loadUserProfile(state.user.uid).then(profile => {
+       if (!profile) return;
+       const serverTier = profile.tier;
+       const localTier  = state.user.tier;
+   
+       // Server has a different tier than local state — sync it
+       if (serverTier !== localTier) {
+         console.log('Tier changed on server:', localTier, '→', serverTier);
+   
+         // Check if premium cancelled but still in grace period
+         if (localTier === 'premium' && serverTier !== 'premium' && profile.premiumUntil) {
+           const graceDays = Math.ceil((new Date(profile.premiumUntil) - Date.now()) / 86400000);
+           if (graceDays > 0) {
+             // Still in grace period — keep premium locally, show notice
+             showToast('Subscription cancelled. Access continues until ' +
+               new Date(profile.premiumUntil).toLocaleDateString('en-IL'));
+             return;
+           }
+         }
+   
+         // Apply server tier
+         state.user.tier = serverTier === 'premium' ? 'premium'
+                         : serverTier === 'trial'   ? 'trial'
+                         : 'free_limited';
+   
+         if (serverTier === 'trial') {
+           state.user.trialDaysLeft = calcTrialDays(profile.trialEndDate);
+         }
+   
+         renderLibrary();
+         updateNudgeBanner();
+         updateStats();
+   
+         if (serverTier === 'premium' && localTier !== 'premium') {
+           showToast('🎉 Premium activated! Full access unlocked.');
+         }
+       }
+     }).catch(e => console.warn('Tier expiry check error:', e));
+   }
+   
+   // Run expiry check every 30 minutes while app is open
+   let _tierCheckInterval = null;
+   function startTierExpiryChecker() {
+     if (_tierCheckInterval) clearInterval(_tierCheckInterval);
+     checkTierExpiry(); // run immediately on boot
+     _tierCheckInterval = setInterval(checkTierExpiry, 30 * 60 * 1000);
+   }
+   function stopTierExpiryChecker() {
+     if (_tierCheckInterval) { clearInterval(_tierCheckInterval); _tierCheckInterval = null; }
    }
    
    /* ── Auth persistence — restore session on page refresh ── */
@@ -699,6 +890,8 @@
        'auth/invalid-email':        'Please enter a valid email address.',
        'auth/popup-closed-by-user': 'Google sign-in was cancelled.',
        'auth/too-many-requests':    'Too many attempts. Please wait a moment and try again.',
+       'auth/unauthorized-domain':   'Domain not authorised. Add repcast.co.il in Firebase Console → Authentication → Settings → Authorised domains.',
+       'auth/operation-not-allowed': 'Google sign-in is not enabled. Enable it in Firebase Console → Authentication → Sign-in method.',
      };
      return map[code] || 'Something went wrong. Please try again.';
    }
@@ -838,8 +1031,9 @@
        // free_limited shows ALL exercises but cards will show lock icon
        // (isExerciseLocked handles per-sub 2-visible logic in the card)
    
-       // Add public custom videos from any trainer
-       const publicCustom = customExercises.filter(e => e.isPublic && e.ownerId !== state.user?.uid);
+       // Add ALL public custom videos to master tab (including owner's own public ones)
+       // This is what makes the "make public" button actually show the video in master library
+       const publicCustom = customExercises.filter(e => e.isPublic === true);
        pool = [...masterPool, ...publicCustom];
      } else {
        // "My Videos" tab: only show exercises owned by THIS user (by ownerId)
@@ -1176,23 +1370,51 @@
    }
    
    /* ── Toggle visibility of an already-uploaded custom video ─ */
-   function toggleVideoVisibility(id, event) {
+   async function toggleVideoVisibility(id, event) {
      event.stopPropagation();
-     const ex = customExercises.find(e => e.id === id);
+     if (!state.user || !window._firebase || !window._db) return;
+   
+     var ex = customExercises.find(function(e) { return e.id === id; });
      if (!ex) return;
-     ex.isPublic = !ex.isPublic;
-     // Update in Firestore if connected
-     if (window._firebase && window._db && state.user) {
-       try {
-         window._firebase.setDoc(
-           window._firebase.doc(window._db, 'customVideos', state.user.uid, 'videos', id),
-           { isPublic: ex.isPublic },
-           { merge: true }
-         );
-       } catch(e) {}
+   
+     var newIsPublic = !ex.isPublic;
+   
+     try {
+       // Save to Firestore — onSnapshot listener will automatically
+       // rebuild customExercises and call renderLibrary()
+       await window._firebase.setDoc(
+         window._firebase.doc(window._db, 'customVideos', state.user.uid, 'videos', id),
+         { isPublic: newIsPublic },
+         { merge: true }
+       );
+   
+       // Clear filters so user sees the change in context
+       state.filterMuscle = null;
+       state.filterSub    = null;
+       document.querySelectorAll('.muscle-sub-item').forEach(function(el) {
+         el.classList.remove('active');
+       });
+       var clearBtn = document.getElementById('clear-filter-btn');
+       if (clearBtn) clearBtn.style.display = 'none';
+   
+       if (newIsPublic) {
+         showToast('🌐 Video is now Public — visible in Master Library');
+         // Switch to master tab so trainer sees it appeared there
+         state.activeTab = 'master';
+         document.getElementById('tab-master').classList.add('active');
+         document.getElementById('tab-custom').classList.remove('active');
+       } else {
+         showToast('🔒 Video is now Private — removed from Master Library');
+         state.activeTab = 'custom';
+         document.getElementById('tab-custom').classList.add('active');
+         document.getElementById('tab-master').classList.remove('active');
+       }
+       // renderLibrary() will be called automatically by onSnapshot after Firestore updates
+   
+     } catch(e) {
+       console.error('Visibility toggle error:', e);
+       showToast('Could not update visibility — try again.');
      }
-     showToast(ex.isPublic ? '🌐 Video is now Public' : '🔒 Video is now Private');
-     renderLibrary();
    }
    
    function populateSubcats(muscleSelectId, subcatSelectId) {
@@ -1269,29 +1491,41 @@
      const lbl  = document.getElementById('upload-progress-label');
      wrap.style.display = 'block';
    
+     // Generate a stable exercise ID before upload
+     const exerciseId  = 'c_' + state.user.uid.slice(0, 6) + '_' + Date.now();
+     // Storage path scoped strictly to user uid — used to re-fetch URL if needed
+     const storagePath = 'videos/' + state.user.uid + '/' + exerciseId + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+   
      let videoURL = '';
+     let videoStoragePath = '';
      try {
-       // Upload to Firebase Storage
-       const storageRef = window._firebase.ref(
-         window._storage,
-         `videos/${state.user.uid}/${Date.now()}_${file.name}`
-       );
-       const task = window._firebase.uploadBytesResumable(storageRef, file);
+       const storageRef = window._firebase.ref(window._storage, storagePath);
+       const task       = window._firebase.uploadBytesResumable(storageRef, file);
        videoURL = await new Promise((resolve, reject) => {
          task.on(
            'state_changed',
            snap => {
              const pct = Math.round(snap.bytesTransferred / snap.totalBytes * 100);
              fill.style.width = pct + '%';
-             lbl.textContent  = `Uploading… ${pct}%`;
+             lbl.textContent  = 'Uploading… ' + pct + '%';
            },
            reject,
-           async () => resolve(await window._firebase.getDownloadURL(task.snapshot.ref))
+           async function() {
+             // Get the permanent download URL
+             const url = await window._firebase.getDownloadURL(task.snapshot.ref);
+             videoStoragePath = storagePath;
+             resolve(url);
+           }
          );
        });
      } catch (e) {
        wrap.style.display = 'none';
-       showToast('Upload failed. Check your Firebase Storage rules.');
+       console.error('Storage upload error:', e.code, e.message);
+       if (e.code === 'storage/unauthorized') {
+         showToast('Upload blocked. Add this Storage rule: match /videos/{uid}/{f} { allow write: if request.auth.uid == uid; }');
+       } else {
+         showToast('Upload failed: ' + (e.message || e.code));
+       }
        return;
      }
    
@@ -1299,33 +1533,38 @@
      const visibility = document.getElementById('upload-visibility').value || 'private';
      const isPublic   = visibility === 'public';
    
-     // Build the exercise object — videoURL and visibility included
+     // Build exercise object — save storagePath so URL can be refreshed later
      const newExercise = {
-       id:        'c' + Date.now(),
+       id:           exerciseId,
        title,
        muscle,
        sub,
-       desc:      desc || 'Custom exercise. See the uploaded video for full instructions.',
-       diff:      'Custom',
-       duration:  '—',
-       premium:   false,
-       custom:    true,
-       isPublic,           // ← true = visible to all trainers, false = owner only
+       desc:         desc || 'Custom exercise. See the uploaded video for full instructions.',
+       diff:         'Custom',
+       duration:     '—',
+       premium:      false,
+       custom:       true,
+       isPublic,
        videoURL,
-       ownerId:   state.user.uid,
-       createdAt: new Date().toISOString(),
+       storagePath:  videoStoragePath,  // ← save path for URL refresh on auth change
+       ownerId:      state.user.uid,
+       createdAt:    new Date().toISOString(),
      };
-     customExercises.push(newExercise);
    
-     // Save to Firestore using exercise id as doc ID — stable across reloads
+     // Save to Firestore — doc ID = exerciseId, strictly under user's uid
      try {
        await window._firebase.setDoc(
-         window._firebase.doc(window._db, 'customVideos', state.user.uid, 'videos', newExercise.id),
+         window._firebase.doc(window._db, 'customVideos', state.user.uid, 'videos', exerciseId),
          newExercise
        );
+       console.log('Saved video to Firestore:', exerciseId, 'for user', state.user.uid);
      } catch (e) {
-       console.error('Custom video Firestore save error:', e);
-       showToast('Video uploaded but could not save metadata. Check Firestore rules.');
+       console.error('Firestore save error:', e.code, e.message);
+       if (e.code === 'permission-denied') {
+         showToast('Saved to Storage but Firestore blocked. Add rule: match /customVideos/{uid}/videos/{v} { allow write: if request.auth.uid == uid; }');
+       } else {
+         showToast('Video uploaded but metadata save failed: ' + (e.code || e.message));
+       }
      }
    
      // Reset UI
@@ -1438,6 +1677,7 @@
      const routine = {
        id:          token,
        createdBy:   state.user.uid,
+       trainerName: state.user.fullName || 'Your Trainer',
        clientName:  client,
        exercises,
        createdAt:   new Date().toISOString(),
@@ -1483,7 +1723,7 @@
        return (i + 1) + '. *' + ex.title + '* ' + s + ' ' + r + n;
      }).join('\n');
      const url = document.getElementById('share-url').textContent || (window.location.origin + '?routine=demo');
-     const msg = 'Hi ' + client + '! Here is your personalised exercise routine from Repcast:\n\n' + items + '\n\nView the full routine with exercise videos here (no login needed):\n' + url;
+     const msg = 'Hi ' + client + '! Here is your personalised exercise routine from RepCast:\n\n' + items + '\n\nView the full routine with exercise videos here (no login needed):\n' + url;
      window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
    }
    
@@ -1495,7 +1735,7 @@
      }
      const client = document.getElementById('checkout-client').value.trim() || 'Client';
      const url    = document.getElementById('share-url').textContent || (window.location.origin + '?routine=demo');
-     const subj   = encodeURIComponent('Your Exercise Routine from Repcast');
+     const subj   = encodeURIComponent('Your Exercise Routine from RepCast');
      const body   = encodeURIComponent(
        'Hi ' + client + ',\n\n' +
        'Your personalised exercise routine is ready.\n' +
@@ -1569,28 +1809,77 @@
    }
    
    function renderSharedPage(routine) {
-     document.getElementById('shared-trainer').textContent = state.user?.fullName || 'Your Trainer';
+     document.getElementById('shared-trainer').textContent = routine.trainerName || state.user?.fullName || 'Your Trainer';
      document.getElementById('shared-date').textContent    =
        'Sent ' + new Date(routine.createdAt).toLocaleDateString('en-US', { month:'long', day:'numeric' });
    
-     document.getElementById('shared-exercises').innerHTML = routine.exercises.map((ex, i) => `
+     document.getElementById('shared-exercises').innerHTML = routine.exercises.map((ex, i) => {
+       const hasVideo = !!ex.videoURL;
+       const gradient = ['background:linear-gradient(135deg,rgba(126,232,162,0.15),rgba(62,207,207,0.1))',
+         'background:linear-gradient(135deg,rgba(244,114,182,0.15),rgba(167,139,250,0.1))',
+         'background:linear-gradient(135deg,rgba(96,165,250,0.15),rgba(62,207,207,0.1))',
+         'background:linear-gradient(135deg,rgba(251,191,36,0.15),rgba(251,146,60,0.1))',
+         'background:linear-gradient(135deg,rgba(167,139,250,0.15),rgba(96,165,250,0.1))',
+       ][ (i) % 5 ];
+   
+       return `
        <div class="shared-exercise-card">
+         ${hasVideo ? `
+         <div class="shared-video-wrap" onclick="playSharedVideo('${ex.videoURL.replace(/'/g,"\'")}','${ex.title.replace(/'/g,"\'")}')">
+           <video class="shared-video-thumb" src="${ex.videoURL}" preload="metadata" muted playsinline
+             onerror="this.parentElement.style.background='${gradient}'"></video>
+           <div class="shared-play-overlay">
+             <div class="shared-play-btn"><i class="ti ti-player-play"></i></div>
+           </div>
+         </div>` : `
+         <div class="shared-video-placeholder" style="${gradient}">
+           <i class="ti ti-barbell" style="font-size:32px;color:rgba(255,255,255,0.3)"></i>
+         </div>`}
          <div class="shared-ex-header">
            <div class="shared-ex-num">${i + 1}</div>
-           <h4>${ex.title}</h4>
-           <span class="tag tag-${ex.muscle}">${capitalize(ex.muscle)}</span>
-           ${ex.custom ? '<span class="tag tag-custom">Custom</span>' : ''}
+           <div style="flex:1">
+             <h4>${ex.title}</h4>
+             <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">
+               <span class="tag tag-${ex.muscle}">${capitalize(ex.muscle)}</span>
+               <span class="tag tag-sub">${ex.sub || ''}</span>
+               ${ex.custom ? '<span class="tag tag-custom">Custom</span>' : ''}
+             </div>
+           </div>
          </div>
          <div class="shared-ex-body">
-           <div class="shared-ex-prescription">
-             ${ex.sets ? `<div class="shared-rx-item"><span class="shared-rx-val">${ex.sets}</span><span class="shared-rx-label">Sets</span></div>` : ''}
-             ${ex.reps ? `<div class="shared-rx-item"><span class="shared-rx-val">${ex.reps}</span><span class="shared-rx-label">Reps</span></div>` : ''}
-           </div>
+           ${(ex.sets || ex.reps) ? `
+           <div class="shared-prescription-bar">
+             ${ex.sets ? `<div class="shared-rx-big"><span class="shared-rx-big-val">${ex.sets}</span><span class="shared-rx-big-label">Sets</span></div>` : ''}
+             ${(ex.sets && ex.reps) ? '<div class="shared-rx-separator">×</div>' : ''}
+             ${ex.reps ? `<div class="shared-rx-big"><span class="shared-rx-big-val">${ex.reps}</span><span class="shared-rx-big-label">Reps</span></div>` : ''}
+           </div>` : ''}
            <p class="shared-ex-desc">${ex.desc}</p>
            ${ex.notes ? `<div class="shared-ex-notes"><strong>Trainer Notes</strong>${ex.notes}</div>` : ''}
-           ${ex.videoURL ? `<a href="${ex.videoURL}" target="_blank" class="btn btn-ghost btn-sm" style="margin-top:10px;display:inline-flex"><i class="ti ti-player-play"></i> Watch Video</a>` : ''}
          </div>
-       </div>`).join('');
+       </div>`;
+     }).join('');
+   }
+   
+   function playSharedVideo(url, title) {
+     var existing = document.getElementById('modal-video-player');
+     if (existing) existing.remove();
+     var modal = document.createElement('div');
+     modal.id = 'modal-video-player';
+     modal.className = 'video-player-overlay';
+     modal.innerHTML =
+       '<div class="video-player-box">' +
+         '<div class="video-player-header">' +
+           '<h3>' + title + '</h3>' +
+           '<button class="video-player-close" onclick="closeVideoPlayer()"><i class="ti ti-x"></i></button>' +
+         '</div>' +
+         '<div class="video-player-wrap">' +
+           '<video src="' + url + '" controls autoplay playsinline ' +
+             'style="width:100%;max-height:480px;border-radius:0 0 12px 12px;background:#000;display:block">' +
+           '</video>' +
+         '</div>' +
+       '</div>';
+     document.body.appendChild(modal);
+     modal.addEventListener('click', function(e) { if (e.target === modal) closeVideoPlayer(); });
    }
    
    function backFromShared() {
@@ -1748,10 +2037,12 @@
      body.innerHTML = `<p style="color:var(--muted);font-size:13px;padding:16px">
        <i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Loading users…</p>`;
    
+     // REQUIRED FIRESTORE RULE for this to work:
+     // In Firebase Console → Firestore → Rules, add:
+     // match /users/{uid} { allow read: if true; }
+     // The manager is not a Firebase Auth user so standard auth-based rules block the read.
+   
      try {
-       // Use Firebase Admin-style read — works if Firestore rules allow manager reads.
-       // REQUIRED FIRESTORE RULE (add to your rules):
-       // match /users/{uid} { allow read: if true; }  // or lock to specific admin email
        const { getDocs, collection } = window._firebase;
        const snap = await getDocs(collection(window._db, 'users'));
    
