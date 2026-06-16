@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1055475395403",
+    "project_id": "repcast-7e325",
+    "storage_bucket": "repcast-7e325.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1055475395403:android:005a688b9df9e1e1f496ce",
+        "android_client_info": {
+          "package_name": "co.il.repcast"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1055475395403-q1d5e9h7s5pdnf5d3oga4cgklbea2neb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "co.il.repcast",
+            "certificate_hash": "ac92e57f281cf865fdc112e1077c31ea209fb29c"
+          }
+        },
+        {
+          "client_id": "1055475395403-kc7vqjas5duve2ri4u1kf6745a6o79vo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDn3jUatsvHVnkT054au-oAuDa66iEyKe4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1055475395403-kc7vqjas5duve2ri4u1kf6745a6o79vo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

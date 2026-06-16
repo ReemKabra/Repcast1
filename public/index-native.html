@@ -1,0 +1,2889 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>RepCast — Trainer & Physio Platform</title>
+<meta name="description" content="RepCast — The platform for Personal Trainers and Physiotherapists to build and share exercise routines">
+<!-- Mobile / PWA meta tags -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="RepCast">
+  <meta name="theme-color" content="#0a0c0f">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="styles-native.css?v=1781545210">
+</head>
+<script>
+// Native app — always set is-native and is-android classes immediately
+document.documentElement.classList.add('is-native', 'is-android');
+// Update platform class when Capacitor is ready
+(function() {
+  function setPlatform() {
+    if (window.Capacitor && window.Capacitor.getPlatform) {
+      var p = window.Capacitor.getPlatform();
+      document.documentElement.classList.remove('is-android', 'is-ios');
+      document.documentElement.classList.add('is-' + p);
+    }
+  }
+  setTimeout(setPlatform, 100);
+})();
+</script>
+<body class="is-native">
+<script>
+// On native: skip landing page, go straight to auth
+// (unless already logged in — onAuthStateChanged handles that)
+document.addEventListener('DOMContentLoaded', function() {
+  // If we land on landing screen, switch to auth
+  var landing = document.getElementById('screen-landing');
+  var auth    = document.getElementById('screen-auth');
+  if (landing && landing.classList.contains('active') && auth) {
+    landing.classList.remove('active');
+    auth.classList.add('active');
+  }
+});
+</script>
+
+<!-- Skip to content link — mandatory for keyboard/screen reader accessibility -->
+<a href="#main-content" class="skip-to-content" tabindex="1">Skip to main content</a>
+
+<!-- ══════════════════════════════════════
+     ACCESSIBILITY WIDGET
+══════════════════════════════════════ -->
+<div id="a11y-widget" role="complementary" aria-label="Accessibility menu">
+  <button id="a11y-toggle" class="a11y-fab" onclick="toggleA11yMenu()"
+    aria-label="Open accessibility menu" aria-expanded="false" aria-controls="a11y-menu"
+    title="Accessibility" tabindex="2">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" aria-hidden="true" focusable="false">
+      <circle cx="12" cy="4" r="1.5"/>
+      <path d="M8 7l4 2 4-2M12 9v6M9 15l-2 4M15 15l2 4"/>
+    </svg>
+    <span class="a11y-fab-label">Access</span>
+  </button>
+
+  <div id="a11y-menu" class="a11y-menu" role="dialog" aria-label="Accessibility options"
+    aria-modal="false" hidden>
+    <div class="a11y-menu-header">
+      <h2 class="a11y-menu-title">Accessibility Settings</h2>
+      <button class="a11y-close" onclick="toggleA11yMenu()" aria-label="Close accessibility menu">
+        <i class="ti ti-x" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div class="a11y-section">
+      <p class="a11y-section-label">Text Size</p>
+      <div class="a11y-row" role="group" aria-label="Change text size">
+        <button class="a11y-btn" onclick="a11yFontSize(-1)" aria-label="Decrease text size">
+          <i class="ti ti-minus" aria-hidden="true"></i> Smaller
+        </button>
+        <button class="a11y-btn" onclick="a11yFontSize(0)" aria-label="Reset text size">
+          <i class="ti ti-refresh" aria-hidden="true"></i> Reset
+        </button>
+        <button class="a11y-btn" onclick="a11yFontSize(1)" aria-label="Increase text size">
+          <i class="ti ti-plus" aria-hidden="true"></i> Larger
+        </button>
+      </div>
+    </div>
+
+    <div class="a11y-section">
+      <p class="a11y-section-label">Contrast & Colors</p>
+      <div class="a11y-grid">
+        <button class="a11y-btn a11y-btn-block" onclick="a11yContrast('high')"
+          aria-label="High contrast" aria-pressed="false" id="btn-contrast-high">
+          <i class="ti ti-contrast" aria-hidden="true"></i> High Contrast
+        </button>
+        <button class="a11y-btn a11y-btn-block" onclick="a11yContrast('light')"
+          aria-label="Light mode" aria-pressed="false" id="btn-contrast-light">
+          <i class="ti ti-sun" aria-hidden="true"></i> Light Mode
+        </button>
+        <button class="a11y-btn a11y-btn-block" onclick="a11yContrast('grayscale')"
+          aria-label="Grayscale" aria-pressed="false" id="btn-contrast-gray">
+          <i class="ti ti-circle-half" aria-hidden="true"></i> Grayscale
+        </button>
+        <button class="a11y-btn a11y-btn-block" onclick="a11yContrast('reset')"
+          aria-label="Reset colors">
+          <i class="ti ti-palette" aria-hidden="true"></i> Reset Colors
+        </button>
+      </div>
+    </div>
+
+    <div class="a11y-section">
+      <p class="a11y-section-label">Readability & Navigation</p>
+      <div class="a11y-grid">
+        <button class="a11y-btn a11y-btn-block" onclick="a11yToggle('readable-font')"
+          aria-label="Readable font" aria-pressed="false" id="btn-readable">
+          <i class="ti ti-typography" aria-hidden="true"></i> Readable Font
+        </button>
+        <button class="a11y-btn a11y-btn-block" onclick="a11yToggle('highlight-links')"
+          aria-label="Highlight links" aria-pressed="false" id="btn-links">
+          <i class="ti ti-link" aria-hidden="true"></i> Highlight Links
+        </button>
+        <button class="a11y-btn a11y-btn-block" onclick="a11yToggle('highlight-focus')"
+          aria-label="Highlight keyboard focus" aria-pressed="false" id="btn-focus">
+          <i class="ti ti-keyboard" aria-hidden="true"></i> Highlight Focus
+        </button>
+        <button class="a11y-btn a11y-btn-block" onclick="a11yToggle('stop-animations')"
+          aria-label="Stop animations" aria-pressed="false" id="btn-anim">
+          <i class="ti ti-player-pause" aria-hidden="true"></i> Stop Animations
+        </button>
+      </div>
+    </div>
+
+    <div class="a11y-section">
+      <p class="a11y-section-label">Language</p>
+      <div class="a11y-row">
+        <button class="a11y-btn" id="btn-translate-he" onclick="a11yTranslate('he')"
+          aria-label="תרגם לעברית" aria-pressed="false">
+          🇮🇱 עברית
+        </button>
+        <button class="a11y-btn" id="btn-translate-en" onclick="a11yTranslate('en')"
+          aria-label="Switch to English" aria-pressed="false">
+          🇬🇧 English
+        </button>
+      </div>
+    </div>
+
+    <div class="a11y-section">
+      <p class="a11y-section-label">Read Aloud</p>
+      <button class="a11y-btn a11y-btn-block" id="btn-hover-read" onclick="a11yToggleHoverRead()"
+        aria-label="Enable hover-to-read" aria-pressed="false">
+        <i class="ti ti-cursor-text" aria-hidden="true"></i> Hover to Read
+      </button>
+      <button class="a11y-btn a11y-btn-block" id="btn-read-aloud" onclick="a11yReadAloud()"
+        aria-label="Read full page aloud" aria-pressed="false" style="margin-top:6px">
+        <i class="ti ti-volume" aria-hidden="true"></i> Read Page Aloud
+      </button>
+      <button class="a11y-btn a11y-btn-block" onclick="a11yStopReading()"
+        aria-label="Stop reading" style="margin-top:6px">
+        <i class="ti ti-player-stop" aria-hidden="true"></i> Stop Reading
+      </button>
+    </div>
+
+    <div class="a11y-section">
+      <a href="/accessibility" class="a11y-statement-link" tabindex="0">
+        <i class="ti ti-file-certificate" aria-hidden="true"></i>
+        Accessibility Statement
+      </a>
+      <button class="a11y-btn a11y-btn-block a11y-reset-all" onclick="a11yResetAll()"
+        style="margin-top:8px">
+        <i class="ti ti-refresh" aria-hidden="true"></i> Reset All
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     LANDING PAGE (shown first to all visitors)
+══════════════════════════════════════ -->
+<div id="screen-landing" class="screen active">
+  <div class="auth-bg">
+    <div class="auth-orb auth-orb-1"></div>
+    <div class="auth-orb auth-orb-2"></div>
+    <div class="auth-orb auth-orb-3"></div>
+    <div class="auth-grid"></div>
+  </div>
+
+  <!-- Landing Nav -->
+  <nav class="landing-nav" role="navigation" aria-label="Main navigation">
+    <div class="landing-nav-brand">
+      <div class="logo-mark-sm"><i class="ti ti-barbell"></i></div>
+      <span class="logo-name">RepCast</span>
+    </div>
+    <div class="landing-nav-actions">
+      <button class="btn btn-ghost btn-sm" onclick="showScreen('auth'); showLogin()">Sign In</button>
+      <button class="btn btn-primary btn-sm" onclick="showScreen('auth'); showRegister()">
+        Start Free Trial
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="landing-hero" id="main-content" tabindex="-1" aria-label="Main content">
+    <div class="landing-hero-content">
+      <div class="landing-badge">
+        <i class="ti ti-star-filled"></i> 7-day free trial · No credit card needed
+      </div>
+      <h1 class="landing-headline">
+        Build &amp; Share<br>
+        Exercise Routines<br>
+        <span>in Seconds</span>
+      </h1>
+      <p class="landing-subheadline">
+        The all-in-one platform for Personal Trainers and Physiotherapists.
+        Prescribe, share and track client routines with a beautifully simple workflow.
+      </p>
+      <div class="landing-cta-row">
+        <button class="btn btn-primary landing-cta-primary" onclick="showScreen('auth'); showRegister()">
+          <i class="ti ti-rocket"></i> Start Free Trial — It's Free
+        </button>
+        <button class="btn btn-ghost landing-cta-secondary" onclick="showScreen('auth'); showLogin()">
+          Already have an account? Sign in
+        </button>
+      </div>
+      <div class="landing-social-proof">
+        <div class="landing-proof-avatars">
+          <div class="proof-av" style="background:rgba(126,232,162,0.2);color:var(--accent)">JD</div>
+          <div class="proof-av" style="background:rgba(96,165,250,0.2);color:#60A5FA">SM</div>
+          <div class="proof-av" style="background:rgba(244,114,182,0.2);color:#F472B6">TK</div>
+          <div class="proof-av" style="background:rgba(167,139,250,0.2);color:#A78BFA">RN</div>
+        </div>
+        <span>Trusted by <strong>200+</strong> trainers &amp; physios</span>
+      </div>
+    </div>
+
+    <!-- Feature preview cards -->
+    <div class="landing-preview">
+      <div class="landing-preview-card">
+        <div class="lp-card-header">
+          <i class="ti ti-layout-grid" style="color:var(--accent)"></i>
+          <span>Exercise Library</span>
+          <span class="lp-card-badge">30+ exercises</span>
+        </div>
+        <div class="lp-card-grid">
+          <div class="lp-ex-pill chest"><span class="lp-dot"></span>Bench Press</div>
+          <div class="lp-ex-pill legs"><span class="lp-dot"></span>Bulgarian Squat</div>
+          <div class="lp-ex-pill back"><span class="lp-dot"></span>Pull-Up</div>
+          <div class="lp-ex-pill shoulders"><span class="lp-dot"></span>Face Pull</div>
+          <div class="lp-ex-pill arms"><span class="lp-dot"></span>Barbell Curl</div>
+          <div class="lp-ex-pill core"><span class="lp-dot"></span>Dead Bug</div>
+        </div>
+      </div>
+      <div class="landing-preview-card">
+        <div class="lp-card-header">
+          <i class="ti ti-send" style="color:var(--accent2)"></i>
+          <span>Send to Client</span>
+        </div>
+        <div class="lp-routine-preview">
+          <div class="lp-routine-item">
+            <span class="lp-rx">3×12</span>
+            <span>Incline Dumbbell Press</span>
+          </div>
+          <div class="lp-routine-item">
+            <span class="lp-rx">4×8</span>
+            <span>Romanian Deadlift</span>
+          </div>
+          <div class="lp-routine-item">
+            <span class="lp-rx">3×15</span>
+            <span>Lateral Raise</span>
+          </div>
+        </div>
+        <div class="lp-share-row">
+          <span style="font-size:11px;color:var(--muted)">Share via</span>
+          <span class="lp-share-chip whatsapp"><i class="ti ti-brand-whatsapp"></i> WhatsApp</span>
+          <span class="lp-share-chip email"><i class="ti ti-mail"></i> Email</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Row -->
+  <section class="landing-features">
+    <div class="landing-feature">
+      <div class="lf-icon"><i class="ti ti-database"></i></div>
+      <h3>Master Library</h3>
+      <p>30+ professionally categorised exercises with coaching cues, organised by muscle group.</p>
+    </div>
+    <div class="landing-feature">
+      <div class="lf-icon" style="background:rgba(62,207,207,0.1);color:var(--accent2)"><i class="ti ti-cloud-upload"></i></div>
+      <h3>Custom Uploads</h3>
+      <p>Upload your own exercise videos to Firebase Storage and build a personalised library.</p>
+    </div>
+    <div class="landing-feature">
+      <div class="lf-icon" style="background:rgba(167,139,250,0.1);color:#A78BFA"><i class="ti ti-list-check"></i></div>
+      <h3>Routine Builder</h3>
+      <p>Add exercises to a cart, prescribe sets and reps, then send a shareable link — no client login needed.</p>
+    </div>
+    <div class="landing-feature">
+      <div class="lf-icon" style="background:rgba(251,191,36,0.1);color:var(--warn)"><i class="ti ti-brand-whatsapp"></i></div>
+      <h3>One-Click Share</h3>
+      <p>Send routines directly via WhatsApp or Email with a pre-formatted message and a client-facing link.</p>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section class="landing-pricing">
+    <div class="landing-pricing-header">
+      <h2>Simple, honest pricing</h2>
+      <p>Start free. Upgrade when you're ready.</p>
+    </div>
+    <div class="landing-pricing-grid">
+      <div class="landing-pricing-card">
+        <div class="lpc-tier">Free</div>
+        <div class="lpc-price">$0<span>/mo</span></div>
+        <p class="lpc-desc">Everything you need to get started</p>
+        <ul class="lpc-features">
+          <li><i class="ti ti-check"></i> 20 master library exercises</li>
+          <li><i class="ti ti-check"></i> Up to 10 custom video uploads</li>
+          <li><i class="ti ti-check"></i> Unlimited client routines</li>
+          <li><i class="ti ti-check"></i> WhatsApp &amp; Email sharing</li>
+          <li class="off"><i class="ti ti-x"></i> Full library access</li>
+          <li class="off"><i class="ti ti-x"></i> Unlimited uploads</li>
+        </ul>
+        <button class="btn btn-ghost btn-full" onclick="showScreen('auth'); showRegister()">
+          Start for Free
+        </button>
+      </div>
+      <div class="landing-pricing-card featured">
+        <div class="lpc-popular">Most Popular</div>
+        <div class="lpc-tier">Premium</div>
+        <div class="lpc-price">₪25<span>/mo</span></div>
+        <p class="lpc-desc">For serious trainers and growing practices</p>
+        <ul class="lpc-features">
+          <li><i class="ti ti-check"></i> Full library — 200+ expert videos</li>
+          <li><i class="ti ti-check"></i> Unlimited custom uploads</li>
+          <li><i class="ti ti-check"></i> Unlimited client routines</li>
+          <li><i class="ti ti-check"></i> WhatsApp &amp; Email sharing</li>
+          <li><i class="ti ti-check"></i> Priority support</li>
+          <li><i class="ti ti-check"></i> Client analytics</li>
+        </ul>
+        <button class="btn btn-primary btn-full" onclick="showScreen('auth'); showRegister()">
+          <i class="ti ti-rocket"></i> Start 7-Day Free Trial
+        </button>
+        <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px">No credit card needed for trial</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="landing-footer" role="contentinfo">
+    <div class="landing-footer-brand">
+      <div class="logo-mark-sm" aria-hidden="true"><i class="ti ti-barbell"></i></div>
+      <span class="logo-name">RepCast</span>
+    </div>
+    <p style="font-size:12px;color:var(--muted2)">© 2025 RepCast · repcast.co.il · Israel</p>
+    <p style="font-size:12px;color:var(--muted2);margin-top:4px">
+      <i class="ti ti-phone" style="font-size:11px"></i>
+      <a href="tel:+972526619527" style="color:var(--muted2);text-decoration:none">+972-52-661-9527</a>
+      &nbsp;·&nbsp;
+      <a href="mailto:reemkabra@gmail.com" style="color:var(--muted2);text-decoration:none">reemkabra@gmail.com</a>
+    </p>
+    <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:8px">
+      <a href="/terms" style="font-size:11.5px;color:var(--muted2)" aria-label="Terms of Service">
+        <i class="ti ti-file-text" aria-hidden="true"></i> Terms &amp; Privacy
+      </a>
+      <a href="/accessibility" style="font-size:11.5px;color:var(--muted2)" aria-label="Accessibility Statement">
+        <i class="ti ti-accessible" aria-hidden="true"></i> Accessibility
+      </a>
+      <a href="#" onclick="showManagerLogin(); showScreen('auth')" style="font-size:11.5px;color:var(--muted2)">Admin</a>
+    </div>
+  </footer>
+</div>
+
+<!-- ══════════════════════════════════════
+     AUTH SCREEN
+══════════════════════════════════════ -->
+<div id="screen-auth" class="screen">
+  <div class="auth-bg">
+    <div class="auth-orb auth-orb-1"></div>
+    <div class="auth-orb auth-orb-2"></div>
+    <div class="auth-orb auth-orb-3"></div>
+    <div class="auth-grid"></div>
+  </div>
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="logo-mark"><i class="ti ti-barbell"></i></div>
+        <div>
+          <h1>RepCast</h1>
+          <p>Trainer &amp; Physio Platform</p>
+        </div>
+      </div>
+
+      <!-- Login Form -->
+      <div id="auth-login" class="auth-form">
+        <h2>Welcome back</h2>
+        <p class="auth-subtitle">Sign in to your trainer dashboard</p>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" placeholder="trainer@studio.com" id="login-email">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input" type="password" placeholder="••••••••" id="login-pass">
+          <div style="text-align:right;margin-top:5px">
+            <a href="javascript:void(0)" onclick="showForgotPassword()" style="font-size:12px;color:var(--muted);text-decoration:none">Forgot password?</a>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="doLogin()">
+          <i class="ti ti-login"></i> Sign In
+        </button>
+        <div class="auth-divider"><span>or</span></div>
+        <!-- Web Google button — hidden on native -->
+        <button class="btn btn-google btn-full" onclick="doGoogleLogin()">
+          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,19.001,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+          Continue with Google
+        </button>
+        <!-- Native Google button — shown only in Capacitor app -->
+        <button class="btn-google-native btn-full" onclick="doGoogleLogin()">
+          <svg width="18" height="18" viewBox="0 0 48 48" style="flex-shrink:0"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.6 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34.1 6.6 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.5 15.8 18.9 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34.1 6.6 29.3 4 24 4 16.3 4 9.7 8.4 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.3 35.3 26.8 36 24 36c-5.3 0-9.7-3.1-11.4-7.5L6 33.8C9.4 39.7 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.9 2.4-2.5 4.5-4.6 5.9l.1-.1 6.2 5.2c-.4.4 6.9-5 6.9-15 0-1.3-.1-2.6-.4-3.9z"/></svg>
+          Continue with Google
+        </button>
+        <div class="auth-divider" style="margin:14px 0 10px"><span>New here?</span></div>
+        <button class="btn btn-ghost btn-full" onclick="showRegister()">
+          <i class="ti ti-user-plus"></i> Create a free account
+        </button>
+        <p class="auth-switch" style="margin-top:4px">
+          <a href="#" onclick="showScreen('landing')" style="color:var(--muted2);font-size:12px">
+            <i class="ti ti-arrow-left" style="font-size:11px"></i> Back to home
+          </a>
+        </p>
+        <p class="auth-switch" style="margin-top:4px">
+          <a href="#" onclick="showManagerLogin()" style="color:var(--muted);font-size:12px">
+            <i class="ti ti-shield-lock" style="font-size:12px"></i> Manager / Admin login
+          </a>
+        </p>
+      </div>
+
+      <!-- Register Form -->
+      <div id="auth-register" class="auth-form" style="display:none">
+        <h2>Create your account</h2>
+        <p class="auth-subtitle">Create your account and get started</p>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input class="form-input" type="text" placeholder="Jordan Davis" id="reg-name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Business Name</label>
+            <input class="form-input" type="text" placeholder="Peak Performance" id="reg-biz">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" placeholder="trainer@studio.com" id="reg-email">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input" type="password" placeholder="Min 8 characters" id="reg-pass">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Specialty</label>
+          <select class="form-select" id="reg-specialty">
+            <option>Personal Trainer</option>
+            <option>Physiotherapist</option>
+            <option>Sports Therapist</option>
+            <option>Rehab Specialist</option>
+          </select>
+        </div>
+        <div class="trial-info-box" style="background:rgba(96,165,250,0.07);border-color:rgba(96,165,250,0.18)">
+          <i class="ti ti-info-circle" style="color:#60A5FA"></i>
+          <div>
+            <strong style="display:block;margin-bottom:2px;color:var(--text)">Free account — limited access</strong>
+            <span style="color:var(--muted)">You'll get limited library access. Once inside, you can activate a <strong style="color:var(--accent)">free 7-day trial</strong> for full access — no card needed.</span>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="doRegister()">
+          <i class="ti ti-user-plus"></i> Create Free Account
+        </button>
+        <p class="auth-switch">Already have an account? <a href="#" onclick="showLogin()">Sign in</a></p>
+        <p class="auth-switch" style="margin-top:4px">
+          <a href="#" onclick="showScreen('landing')" style="color:var(--muted2);font-size:12px">
+            <i class="ti ti-arrow-left" style="font-size:11px"></i> Back to home
+          </a>
+        </p>
+      </div>
+
+      <!-- Manager Login Form -->
+      <div id="auth-manager" class="auth-form" style="display:none">
+        <div class="manager-login-badge">
+          <i class="ti ti-shield-lock"></i> Manager Access
+        </div>
+        <h2>Admin Login</h2>
+        <p class="auth-subtitle">Full control over the master exercise library</p>
+        <div class="form-group">
+          <label class="form-label">Admin Email</label>
+          <input class="form-input" type="email" placeholder="manager@fitflowpro.com" id="manager-email">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Admin Password</label>
+          <input class="form-input" type="password" placeholder="••••••••" id="manager-pass">
+        </div>
+        <button class="btn btn-manager btn-full" onclick="doManagerLogin()">
+          <i class="ti ti-shield-check"></i> Sign In as Manager
+        </button>
+        <p class="auth-switch"><a href="#" onclick="showLogin()">← Back to trainer login</a></p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     TRAINER APP
+══════════════════════════════════════ -->
+<div id="screen-app" class="screen">
+
+  <!-- TOP NAVIGATION BAR -->
+  <nav class="topnav" id="topnav" role="navigation" aria-label="App navigation">
+    <div class="topnav-brand">
+      <div class="logo-mark-sm"><i class="ti ti-barbell"></i></div>
+      <span class="logo-name">RepCast</span>
+    </div>
+    <div class="topnav-links">
+      <a class="topnav-link active" id="tnav-library" onclick="setView('library',this)" href="#">
+        <i class="ti ti-layout-grid"></i> Library
+      </a>
+      <a class="topnav-link" id="tnav-routines" onclick="setView('routines',this)" href="#">
+        <i class="ti ti-list-check"></i> Routines
+        <span class="tnav-badge" id="tnav-routines-badge">0</span>
+      </a>
+      <a class="topnav-link" id="tnav-profile" onclick="setView('profile',this)" href="#">
+        <i class="ti ti-user-circle"></i> Profile
+      </a>
+      <a class="topnav-link" id="tnav-nutrition" onclick="setView('nutrition',this)" href="#">
+        <i class="ti ti-salad"></i> Nutrition
+      </a>
+      <a class="topnav-link" id="tnav-programs" onclick="setView('programs',this)" href="#">
+        <i class="ti ti-calendar"></i> Programs
+      </a>
+      <a class="topnav-link" id="tnav-recipes" onclick="setView('recipes',this)" href="#">
+        <i class="ti ti-chef-hat"></i> Recipes
+      </a>
+      <a class="topnav-link" id="tnav-research" onclick="setView('research',this)" href="#">
+        <i class="ti ti-microscope"></i> Research
+      </a>
+      <a class="topnav-link" id="tnav-clients" onclick="setView('clients',this)" href="#">
+        <i class="ti ti-users"></i> Clients
+      </a>
+      <a class="topnav-link" id="tnav-billing" onclick="setView('billing',this)" href="#">
+        <i class="ti ti-credit-card"></i> Billing
+      </a>
+    </div>
+    <div class="topnav-right">
+      <div class="trial-pill-top" id="trial-pill-top">
+        <i class="ti ti-star-filled"></i>
+        Trial — <strong id="trial-days-top">5</strong> days left
+        <button class="upgrade-btn-top" onclick="showUpgrade()">Upgrade</button>
+      </div>
+      <div class="topnav-user" onclick="setView('profile', document.getElementById('tnav-profile'))">
+        <div class="user-avatar-sm" id="topnav-avatar">JD</div>
+        <span id="topnav-name">Jordan Davis</span>
+        <i class="ti ti-chevron-down" style="font-size:12px;color:var(--muted)"></i>
+      </div>
+      <button class="btn-icon-nav" onclick="doLogout()" title="Sign out">
+        <i class="ti ti-logout"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- UPGRADE NUDGE BANNER -->
+  <div class="upgrade-nudge-banner" id="upgrade-nudge-banner">
+    <div class="upgrade-nudge-inner">
+      <i class="ti ti-star-filled" style="color:var(--warn);font-size:15px;flex-shrink:0"></i>
+      <span id="upgrade-nudge-text">Your free trial ends in <strong id="nudge-days">5</strong> days — upgrade to keep unlimited access.</span>
+      <button class="btn btn-primary btn-sm" onclick="showUpgrade()">
+        <i class="ti ti-arrow-up-circle"></i> Upgrade to Pro — ₪25/mo
+      </button>
+      <button class="nudge-dismiss" onclick="dismissNudge()" title="Dismiss">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="app-layout">
+    <!-- Native horizontal muscle filter bar -->
+    <div id="sidebar" style="display:flex;flex-direction:row;width:100%;height:48px;min-height:48px;max-height:48px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;overflow:hidden">
+      <div id="muscle-panel" style="display:flex;flex-direction:row;flex:1;overflow-x:auto;overflow-y:hidden;align-items:center;padding:0 8px;gap:6px;scrollbar-width:none;-webkit-overflow-scrolling:touch">
+        <div id="muscle-filter-list" style="display:flex;flex-direction:row;gap:6px;align-items:center;flex-shrink:0"></div>
+        <button class="clear-filter-btn" id="clear-filter-btn" onclick="clearFilters()" style="display:none;flex-shrink:0;white-space:nowrap;border-radius:20px;padding:4px 10px;font-size:11px;height:30px">
+          <i class="ti ti-x"></i> Clear
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="main-content" role="main" aria-label="Main content">
+
+      <!-- LIBRARY VIEW -->
+      <div class="view active" id="view-library">
+        <!-- Library tabs — scrollable horizontal strip -->
+        <div id="lib-tabs-bar" style="display:flex;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;padding:0 8px;gap:4px;min-height:44px;align-items:center">
+          <button class="lib-tab active" id="tab-master" onclick="switchLibTab('master',this)" style="flex-shrink:0">
+            <i class="ti ti-database"></i> Library
+          </button>
+          <button class="lib-tab" id="tab-custom" onclick="switchLibTab('custom',this)" style="flex-shrink:0">
+            <i class="ti ti-cloud-upload"></i> My Videos
+          </button>
+          <button class="lib-tab" id="tab-mymenus" onclick="switchLibTab('mymenus',this)" style="flex-shrink:0">
+            <i class="ti ti-salad"></i> My Menus
+          </button>
+          <button class="lib-tab" id="tab-myprograms" onclick="switchLibTab('myprograms',this)" style="flex-shrink:0">
+            <i class="ti ti-calendar"></i> My Programs
+          </button>
+          <button class="lib-tab" id="tab-myrecipes" onclick="switchLibTab('myrecipes',this)" style="flex-shrink:0">
+            <i class="ti ti-chef-hat"></i> My Recipes
+          </button>
+          <button class="lib-tab" id="tab-myresearch" onclick="switchLibTab('myresearch',this)" style="flex-shrink:0">
+            <i class="ti ti-book"></i> My Research
+          </button>
+        </div>
+
+        <!-- Search bar — always visible -->
+        <div style="padding:8px 10px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0">
+          <div class="search-wrap" style="width:100%">
+            <i class="ti ti-search"></i>
+            <input type="text" placeholder="Search exercises..." id="search-input" oninput="handleSearch(this.value)" style="flex:1">
+            <span class="search-clear" id="search-clear" onclick="clearSearch()" style="display:none">
+              <i class="ti ti-x"></i>
+            </span>
+          </div>
+        </div>
+
+        <!-- Upload button — only shown on My Videos tab -->
+        <div id="lib-upload-bar" style="display:none;padding:6px 10px;border-bottom:1px solid var(--border);gap:8px;background:var(--surface);flex-shrink:0">
+          <button class="btn btn-ghost btn-sm" onclick="reloadMyVideos()">
+            <i class="ti ti-refresh"></i> Reload
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="openModal('upload')">
+            <i class="ti ti-upload"></i> Upload Video
+          </button>
+        </div>
+
+        <!-- Library content -->
+        <div class="library-body" id="library-body" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch"></div>
+      </div>
+
+      <!-- ROUTINES VIEW -->
+      <div class="view" id="view-routines">
+        <div class="view-topbar">
+          <div class="topbar-left"><h2 class="view-title">Sent Routines</h2></div>
+        </div>
+        <div class="routines-body" id="routines-body">
+          <div class="empty-state">
+            <div class="empty-icon"><i class="ti ti-list-check"></i></div>
+            <h3>No routines sent yet</h3>
+            <p>Build a routine from the Exercise Library and send it to a client.</p>
+            <button class="btn btn-primary" onclick="setView('library',document.getElementById('tnav-library'))">
+              <i class="ti ti-layout-grid"></i> Browse Library
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- NUTRITION VIEW -->
+      <div class="view" id="view-nutrition">
+
+        <!-- MENU LIBRARY -->
+        <div class="nutrition-section" style="margin-top:24px">
+          <div class="view-topbar">
+            <div class="topbar-left">
+              <h2 class="view-title"><i class="ti ti-book" style="color:var(--accent)"></i> Menu Library</h2>
+            </div>
+            <div class="topbar-right">
+              <div class="lib-tabs" style="margin:0">
+                <button class="lib-tab active" id="menu-tab-all" onclick="filterMenus('all',this)">All</button>
+                <button class="lib-tab" id="menu-tab-cut" onclick="filterMenus('cut',this)">Cut</button>
+                <button class="lib-tab" id="menu-tab-maintain" onclick="filterMenus('maintain',this)">Maintain</button>
+                <button class="lib-tab" id="menu-tab-bulk" onclick="filterMenus('bulk',this)">Bulk</button>
+              </div>
+            </div>
+          </div>
+          <div id="menu-library-body">
+            <div class="empty-state">
+              <div class="empty-icon"><i class="ti ti-salad"></i></div>
+              <h3>No menus yet</h3>
+              <p>Ask your manager to add nutrition menus to the library.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- PROGRAMS VIEW -->
+      <div class="view" id="view-programs">
+        <div class="view-topbar">
+          <div class="topbar-left"><h2 class="view-title"><i class="ti ti-calendar" style="color:var(--accent)"></i> Training Programs</h2></div>
+        </div>
+        <div id="programs-body">
+          <div class="empty-state">
+            <div class="empty-icon"><i class="ti ti-calendar"></i></div>
+            <h3>No programs yet</h3>
+            <p>Training programs will appear here once your manager adds them.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECIPES VIEW -->
+      <div class="view" id="view-recipes">
+        <div class="view-topbar">
+          <div class="topbar-left"><h2 class="view-title"><i class="ti ti-chef-hat" style="color:var(--accent)"></i> Recipe Library</h2></div>
+          <div class="topbar-right">
+            <div class="lib-tabs" style="margin:0">
+              <button class="lib-tab active" id="recipe-tab-all" onclick="filterRecipes('all',this)">All</button>
+              <button class="lib-tab" onclick="filterRecipes('breakfast',this)">Breakfast</button>
+              <button class="lib-tab" onclick="filterRecipes('lunch',this)">Lunch</button>
+              <button class="lib-tab" onclick="filterRecipes('dinner',this)">Dinner</button>
+              <button class="lib-tab" onclick="filterRecipes('snack',this)">Snacks</button>
+              <button class="lib-tab" onclick="filterRecipes('post-workout',this)">Post-Workout</button>
+              <button class="lib-tab" onclick="filterRecipes('protein-dessert',this)">Protein Desserts</button>
+            </div>
+
+          </div>
+        </div>
+        <div id="recipes-body">
+          <div class="empty-state">
+            <div class="empty-icon"><i class="ti ti-chef-hat"></i></div>
+            <h3>No recipes yet</h3>
+            <p>Recipes will appear here once your manager adds them.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESEARCH VIEW -->
+      <div class="view" id="view-research">
+        <div class="view-topbar">
+          <div class="topbar-left"><h2 class="view-title"><i class="ti ti-microscope" style="color:var(--accent)"></i> Research Library</h2></div>
+          <div class="topbar-right">
+            <input class="search-input" id="research-search" placeholder="Search studies..." oninput="filterResearch(this.value)" style="width:180px">
+
+          </div>
+        </div>
+        <div id="research-body">
+          <div class="empty-state">
+            <div class="empty-icon"><i class="ti ti-microscope"></i></div>
+            <h3>No studies yet</h3>
+            <p>Research articles will appear here once your manager adds them.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLIENTS VIEW -->
+      <div class="view" id="view-clients" style="overflow-y:auto">
+        <div class="view-topbar">
+          <div class="topbar-left">
+            <h2 class="view-title"><i class="ti ti-users" style="color:var(--accent)"></i> My Clients</h2>
+            <span id="clients-count" style="font-size:13px;color:var(--muted)"></span>
+          </div>
+          <div class="topbar-right">
+            <button class="btn btn-primary" onclick="openAddClientModal()">
+              <i class="ti ti-user-plus"></i> Add Client
+            </button>
+          </div>
+        </div>
+        <div id="clients-list-body" style="padding:0 24px 24px">
+          <div class="empty-state"><div class="empty-icon"><i class="ti ti-users"></i></div><h3>Loading...</h3></div>
+        </div>
+      </div>
+
+      <!-- PROFILE VIEW -->
+      <div class="view" id="view-profile" style="overflow-y:auto;-webkit-overflow-scrolling:touch">
+        <div class="view-topbar">
+          <div class="topbar-left"><h2 class="view-title">Profile &amp; Settings</h2></div>
+          <div class="topbar-right">
+            <button class="btn btn-primary" onclick="saveProfile()"><i class="ti ti-check"></i> Save Changes</button>
+          </div>
+        </div>
+        <div class="profile-body">
+          <div class="profile-hero">
+            <div class="profile-avatar-wrap">
+              <div class="profile-avatar" id="profile-avatar">JD</div>
+              <button class="avatar-upload-btn" onclick="document.getElementById('avatar-file').click()"><i class="ti ti-camera"></i></button>
+              <input type="file" id="avatar-file" accept="image/*" style="display:none" onchange="handleAvatarUpload(this)">
+            </div>
+            <div class="profile-hero-info">
+              <h3 id="profile-display-name">Jordan Davis, PT</h3>
+              <p id="profile-display-biz">Peak Performance Physio</p>
+              <div class="profile-stats">
+                <div class="pstat"><span id="pstat-videos">0</span><em>Custom Videos</em></div>
+                <div class="pstat"><span id="pstat-routines">0</span><em>Routines Sent</em></div>
+                <div class="pstat"><span id="pstat-clients">0</span><em>Clients Reached</em></div>
+              </div>
+            </div>
+          </div>
+          <div class="tier-status-card" id="tier-status-card">
+            <div class="tier-icon"><i class="ti ti-lock"></i></div>
+            <div class="tier-info">
+              <strong id="tier-status-title">Limited Free Access — Start your 7-day trial</strong>
+              <span id="tier-status-sub">You have access to 1-2 exercises per muscle group. Start the free trial to unlock everything.</span>
+            </div>
+            <button class="btn btn-primary btn-sm" id="tier-status-btn" onclick="openModal('start-trial')">
+              Start Free Trial
+            </button>
+          </div>
+          <div class="profile-form-grid">
+            <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="pf-name" value="Jordan Davis"></div>
+            <div class="form-group"><label class="form-label">Phone Number</label><input class="form-input" id="pf-phone" value="+972 50 123 4567"></div>
+            <div class="form-group"><label class="form-label">Business Name</label><input class="form-input" id="pf-biz" value="Peak Performance Physio"></div>
+            <div class="form-group">
+              <label class="form-label">Specialty</label>
+              <select class="form-select" id="pf-specialty">
+                <option selected>Physiotherapist</option>
+                <option>Personal Trainer</option>
+                <option>Sports Therapist</option>
+                <option>Rehab Specialist</option>
+              </select>
+            </div>
+            <div class="form-group full-span">
+              <label class="form-label">Professional Bio</label>
+              <textarea class="form-textarea" id="pf-bio" rows="3">Helping athletes recover faster and perform better. Specialising in sports rehabilitation and corrective exercise programming.</textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NATIVE LINKS — Accessibility + Terms -->
+      <div style="display:none" id="native-links-placeholder"></div>
+
+      <!-- ACCESSIBILITY + TERMS (native) -->
+      <div style="padding:20px 24px;border-top:1px solid var(--border);margin-top:16px;display:flex;gap:12px;flex-wrap:wrap" id="native-legal-links">
+        <a href="javascript:void(0)" onclick="openInBrowser('https://repcast.co.il/accessibility')" style="color:var(--muted);font-size:13px;display:flex;align-items:center;gap:6px">
+          <i class="ti ti-accessibility"></i> Accessibility
+        </a>
+        <a href="javascript:void(0)" onclick="openInBrowser('https://repcast.co.il/terms')" style="color:var(--muted);font-size:13px;display:flex;align-items:center;gap:6px">
+          <i class="ti ti-file-text"></i> Terms &amp; Privacy
+        </a>
+      </div>
+
+      <!-- BILLING VIEW -->
+      <div class="view" id="view-billing">
+        <div class="view-topbar">
+          <div class="topbar-left"><h2 class="view-title">Billing &amp; Subscription</h2></div>
+        </div>
+        <div class="billing-body">
+          <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px">
+            <a href="/terms" target="_blank" style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:5px;text-decoration:none;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px">
+              <i class="ti ti-file-text" style="color:var(--accent)"></i> Terms &amp; Privacy Policy
+            </a>
+            <a href="/accessibility" target="_blank" style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:5px;text-decoration:none;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px">
+              <i class="ti ti-accessible" style="color:var(--accent)"></i> Accessibility Statement
+            </a>
+            <a href="mailto:reemkabra@gmail.com" style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:5px;text-decoration:none;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px">
+              <i class="ti ti-mail" style="color:var(--accent)"></i> reemkabra@gmail.com
+            </a>
+            <a href="tel:+972526619527" style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:5px;text-decoration:none;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px">
+              <i class="ti ti-phone" style="color:var(--accent)"></i> +972-52-661-9527
+            </a>
+          </div>
+          <div class="billing-current">
+            <div class="billing-badge trial"><i class="ti ti-star-filled"></i> Free Trial</div>
+            <h3>7-Day Free Trial</h3>
+            <p>You have <strong id="billing-days">5 days</strong> remaining. Upgrade to keep unlimited access.</p>
+          </div>
+          <div class="pricing-grid" style="grid-template-columns:1fr 1fr 1fr">
+            <div class="pricing-card">
+              <div class="pricing-tier">Limited Free</div>
+              <div class="pricing-price">₪0<span>/mo</span></div>
+              <ul class="pricing-features">
+                <li><i class="ti ti-check"></i> 1-2 exercises per sub-group</li>
+                <li><i class="ti ti-check"></i> Up to 10 video uploads</li>
+                <li><i class="ti ti-check"></i> Send routines to clients</li>
+                <li class="off"><i class="ti ti-x"></i> Full library access</li>
+                <li class="off"><i class="ti ti-x"></i> Unlimited uploads</li>
+              </ul>
+              <div class="pricing-current-label" id="billing-current-plan">Current Plan</div>
+            </div>
+            <div class="pricing-card" style="border-color:rgba(62,207,207,0.3)">
+              <div class="pricing-tier">Free Trial</div>
+              <div class="pricing-price">₪0<span>/7 days</span></div>
+              <ul class="pricing-features">
+                <li><i class="ti ti-check"></i> Full library — 143+ exercises</li>
+                <li><i class="ti ti-check"></i> Unlimited uploads</li>
+                <li><i class="ti ti-check"></i> All premium features</li>
+                <li><i class="ti ti-check"></i> No credit card needed</li>
+                <li><i class="ti ti-check"></i> 7 full days</li>
+              </ul>
+              <button class="btn btn-full" onclick="openModal('start-trial')"
+                style="background:rgba(62,207,207,0.12);color:var(--accent2);border:1px solid rgba(62,207,207,0.3)">
+                <i class="ti ti-rocket"></i> Start Free Trial
+              </button>
+            </div>
+            <div class="pricing-card featured">
+              <div class="pricing-popular">Best Value</div>
+              <div class="pricing-tier">Pro</div>
+              <div class="pricing-price">₪25<span>/mo</span></div>
+              <ul class="pricing-features">
+                <li><i class="ti ti-check"></i> Full library — 143+ exercises</li>
+                <li><i class="ti ti-check"></i> Unlimited custom uploads</li>
+                <li><i class="ti ti-check"></i> Unlimited routines</li>
+                <li><i class="ti ti-check"></i> Priority support</li>
+                <li><i class="ti ti-check"></i> Client analytics</li>
+              </ul>
+              <button class="btn btn-primary btn-full" onclick="handleGrowPayment()">
+                <i class="ti ti-credit-card"></i> Subscribe — ₪25/mo
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- FLOATING CART BAR -->
+  <div class="cart-bar" id="cart-bar">
+    <div class="cart-info">
+      <div class="cart-badge-wrap">
+        <div class="cart-badge" id="cart-count">0</div>
+      </div>
+      <span id="cart-label">exercises selected</span>
+    </div>
+    <div class="cart-actions">
+      <button class="btn btn-ghost-sm" onclick="clearCart()"><i class="ti ti-trash"></i> Clear</button>
+      <button class="btn btn-accent" onclick="openModal('checkout');renderCheckout()"><i class="ti ti-clipboard-list"></i> Review &amp; Assign <i class="ti ti-arrow-right"></i></button>
+    </div>
+  </div>
+  <!-- In-app footer -->
+  <footer class="inapp-footer" role="contentinfo">
+    <span>© 2025 RepCast</span>
+    <a href="/terms" target="_blank"><i class="ti ti-file-text"></i> Terms &amp; Privacy</a>
+    <a href="/accessibility" target="_blank"><i class="ti ti-accessible"></i> Accessibility</a>
+    <a href="mailto:reemkabra@gmail.com"><i class="ti ti-mail"></i> Support</a>
+    <a href="tel:+972526619527"><i class="ti ti-phone"></i> +972-52-661-9527</a>
+  </footer>
+</div>
+
+<!-- CLIENT PORTAL SCREEN -->
+<div id="screen-client-portal" class="screen">
+  <nav class="topnav" role="navigation">
+    <div class="topnav-brand">
+      <div class="logo-mark-sm"><i class="ti ti-barbell"></i></div>
+      <span class="logo-name">RepCast</span>
+      <span style="font-size:11px;color:var(--muted2);margin-left:6px">Client Portal</span>
+    </div>
+    <div class="topnav-right">
+      <span id="client-portal-name" style="font-size:14px;color:var(--muted)"></span>
+      <button class="lang-toggle-btn btn btn-ghost btn-sm" onclick="toggleLang()" style="font-size:13px;padding:4px 10px;margin-left:8px">🇮🇱 עב</button>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()" style="margin-left:12px">
+        <i class="ti ti-logout"></i> Sign Out
+      </button>
+    </div>
+  </nav>
+
+  <div style="max-width:800px;margin:0 auto;padding:24px;overflow-y:auto;height:calc(100vh - 56px)">
+
+    <!-- BMR Stats -->
+    <div id="client-bmr-stats" style="margin-bottom:24px"></div>
+
+    <!-- My Program -->
+    <div class="client-portal-section">
+      <h3 class="client-portal-section-title"><i class="ti ti-calendar"></i> My Training Program</h3>
+      <div id="client-program-body"></div>
+    </div>
+
+    <!-- My Menu -->
+    <div class="client-portal-section">
+      <h3 class="client-portal-section-title"><i class="ti ti-salad"></i> My Nutrition Plan</h3>
+      <div id="client-menu-body"></div>
+    </div>
+
+    <!-- My Routines -->
+    <div class="client-portal-section">
+      <h3 class="client-portal-section-title"><i class="ti ti-list-check"></i> My Routines</h3>
+      <div id="client-routines-body"></div>
+    </div>
+
+    <!-- My Recipes -->
+    <div class="client-portal-section">
+      <h3 class="client-portal-section-title"><i class="ti ti-chef-hat"></i> My Recipes</h3>
+      <div id="client-recipes-body"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MANAGER / ADMIN PANEL
+══════════════════════════════════════ -->
+<div id="screen-manager" class="screen">
+
+  <!-- Manager Top Nav -->
+  <nav class="topnav manager-nav" id="manager-topnav" role="navigation" aria-label="Admin navigation">
+    <div class="topnav-brand">
+      <div class="logo-mark-sm manager-logo-mark"><i class="ti ti-shield-lock"></i></div>
+      <span class="logo-name">RepCast <span class="manager-badge-nav">Admin</span></span>
+    </div>
+    <div class="topnav-links">
+      <a class="topnav-link active" id="mnav-exercises" onclick="setAdminView('exercises',this)" href="#">
+        <i class="ti ti-database"></i> Master Library
+      </a>
+      <a class="topnav-link" id="mnav-users" onclick="setAdminView('users',this)" href="#">
+        <i class="ti ti-users"></i> Users
+      </a>
+      <a class="topnav-link" id="mnav-stats" onclick="setAdminView('stats',this)" href="#">
+        <i class="ti ti-chart-bar"></i> Stats
+      </a>
+      <a class="topnav-link" id="mnav-nutrition" onclick="setAdminView('nutrition',this)" href="#">
+        <i class="ti ti-salad"></i> Nutrition
+      </a>
+      <a class="topnav-link" id="mnav-foods" onclick="setAdminView('foods',this)" href="#">
+        <i class="ti ti-apple"></i> Food DB
+      </a>
+      <a class="topnav-link" id="mnav-programs" onclick="setAdminView('programs',this)" href="#">
+        <i class="ti ti-calendar"></i> Programs
+      </a>
+      <a class="topnav-link" id="mnav-recipes" onclick="setAdminView('recipes',this)" href="#">
+        <i class="ti ti-chef-hat"></i> Recipes
+      </a>
+      <a class="topnav-link" id="mnav-research" onclick="setAdminView('research',this)" href="#">
+        <i class="ti ti-microscope"></i> Research
+      </a>
+    </div>
+    <div class="topnav-right">
+      <div class="manager-badge-top"><i class="ti ti-shield-check"></i> Manager: Reem Kabra</div>
+      <button class="btn-icon-nav" onclick="doLogout()" title="Sign out"><i class="ti ti-logout"></i></button>
+    </div>
+  </nav>
+
+  <!-- Manager Content -->
+  <div class="manager-content">
+
+    <!-- EXERCISES ADMIN VIEW -->
+    <div class="admin-view active" id="admin-view-exercises">
+      <div class="view-topbar">
+        <div class="topbar-left">
+          <h2 class="view-title">Master Exercise Library</h2>
+          <span class="count-chip" id="admin-exercise-count">30 exercises</span>
+        </div>
+        <div class="topbar-right">
+          <div class="search-wrap">
+            <i class="ti ti-search"></i>
+            <input type="text" placeholder="Search exercises…" id="admin-search" oninput="handleAdminSearch(this.value)">
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="openModal('bulk-import')">
+            <i class="ti ti-file-import"></i> Bulk Import
+          </button>
+          <button class="btn btn-primary" onclick="openAdminModal('add')">
+            <i class="ti ti-plus"></i> Add Exercise
+          </button>
+        </div>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table" id="admin-table">
+          <thead>
+            <tr>
+              <th>Exercise</th>
+              <th>Muscle</th>
+              <th>Sub-category</th>
+              <th>Difficulty</th>
+              <th>Tier</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- USERS ADMIN VIEW -->
+    <div class="admin-view" id="admin-view-users">
+      <div class="view-topbar">
+        <div class="topbar-left">
+          <h2 class="view-title">Registered Users</h2>
+        </div>
+      </div>
+      <div style="padding:24px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <button class="btn btn-primary btn-sm" onclick="loadAdminUsers()">
+            <i class="ti ti-refresh"></i> Load Users from Firebase
+          </button>
+          <span style="font-size:12px;color:var(--muted)">Reads directly from your Firestore users collection</span>
+        </div>
+        <div class="admin-users-grid" id="admin-users-list">
+          <p style="color:var(--muted);font-size:13px">Click "Load Users" to fetch real users from Firebase.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS ADMIN VIEW -->
+    <!-- ══ ADMIN NUTRITION ══ -->
+    <div class="admin-view" id="admin-view-nutrition">
+      <div class="admin-view-topbar">
+        <div><h2 class="admin-view-title">Nutrition Menus</h2><span id="admin-menu-count" style="font-size:13px;color:var(--muted)">0 menus</span></div>
+        
+      </div>
+      <div style="display:flex;gap:0;padding:12px 16px 0;border-bottom:1px solid var(--border)">
+        <button id="admin-tab-menus-en" onclick="setAdminLang('menus','en')"
+          style="padding:6px 18px;border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;cursor:pointer;font-weight:600;font-size:13px;background:var(--surface2);color:var(--text);margin-right:4px">
+          🇺🇸 English
+        </button>
+        <button id="admin-tab-menus-he" onclick="setAdminLang('menus','he')"
+          style="padding:6px 18px;border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;cursor:pointer;font-weight:600;font-size:13px;background:transparent;color:var(--muted)">
+          🇮🇱 עברית
+        </button>
+      </div>
+      <div id="admin-menu-list">
+      </div>
+      <div id="admin-menu-list-he" style="display:none"><div class="empty-state"><div class="empty-icon"><i class="ti ti-salad"></i></div><h3>No menus yet</h3><p>Click "Add Menu" to create your first nutrition plan.</p></div></div>
+    </div>
+
+    <!-- ══ ADMIN PROGRAMS ══ -->
+    <div class="admin-view" id="admin-view-foods">
+      <div class="admin-view-topbar">
+        <div><h2 class="admin-view-title">Food Database</h2><span style="font-size:13px;color:var(--muted)">Master food collection for menus</span></div>
+        <button class="btn btn-ghost btn-sm" onclick="openModal('bulk-foods')">
+          <i class="ti ti-file-import"></i> Import
+        </button>
+        <button class="btn btn-primary btn-sm" onclick="openAdminFoodModal()">
+          <i class="ti ti-plus"></i> Add
+        </button>
+      </div>
+      <div style="display:flex;gap:0;padding:12px 16px 0;border-bottom:1px solid var(--border)">
+        <button id="admin-tab-foods-en" onclick="setAdminLang('foods','en')"
+          style="padding:6px 18px;border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;cursor:pointer;font-weight:600;font-size:13px;background:var(--surface2);color:var(--text);margin-right:4px">
+          🇺🇸 English
+        </button>
+        <button id="admin-tab-foods-he" onclick="setAdminLang('foods','he')"
+          style="padding:6px 18px;border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;cursor:pointer;font-weight:600;font-size:13px;background:transparent;color:var(--muted)">
+          🇮🇱 עברית
+        </button>
+      </div>
+      <div id="admin-food-list"></div>
+      <div id="admin-food-list-he" style="display:none"></div>
+    </div>
+
+    <div class="admin-view" id="admin-view-programs">
+      <div class="admin-view-topbar">
+        <div><h2 class="admin-view-title">Training Programs</h2><span id="admin-programs-count" style="font-size:13px;color:var(--muted)">0 programs</span></div>
+        
+      </div>
+      <div style="display:flex;gap:0;padding:12px 16px 0;border-bottom:1px solid var(--border)">
+        <button id="admin-tab-programs-en" onclick="setAdminLang('programs','en')"
+          style="padding:6px 18px;border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;cursor:pointer;font-weight:600;font-size:13px;background:var(--surface2);color:var(--text);margin-right:4px">
+          🇺🇸 English
+        </button>
+        <button id="admin-tab-programs-he" onclick="setAdminLang('programs','he')"
+          style="padding:6px 18px;border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;cursor:pointer;font-weight:600;font-size:13px;background:transparent;color:var(--muted)">
+          🇮🇱 עברית
+        </button>
+      </div>
+      <div id="admin-programs-list">
+      </div>
+      <div id="admin-programs-list-he" style="display:none"><div class="empty-state"><div class="empty-icon"><i class="ti ti-calendar"></i></div><h3>No programs yet</h3></div></div>
+    </div>
+
+    <!-- ══ ADMIN RECIPES ══ -->
+    <div class="admin-view" id="admin-view-recipes">
+      <div class="admin-view-topbar">
+        <div><h2 class="admin-view-title">Recipe Library</h2><span id="admin-recipes-count" style="font-size:13px;color:var(--muted)">0 recipes</span></div>
+        
+      </div>
+      <div style="display:flex;gap:0;padding:12px 16px 0;border-bottom:1px solid var(--border)">
+        <button id="admin-tab-recipes-en" onclick="setAdminLang('recipes','en')"
+          style="padding:6px 18px;border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;cursor:pointer;font-weight:600;font-size:13px;background:var(--surface2);color:var(--text);margin-right:4px">
+          🇺🇸 English
+        </button>
+        <button id="admin-tab-recipes-he" onclick="setAdminLang('recipes','he')"
+          style="padding:6px 18px;border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;cursor:pointer;font-weight:600;font-size:13px;background:transparent;color:var(--muted)">
+          🇮🇱 עברית
+        </button>
+      </div>
+      <div id="admin-recipes-list">
+      </div>
+      <div id="admin-recipes-list-he" style="display:none"><div class="empty-state"><div class="empty-icon"><i class="ti ti-chef-hat"></i></div><h3>No recipes yet</h3></div></div>
+    </div>
+
+    <!-- ══ ADMIN RESEARCH ══ -->
+    <div class="admin-view" id="admin-view-research">
+      <div class="admin-view-topbar">
+        <div><h2 class="admin-view-title">Research Library</h2><span id="admin-research-count" style="font-size:13px;color:var(--muted)">0 studies</span></div>
+        
+      </div>
+      <div id="admin-research-list"><div class="empty-state"><div class="empty-icon"><i class="ti ti-microscope"></i></div><h3>No studies yet</h3></div></div>
+    </div>
+
+    <div class="admin-view" id="admin-view-stats">
+      <div class="view-topbar">
+        <div class="topbar-left"><h2 class="view-title">Platform Stats</h2></div>
+      </div>
+      <div style="padding:24px">
+        <div class="admin-stats-grid">
+          <div class="admin-stat-card">
+            <i class="ti ti-database" style="font-size:22px;color:var(--accent2)"></i>
+            <div class="admin-stat-val" id="stat-total-exercises">30</div>
+            <div class="admin-stat-label">Total Exercises</div>
+          </div>
+          <div class="admin-stat-card">
+            <i class="ti ti-users" style="font-size:22px;color:var(--accent)"></i>
+            <div class="admin-stat-val" id="stat-total-users">—</div>
+            <div class="admin-stat-label">Registered Trainers</div>
+          </div>
+          <div class="admin-stat-card">
+            <i class="ti ti-list-check" style="font-size:22px;color:#A78BFA"></i>
+            <div class="admin-stat-val" id="stat-total-routines">0</div>
+            <div class="admin-stat-label">Routines Created</div>
+          </div>
+          <div class="admin-stat-card">
+            <i class="ti ti-star-filled" style="font-size:22px;color:var(--warn)"></i>
+            <div class="admin-stat-val">1</div>
+            <div class="admin-stat-label">Premium Subscribers</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SHARED ROUTINE PAGE (public)
+══════════════════════════════════════ -->
+<div id="screen-shared" class="screen">
+  <div class="shared-bg">
+    <div class="auth-orb auth-orb-1"></div>
+    <div class="auth-orb auth-orb-2"></div>
+  </div>
+  <div class="shared-container">
+    <div class="shared-header">
+      <div class="auth-logo" style="justify-content:center">
+        <div class="logo-mark"><i class="ti ti-barbell"></i></div>
+        <div><h1>RepCast</h1><p>Your Personalised Routine</p></div>
+      </div>
+      <div class="shared-meta">
+        <div class="shared-meta-item"><i class="ti ti-user"></i><span>From: <strong id="shared-trainer">Your Trainer</strong></span></div>
+        <div class="shared-meta-item"><i class="ti ti-calendar"></i><span id="shared-date">Sent today</span></div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="backFromShared()" style="margin-top:14px">
+        <i class="ti ti-arrow-left"></i> Back
+      </button>
+    </div>
+    <div id="shared-exercises" class="shared-exercises"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MODALS
+══════════════════════════════════════ -->
+<div class="modal-backdrop" id="modal-backdrop" onclick="closeAllModals()"></div>
+
+<!-- Upload Modal (trainer) -->
+<div class="modal" id="modal-upload">
+  <div class="modal-header">
+    <h3><i class="ti ti-cloud-upload"></i> Upload Custom Video</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('video-file-input').click()"
+         ondragover="handleDragOver(event)" ondrop="handleDrop(event)" ondragleave="handleDragLeave(event)">
+      <div class="upload-zone-inner" id="upload-zone-inner">
+        <i class="ti ti-cloud-upload"></i>
+        <p>Drag &amp; drop your video here</p>
+        <span>or <em>browse files</em></span>
+        <small>MP4, MOV, WebM · max 500 MB</small>
+      </div>
+      <input type="file" id="video-file-input" accept="video/mp4,video/quicktime,video/webm" style="display:none" onchange="handleVideoSelect(this)">
+    </div>
+    <div class="upload-progress-wrap" id="upload-progress-wrap" style="display:none">
+      <div class="upload-progress-bar"><div id="upload-progress-fill"></div></div>
+      <span id="upload-progress-label">Uploading… 0%</span>
+    </div>
+    <div class="form-group" style="margin-top:18px">
+      <label class="form-label">Exercise Title *</label>
+      <input class="form-input" id="upload-title" placeholder="e.g. Cable Crossover Fly">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Primary Muscle Group *</label>
+        <select class="form-select" id="upload-muscle" onchange="populateSubcats('upload-muscle','upload-subcat')">
+          <option value="">Select muscle…</option>
+          <option value="chest">Chest</option>
+          <option value="back">Back</option>
+          <option value="legs">Legs</option>
+          <option value="shoulders">Shoulders</option>
+          <option value="arms">Arms</option>
+          <option value="core">Core</option>
+          <option value="fullbody">Full Body</option>
+          <option value="physio">Physiotherapy</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sub-category *</label>
+        <select class="form-select" id="upload-subcat"><option value="">Select group first</option></select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description / Coaching Cues</label>
+      <textarea class="form-textarea" id="upload-desc" placeholder="e.g. Keep elbows slightly bent. Squeeze at peak contraction…" rows="3"></textarea>
+    </div>
+
+    <!-- Visibility Toggle -->
+    <div class="visibility-toggle-wrap">
+      <div class="visibility-option active" id="vis-private" onclick="setVisibility('private')">
+        <div class="vis-icon"><i class="ti ti-lock"></i></div>
+        <div class="vis-text">
+          <strong>Private</strong>
+          <span>Only visible in your library</span>
+        </div>
+        <div class="vis-check"><i class="ti ti-check"></i></div>
+      </div>
+      <div class="visibility-option" id="vis-public" onclick="setVisibility('public')">
+        <div class="vis-icon" style="background:rgba(62,207,207,0.1);color:var(--accent2)"><i class="ti ti-world"></i></div>
+        <div class="vis-text">
+          <strong>Public</strong>
+          <span>Visible in the shared master library</span>
+        </div>
+        <div class="vis-check"><i class="ti ti-check"></i></div>
+      </div>
+    </div>
+    <input type="hidden" id="upload-visibility" value="private">
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-primary" onclick="submitUpload()"><i class="ti ti-cloud-upload"></i> Save to My Videos</button>
+  </div>
+</div>
+
+<!-- Checkout Modal -->
+<div class="modal modal-wide" id="modal-checkout">
+  <div class="modal-header">
+    <div>
+      <h3><i class="ti ti-clipboard-list"></i> Review Exercises</h3>
+      <p class="modal-subtitle" id="checkout-subtitle">Add sets, reps and notes</p>
+    </div>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+
+    <!-- Exercise list -->
+    <div id="checkout-list" style="margin-bottom:16px"></div>
+
+    <!-- Step 1: Name and save -->
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+        <i class="ti ti-bookmark" style="color:#60A5FA"></i>
+        Step 1 — Name &amp; Save Routine
+      </div>
+      <input class="form-input" id="checkout-routine-name" placeholder="e.g. Upper Body Day A" style="margin-bottom:10px">
+      <button class="btn btn-full" onclick="saveAsRoutine()" style="background:rgba(96,165,250,0.12);border:1px solid rgba(96,165,250,0.4);color:#60A5FA;font-weight:700">
+        <i class="ti ti-bookmark"></i> Save Routine
+      </button>
+    </div>
+
+    <!-- Step 2: Assign to client (enabled after save) -->
+    <div id="checkout-assign-section" style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;opacity:0.4;pointer-events:none">
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+        <i class="ti ti-user-check" style="color:var(--accent)"></i>
+        Step 2 — Assign to Client (optional)
+      </div>
+      <select class="form-select" id="checkout-client-select" style="margin-bottom:10px">
+        <option value="">— Choose client —</option>
+      </select>
+      <button class="btn btn-primary btn-full" onclick="assignRoutineToClient()">
+        <i class="ti ti-user-check"></i> Assign to Client
+      </button>
+    </div>
+
+    <!-- Success message -->
+    <div id="checkout-success" style="display:none;margin-top:14px;background:rgba(126,232,162,0.08);border:1px solid rgba(126,232,162,0.3);border-radius:10px;padding:14px;text-align:center">
+      <i class="ti ti-circle-check" style="color:var(--accent);font-size:24px;display:block;margin-bottom:6px"></i>
+      <div id="checkout-success-msg" style="font-size:14px;font-weight:600;color:var(--accent)"></div>
+    </div>
+
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">Close</button>
+  </div>
+</div>
+
+<!-- Admin Add/Edit Modal -->
+<div class="modal modal-wide" id="modal-admin-exercise">
+  <div class="modal-header">
+    <h3 id="admin-modal-title"><i class="ti ti-plus"></i> Add Exercise to Master Library</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+    <input type="hidden" id="admin-edit-id">
+    <div class="form-group">
+      <label class="form-label">Exercise Title * <span style="color:var(--muted);font-weight:400">(English)</span></label>
+      <input class="form-input" id="admin-ex-title" placeholder="e.g. Incline Dumbbell Press">
+    </div>
+    <div class="form-group">
+      <label class="form-label">שם התרגיל <span style="color:var(--muted);font-weight:400">(עברית)</span></label>
+      <input class="form-input" id="admin-ex-title-he" placeholder="לדוג׳ לחיצת הנטל משופע" dir="auto">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Primary Muscle Group *</label>
+        <select class="form-select" id="admin-ex-muscle" onchange="populateSubcats('admin-ex-muscle','admin-ex-subcat')">
+          <option value="">Select muscle…</option>
+          <option value="chest">Chest</option>
+          <option value="back">Back</option>
+          <option value="legs">Legs</option>
+          <option value="shoulders">Shoulders</option>
+          <option value="arms">Arms</option>
+          <option value="core">Core</option>
+          <option value="fullbody">Full Body</option>
+          <option value="physio">Physiotherapy</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sub-category *</label>
+        <select class="form-select" id="admin-ex-subcat"><option value="">Select group first</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Difficulty</label>
+        <select class="form-select" id="admin-ex-diff">
+          <option>Beginner</option>
+          <option>Intermediate</option>
+          <option>Advanced</option>
+        </select>
+      </div>
+      <!-- Duration is auto-detected from video metadata, not manually entered -->
+      <input type="hidden" id="admin-ex-duration" value="">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description / Coaching Cues * <span style="color:var(--muted);font-weight:400">(English)</span></label>
+      <textarea class="form-textarea" id="admin-ex-desc" rows="3" placeholder="Step-by-step instructions and coaching cues…"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">תיאור / הנחיות אימון <span style="color:var(--muted);font-weight:400">(עברית)</span></label>
+      <textarea class="form-textarea" id="admin-ex-desc-he" rows="3" placeholder="שלב אחר שלב…" dir="auto"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label" style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <input type="checkbox" id="admin-ex-premium" style="width:16px;height:16px;accent-color:var(--warn)">
+        Premium only (hidden from free tier)
+      </label>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Video URL (Firebase Storage, YouTube, or paste direct link)</label>
+      <input class="form-input" id="admin-ex-video" placeholder="https://… or leave blank to upload a file below">
+    </div>
+    <div class="form-group">
+      <label class="form-label">— or — Upload Video from Computer</label>
+      <div class="admin-file-upload-zone" onclick="document.getElementById('admin-ex-file').click()">
+        <i class="ti ti-cloud-upload"></i>
+        <span id="admin-file-label">Choose video file…</span>
+        <small>MP4, MOV, WebM · max 500 MB · overwrites URL field above</small>
+        <input type="file" id="admin-ex-file" accept="video/mp4,video/quicktime,video/webm"
+          style="display:none" onchange="handleAdminFileSelect(this)">
+      </div>
+      <div class="upload-progress-wrap" id="admin-upload-progress" style="display:none;margin-top:8px">
+        <div class="upload-progress-bar"><div id="admin-upload-fill"></div></div>
+        <span id="admin-upload-label">Uploading…</span>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-primary" id="admin-modal-save-btn" onclick="saveAdminExercise()">
+      <i class="ti ti-check"></i> Save Exercise
+    </button>
+  </div>
+</div>
+
+<!-- Bulk Import Modal -->
+<div class="modal modal-wide" id="modal-bulk-import">
+  <div class="modal-header">
+    <h3><i class="ti ti-file-import"></i> Bulk Import Exercises</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+
+    <!-- Format tabs -->
+    <div class="bulk-tabs">
+      <button class="bulk-tab active" id="bulk-tab-json" onclick="switchBulkTab('json',this)">
+        <i class="ti ti-code"></i> JSON Paste
+      </button>
+      <button class="bulk-tab" id="bulk-tab-csv" onclick="switchBulkTab('csv',this)">
+        <i class="ti ti-table"></i> CSV Paste
+      </button>
+      <button class="bulk-tab" id="bulk-tab-simple" onclick="switchBulkTab('simple',this)">
+        <i class="ti ti-list"></i> Simple List
+      </button>
+    </div>
+
+    <!-- JSON tab -->
+    <div class="bulk-panel active" id="bulk-panel-json">
+      <p class="bulk-hint">Paste a JSON array of exercises. Each exercise needs: <code>title</code>, <code>muscle</code>, <code>sub</code>, <code>desc</code>. Optional: <code>diff</code>, <code>premium</code>, <code>videoURL</code>.</p>
+      <div class="bulk-example">
+        <strong>Example:</strong>
+        <pre>[
+  {
+    "title": "Incline Dumbbell Press",
+    "muscle": "chest",
+    "sub": "Upper Chest",
+    "desc": "Set bench to 30-45 degrees. Lower dumbbells to chest...",
+    "diff": "Intermediate",
+    "premium": false
+  }
+]</pre>
+      </div>
+      <textarea class="bulk-textarea" id="bulk-json-input"
+        placeholder='[{"title":"Exercise Name","muscle":"chest","sub":"Upper Chest","desc":"Description...","diff":"Beginner","premium":false}]'
+        rows="12"></textarea>
+    </div>
+
+    <!-- CSV tab -->
+    <div class="bulk-panel" id="bulk-panel-csv">
+      <p class="bulk-hint">Paste CSV rows. First row must be headers. Required columns: <code>title, muscle, sub, desc</code>. Optional: <code>diff, premium, videoURL</code>.</p>
+      <div class="bulk-example">
+        <strong>Example:</strong>
+        <pre>title,muscle,sub,desc,diff,premium
+Bench Press,chest,Middle Chest,Lower bar to mid-chest...,Beginner,false
+Squat,legs,Quads,Feet shoulder-width...,Intermediate,false</pre>
+      </div>
+      <textarea class="bulk-textarea" id="bulk-csv-input"
+        placeholder="title,muscle,sub,desc,diff,premium&#10;Exercise Name,chest,Upper Chest,Description here,Beginner,false"
+        rows="12"></textarea>
+    </div>
+
+    <!-- Simple list tab -->
+    <div class="bulk-panel" id="bulk-panel-simple">
+      <p class="bulk-hint">One exercise per line. Format: <code>Title | muscle | sub-category | description</code>. Difficulty defaults to Intermediate.</p>
+      <div class="bulk-example">
+        <strong>Example:</strong>
+        <pre>Bench Press | chest | Middle Chest | Lower bar to mid-chest, drive through chest
+Squat | legs | Quads | Feet shoulder-width, hip crease below parallel
+Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
+      </div>
+      <textarea class="bulk-textarea" id="bulk-simple-input"
+        placeholder="Exercise Name | muscle | Sub Category | Exercise description here"
+        rows="12"></textarea>
+    </div>
+
+    <!-- Muscle group reference -->
+    <div class="bulk-reference">
+      <strong>Valid muscle groups:</strong>
+      <span class="tag tag-chest">chest</span>
+      <span class="tag tag-back">back</span>
+      <span class="tag tag-legs">legs</span>
+      <span class="tag tag-shoulders">shoulders</span>
+      <span class="tag tag-arms">arms</span>
+      <span class="tag tag-core">core</span>
+      <span class="tag" style="background:rgba(62,207,207,0.1);color:var(--accent2)">fullbody</span>
+      <span class="tag" style="background:rgba(167,139,250,0.1);color:#A78BFA">physio</span>
+    </div>
+
+    <!-- Preview area -->
+    <div id="bulk-preview" style="display:none">
+      <div class="bulk-preview-header">
+        <span id="bulk-preview-count"></span>
+        <button class="btn btn-ghost btn-sm" onclick="clearBulkPreview()">Clear</button>
+      </div>
+      <div id="bulk-preview-list"></div>
+    </div>
+
+    <div id="bulk-error" class="bulk-error" style="display:none"></div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-ghost" onclick="previewBulkImport()">
+      <i class="ti ti-eye"></i> Preview
+    </button>
+    <button class="btn btn-primary" id="bulk-import-btn" onclick="executeBulkImport()">
+      <i class="ti ti-file-import"></i> Import to Library
+    </button>
+  </div>
+</div>
+
+<!-- Menu Detail Modal -->
+<div class="modal modal-wide" id="modal-menu-detail">
+  <div class="modal-header">
+    <h3 id="menu-detail-title"><i class="ti ti-salad"></i> Menu Plan</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body" id="menu-detail-body"></div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" onclick="closeAllModals()">Close</button>
+  </div>
+</div>
+
+<!-- Admin Menu Editor Modal -->
+<div class="modal modal-wide" id="modal-admin-menu">
+  <div class="modal-header">
+    <h3 id="admin-menu-modal-title"><i class="ti ti-salad"></i> Add Menu Plan</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+    <input type="hidden" id="admin-menu-edit-id">
+    <div class="form-row">
+      <div class="form-group" style="flex:2">
+        <label class="form-label">Menu Name * <span style="color:var(--muted);font-weight:400">(EN)</span></label>
+        <input class="form-input" id="admin-menu-name" placeholder="e.g. High Protein Cut — 1800 kcal">
+      </div>
+      <div class="form-group" style="flex:2">
+        <label class="form-label">שם תפריט <span style="color:var(--muted);font-weight:400">(עב)</span></label>
+        <input class="form-input" id="admin-menu-name-he" placeholder="לדוג׳ תפריט חיטוב עתיר חלבון" dir="auto">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Language</label>
+        <select class="form-select" id="admin-menu-lang">
+          <option value="en">🇺🇸 English</option>
+          <option value="he">🇮🇱 Hebrew</option>
+          <option value="both">🌐 Both</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Goal *</label>
+        <select class="form-input" id="admin-menu-goal">
+          <option value="cut">Cut</option>
+          <option value="maintain">Maintain</option>
+          <option value="bulk">Bulk</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Target Calories</label>
+        <input class="form-input" id="admin-menu-calories" type="number" placeholder="1800">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea class="form-textarea" id="admin-menu-desc" rows="2" placeholder="Brief description of this menu plan..."></textarea>
+    </div>
+
+    <!-- Live macro preview -->
+    <div id="admin-menu-preview-chart" style="display:flex;justify-content:center;margin:12px 0 4px">
+      <div style="color:var(--muted2);font-size:13px;padding:20px">Fill in food items to see the macro chart</div>
+    </div>
+
+    <div class="admin-menu-meals" id="admin-menu-meals" oninput="updateAdminMenuPreview()">
+      <!-- Meals added dynamically -->
+    </div>
+    <button class="btn btn-ghost btn-full" onclick="addMealToEditor();updateAdminMenuPreview()" style="margin-top:10px">
+      <i class="ti ti-plus"></i> Add Meal
+    </button>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveAdminMenu()">
+      <i class="ti ti-check"></i> Save Menu
+    </button>
+  </div>
+</div>
+
+<!-- Program Detail Modal -->
+<div class="modal modal-wide" id="modal-program-detail">
+  <div class="modal-header">
+    <h3 id="program-detail-title"><i class="ti ti-calendar"></i> Program</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body" id="program-detail-body"></div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" onclick="closeAllModals()">Close</button>
+  </div>
+</div>
+
+<!-- Admin Program Modal -->
+<div class="modal modal-wide" id="modal-admin-program">
+  <div class="modal-header">
+    <h3 id="admin-program-title"><i class="ti ti-calendar"></i> Add Program</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+    <input type="hidden" id="admin-program-id">
+    <div class="form-row">
+      <div class="form-group" style="flex:2">
+        <label class="form-label">Program Name * <span style="color:var(--muted);font-weight:400">(EN)</span></label>
+        <input class="form-input" id="prog-name" placeholder="e.g. 12-Week Strength Builder">
+      </div>
+      <div class="form-group" style="flex:2">
+        <label class="form-label">שם התוכנית <span style="color:var(--muted);font-weight:400">(עב)</span></label>
+        <input class="form-input" id="prog-name-he" placeholder="לדוג׳ תוכנית כוח 12 שבועות" dir="auto">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Duration (weeks)</label>
+        <input class="form-input" id="prog-weeks" type="number" min="1" max="52" placeholder="12">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Days/week</label>
+        <input class="form-input" id="prog-days" type="number" min="1" max="7" placeholder="4">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Language</label>
+      <select class="form-select" id="admin-prog-lang">
+        <option value="en">🇺🇸 English</option>
+        <option value="he">🇮🇱 Hebrew</option>
+        <option value="both">🌐 Both</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Goal</label>
+        <select class="form-input" id="prog-goal">
+          <option value="strength">Strength</option>
+          <option value="hypertrophy">Hypertrophy</option>
+          <option value="fat-loss">Fat Loss</option>
+          <option value="endurance">Endurance</option>
+          <option value="rehab">Rehabilitation</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Level</label>
+        <select class="form-input" id="prog-level">
+          <option value="Beginner">Beginner</option>
+          <option value="Intermediate">Intermediate</option>
+          <option value="Advanced">Advanced</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description *</label>
+      <textarea class="form-textarea" id="prog-desc" rows="3" placeholder="Describe the program, who it's for, what results to expect..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Weekly Schedule (one day per line, e.g. "Monday: Chest & Triceps")</label>
+      <textarea class="form-textarea" id="prog-schedule" rows="5" placeholder="Monday: Chest &amp; Triceps&#10;Tuesday: Rest&#10;Wednesday: Back &amp; Biceps&#10;Thursday: Rest&#10;Friday: Legs&#10;Saturday: Shoulders &amp; Core&#10;Sunday: Rest"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group" style="flex:2">
+        <label class="form-label">Notes / Progression Rules</label>
+        <textarea class="form-textarea" id="prog-notes" rows="2" placeholder="Progressive overload guidelines, warm-up instructions, etc."></textarea>
+      </div>
+      <div class="form-group" style="flex:0;min-width:160px">
+        <label class="form-label">Visibility</label>
+        <input type="hidden" id="prog-is-public" value="true">
+        <button type="button" id="prog-public-toggle"
+          onclick="toggleProgPublic(this)"
+          style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;border:1px solid var(--accent);background:rgba(126,232,162,0.1);color:var(--accent);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;width:100%;touch-action:manipulation">
+          <i class="ti ti-world" id="prog-public-icon"></i>
+          <span id="prog-public-label">Public</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="admin-menu-meals" id="prog-exercises-container"></div>
+    <button class="btn btn-ghost btn-full" onclick="addProgExercise()" style="margin-top:8px">
+      <i class="ti ti-plus"></i> Add Exercise Day
+    </button>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveAdminProgram()"><i class="ti ti-check"></i> Save Program</button>
+  </div>
+</div>
+
+<!-- Recipe Detail Modal -->
+<div class="modal modal-wide" id="modal-recipe-detail">
+  <div class="modal-header">
+    <h3 id="recipe-detail-title"><i class="ti ti-chef-hat"></i> Recipe</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body" id="recipe-detail-body"></div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">Close</button>
+  </div>
+</div>
+
+<!-- Admin Recipe Modal -->
+<div class="modal modal-wide" id="modal-admin-recipe">
+  <div class="modal-header">
+    <h3 id="admin-recipe-title"><i class="ti ti-chef-hat"></i> Add Recipe</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+    <input type="hidden" id="admin-recipe-id">
+    <div class="form-row">
+      <div class="form-group" style="flex:2">
+        <label class="form-label">Recipe Name * <span style="color:var(--muted);font-weight:400">(EN)</span></label>
+        <input class="form-input" id="recipe-name" placeholder="e.g. High Protein Overnight Oats">
+      </div>
+      <div class="form-group" style="flex:2">
+        <label class="form-label">שם מתכון <span style="color:var(--muted);font-weight:400">(עב)</span></label>
+        <input class="form-input" id="recipe-name-he" placeholder="לדוג׳ שיבולת שועל לילה עתיר חלבון" dir="auto">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Language</label>
+        <select class="form-select" id="admin-recipe-lang">
+          <option value="en">🇺🇸 English</option>
+          <option value="he">🇮🇱 Hebrew</option>
+          <option value="both">🌐 Both</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-input" id="recipe-category">
+          <option value="breakfast">Breakfast</option>
+          <option value="lunch">Lunch</option>
+          <option value="dinner">Dinner</option>
+          <option value="snack">Snack</option>
+          <option value="post-workout">Post-Workout</option>
+          <option value="protein-dessert">Protein Desserts</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Prep Time (min)</label>
+        <input class="form-input" id="recipe-time" type="number" placeholder="15">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Calories</label><input class="form-input" id="recipe-cal" type="number" placeholder="450"></div>
+      <div class="form-group"><label class="form-label">Protein (g)</label><input class="form-input" id="recipe-pro" type="number" placeholder="35"></div>
+      <div class="form-group"><label class="form-label">Carbs (g)</label><input class="form-input" id="recipe-car" type="number" placeholder="45"></div>
+      <div class="form-group"><label class="form-label">Fat (g)</label><input class="form-input" id="recipe-fat" type="number" placeholder="12"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Ingredients (one per line, e.g. "100g oats")</label>
+      <textarea class="form-textarea" id="recipe-ingredients" rows="5" placeholder="100g rolled oats&#10;200ml almond milk&#10;1 scoop whey protein&#10;1 tbsp peanut butter&#10;1 banana"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Instructions *</label>
+      <textarea class="form-textarea" id="recipe-instructions" rows="6" placeholder="Step 1: ...&#10;Step 2: ...&#10;Step 3: ..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tips (optional)</label>
+      <textarea class="form-textarea" id="recipe-tips" rows="2" placeholder="Meal prep tips, variations, storage instructions..."></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group" style="flex:2">
+        <label class="form-label"><i class="ti ti-photo"></i> Photo URL (optional)</label>
+        <input class="form-input" id="recipe-photo" type="url" placeholder="https://... or paste an image URL">
+      </div>
+      <div class="form-group" style="flex:2">
+        <label class="form-label"><i class="ti ti-brand-youtube"></i> Video URL (optional — YouTube or direct)</label>
+        <input class="form-input" id="recipe-video" type="url" placeholder="https://youtube.com/watch?v=...">
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveAdminRecipe()"><i class="ti ti-check"></i> Save Recipe</button>
+  </div>
+</div>
+
+<!-- Admin Research Modal -->
+<div class="modal modal-wide" id="modal-admin-research">
+  <div class="modal-header">
+    <h3 id="admin-research-title"><i class="ti ti-microscope"></i> Add Study</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+    <input type="hidden" id="admin-research-id">
+    <div class="form-group">
+      <label class="form-label">Study Title * <span style="color:var(--muted);font-weight:400">(English)</span></label>
+      <input class="form-input" id="research-title-input" placeholder="e.g. Effects of High Protein Diet on Muscle Hypertrophy">
+    </div>
+    <div class="form-group">
+      <label class="form-label">כותרת המחקר <span style="color:var(--muted);font-weight:400">(עברית)</span></label>
+      <input class="form-input" id="research-title-he" placeholder="לדוג׳ השפעת תזונה עתירת חלבון על היפרטרופיה" dir="auto">
+    </div>
+    <div class="form-row">
+      <div class="form-group" style="flex:2">
+        <label class="form-label">Authors</label>
+        <input class="form-input" id="research-authors" placeholder="Smith J, Cohen A, et al.">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Year</label>
+        <input class="form-input" id="research-year" type="number" placeholder="2024">
+      </div>
+      <div class="form-group" style="flex:2">
+        <label class="form-label">Journal</label>
+        <input class="form-input" id="research-journal" placeholder="Journal of Strength & Conditioning">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-i18n="langField">Language</label>
+      <select class="form-select" id="admin-research-lang">
+        <option value="en">🇺🇸 English</option>
+        <option value="he">🇮🇱 Hebrew</option>
+        <option value="both">🌐 Both</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Category</label>
+      <select class="form-input" id="research-cat">
+        <option value="strength">Strength</option>
+        <option value="hypertrophy">Hypertrophy</option>
+        <option value="nutrition">Nutrition</option>
+        <option value="recovery">Recovery</option>
+        <option value="injury">Injury Prevention</option>
+        <option value="cardio">Cardio & Endurance</option>
+        <option value="physio">Physiotherapy</option>
+        <option value="psychology">Sports Psychology</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Plain Language Summary * <small style="color:var(--muted)">(what did the study find, in simple terms)</small></label>
+      <textarea class="form-textarea" id="research-summary" rows="5" placeholder="This study found that...&#10;&#10;Key takeaways for trainers:&#10;- ...&#10;- ..."></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Link to Original Paper (URL)</label>
+      <input class="form-input" id="research-url" type="url" placeholder="https://pubmed.ncbi.nlm.nih.gov/...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Practical Application <small style="color:var(--muted)">(how to apply this in training)</small></label>
+      <textarea class="form-textarea" id="research-application" rows="3" placeholder="Based on this study, consider implementing..."></textarea>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveAdminResearch()"><i class="ti ti-check"></i> Save Study</button>
+  </div>
+</div>
+
+<!-- Pro Gate Modal -->
+<div class="modal" id="modal-pro-gate" style="max-width:440px">
+  <div class="modal-header" style="border-bottom:none;padding-bottom:0">
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body" style="text-align:center;padding:12px 28px 24px">
+    <div style="width:64px;height:64px;background:rgba(251,191,36,0.12);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+      <i class="ti ti-star-filled" style="font-size:28px;color:#FBBF24"></i>
+    </div>
+    <h2 style="margin-bottom:8px">Pro Feature</h2>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:6px">
+      <strong id="pro-gate-feature">This section</strong> is available on the Pro plan.
+    </p>
+    <p style="color:var(--muted2);font-size:13px;margin-bottom:24px">
+      Upgrade to access Nutrition, Programs, Recipes, Research and the full Clients system.
+    </p>
+    <button class="btn btn-primary btn-full" onclick="closeAllModals();showUpgrade()" style="margin-bottom:10px">
+      <i class="ti ti-star-filled"></i> Upgrade to Pro — ₪25/mo
+    </button>
+    <button class="btn btn-ghost btn-full" onclick="closeAllModals();activateFreeTrial()">
+      Start Free 7-Day Trial
+    </button>
+  </div>
+</div>
+
+<!-- Add Client Modal -->
+<div class="modal modal-wide" id="modal-add-client">
+  <div class="modal-header">
+    <h3><i class="ti ti-user-plus"></i> Add New Client</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+    <div class="form-row">
+      <div class="form-group" style="flex:2">
+        <label class="form-label">Full Name *</label>
+        <input class="form-input" id="client-name" placeholder="David Cohen">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Gender</label>
+        <select class="form-input" id="client-gender">
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Goal</label>
+        <select class="form-input" id="client-goal">
+          <option value="cut">Cut</option>
+          <option value="maintain" selected>Maintain</option>
+          <option value="bulk">Bulk</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" id="client-email" type="email" placeholder="david@email.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone</label>
+        <input class="form-input" id="client-phone" placeholder="+972-50-...">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Age</label>
+        <input class="form-input" id="client-age" type="number" placeholder="30">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Weight (kg)</label>
+        <input class="form-input" id="client-weight" type="number" placeholder="80">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Height (cm)</label>
+        <input class="form-input" id="client-height" type="number" placeholder="175">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Activity Level</label>
+      <select class="form-input" id="client-activity">
+        <option value="1.2">Sedentary (desk job, no exercise)</option>
+        <option value="1.375">Lightly Active (1–3 days/week)</option>
+        <option value="1.55" selected>Moderately Active (3–5 days/week)</option>
+        <option value="1.725">Very Active (6–7 days/week)</option>
+        <option value="1.9">Athlete (twice daily / physical job)</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Cut Intensity</label>
+        <select class="form-input" id="client-cut-intensity">
+          <option value="0.85">Moderate Cut (−15%)</option>
+          <option value="0.80">Aggressive Cut (−20%)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Bulk Intensity</label>
+        <select class="form-input" id="client-bulk-intensity">
+          <option value="1.10">Lean Bulk (+10%)</option>
+          <option value="1.20">Aggressive Bulk (+20%)</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Trainer Notes <small style="color:var(--muted2)">(private — client cannot see)</small></label>
+      <textarea class="form-textarea" id="client-notes" rows="2" placeholder="Injury history, preferences, goals..."></textarea>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveNewClient()">
+      <i class="ti ti-user-plus"></i> Add Client
+    </button>
+  </div>
+</div>
+
+<!-- Client Profile Modal -->
+<div class="modal modal-wide" id="modal-client-profile">
+  <div class="modal-header">
+    <h3 id="client-profile-title"><i class="ti ti-user"></i> Client Profile</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body" id="client-profile-body"></div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">Close</button>
+  </div>
+</div>
+
+<!-- Assign Content Modal -->
+<!-- ══ ASSIGN CONTENT MODAL ══ -->
+<div class="modal modal-wide" id="modal-assign-content">
+  <div class="modal-header">
+    <h3 id="assign-modal-title">Assign Content</h3>
+    <button class="modal-close" onclick="closeAssignModal()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body" style="padding-bottom:0">
+    <!-- Search -->
+    <div class="search-wrap" style="margin-bottom:10px">
+      <i class="ti ti-search"></i>
+      <input type="text" id="assign-search-input" placeholder="Search..." oninput="filterAssignSearch(this.value)" style="width:100%">
+    </div>
+    <!-- Category filter pills -->
+    <div id="assign-filter-pills" style="display:flex;gap:6px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:10px;scrollbar-width:none;-webkit-overflow-scrolling:touch"></div>
+  </div>
+  <!-- Results list -->
+  <div id="assign-modal-body" style="max-height:50vh;overflow-y:auto;padding:0 16px 16px;-webkit-overflow-scrolling:touch"></div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAssignModal()">Cancel</button>
+    <button class="btn btn-primary" onclick="confirmAssign()"><i class="ti ti-check"></i> Save Assignment</button>
+  </div>
+</div>
+
+<!-- Edit BMR Modal (static — populated by openEditClientBMR) -->
+<div class="modal" id="modal-edit-bmr" style="max-width:520px">
+  <div class="modal-header">
+    <h3><i class="ti ti-calculator" style="color:var(--accent)"></i> <span id="ebmr-title">Edit BMR</span></h3>
+    <button class="modal-close" onclick="closeEditBMR()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Gender</label>
+        <select class="form-input" id="ebmr-gender" onchange="previewEditBMR()">
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Goal</label>
+        <select class="form-input" id="ebmr-goal" onchange="previewEditBMR()">
+          <option value="cut">Cut</option>
+          <option value="maintain">Maintain</option>
+          <option value="bulk">Bulk</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Age</label>
+        <input class="form-input" id="ebmr-age" type="number" placeholder="30" oninput="previewEditBMR()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Weight (kg)</label>
+        <input class="form-input" id="ebmr-weight" type="number" placeholder="80" oninput="previewEditBMR()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Height (cm)</label>
+        <input class="form-input" id="ebmr-height" type="number" placeholder="175" oninput="previewEditBMR()">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Activity Level</label>
+      <select class="form-input" id="ebmr-activity" onchange="previewEditBMR()">
+        <option value="1.2">Sedentary (desk job, no exercise)</option>
+        <option value="1.375">Lightly Active (1–3 days/week)</option>
+        <option value="1.55" selected>Moderately Active (3–5 days/week)</option>
+        <option value="1.725">Very Active (6–7 days/week)</option>
+        <option value="1.9">Athlete (twice daily / physical job)</option>
+      </select>
+      <div class="recipe-tips" style="margin-top:8px;font-size:12px">
+        <i class="ti ti-info-circle"></i>
+        <span>
+          <strong>BMR</strong> = calories burned at rest (just to stay alive).<br>
+          <strong>TDEE</strong> = BMR × activity factor = total daily calories burned including exercise.<br>
+          Target = TDEE adjusted for your goal.
+        </span>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Cut Intensity</label>
+        <select class="form-input" id="ebmr-cut" onchange="previewEditBMR()">
+          <option value="0.85">Moderate Cut (−15%)</option>
+          <option value="0.80">Aggressive Cut (−20%)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Bulk Intensity</label>
+        <select class="form-input" id="ebmr-bulk" onchange="previewEditBMR()">
+          <option value="1.10">Lean Bulk (+10%)</option>
+          <option value="1.20">Aggressive Bulk (+20%)</option>
+        </select>
+      </div>
+    </div>
+    <div id="ebmr-preview" style="margin-top:16px"></div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeEditBMR()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveEditClientBMR()">
+      <i class="ti ti-check"></i> Save
+    </button>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal" id="modal-confirm-delete">
+  <div class="modal-header">
+    <h3 style="color:var(--danger)"><i class="ti ti-trash"></i> Delete Exercise</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body" style="text-align:center;padding:28px 24px">
+    <div style="width:56px;height:56px;background:rgba(255,107,107,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:26px;color:var(--danger)"><i class="ti ti-trash"></i></div>
+    <h4 style="font-size:17px;margin-bottom:8px">Are you sure?</h4>
+    <p style="color:var(--muted);font-size:13.5px" id="delete-confirm-text">This exercise will be permanently removed from the master library.</p>
+  </div>
+  <div class="modal-footer" style="justify-content:center;gap:12px">
+    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-danger-solid" id="confirm-delete-btn" onclick="confirmDeleteExercise()">
+      <i class="ti ti-trash"></i> Yes, Delete
+    </button>
+  </div>
+</div>
+
+<!-- Start Free Trial Modal -->
+<div class="modal" id="modal-start-trial">
+  <div class="modal-header">
+    <h3><i class="ti ti-rocket" style="color:var(--accent)"></i> Start Your Free Trial</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body" style="text-align:center;padding:28px 24px" id="trial-modal-body">
+    <div style="width:64px;height:64px;background:rgba(126,232,162,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:30px;color:var(--accent)">
+      <i class="ti ti-rocket"></i>
+    </div>
+    <h4 style="font-size:20px;font-weight:700;margin-bottom:8px">7 Days of Full Access</h4>
+    <p style="color:var(--muted);font-size:13.5px;margin-bottom:22px;line-height:1.6">
+      No credit card needed. Instant access to everything — free for 7 days.
+    </p>
+    <ul style="list-style:none;text-align:left;display:inline-block;margin-bottom:22px">
+      <li style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13.5px"><i class="ti ti-check" style="color:var(--accent);font-size:15px"></i> Full master library — 143+ exercises</li>
+      <li style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13.5px"><i class="ti ti-check" style="color:var(--accent);font-size:15px"></i> Unlimited custom video uploads</li>
+      <li style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13.5px"><i class="ti ti-check" style="color:var(--accent);font-size:15px"></i> Unlimited client routines &amp; sharing</li>
+      <li style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13.5px"><i class="ti ti-check" style="color:var(--accent);font-size:15px"></i> One-time per account</li>
+    </ul>
+    <button class="btn btn-primary btn-full" onclick="activateFreeTrial()" style="font-size:15px;padding:12px" id="trial-activate-btn">
+      <i class="ti ti-rocket"></i> Activate My Free Trial Now
+    </button>
+    <p style="font-size:12px;color:var(--muted2);margin-top:10px">After 7 days you return to the limited free plan unless you upgrade to Pro (₪25/mo).</p>
+  </div>
+</div>
+
+<!-- Upgrade Modal — Customer Details Form -->
+<div class="modal modal-wide" id="modal-upgrade">
+  <div class="modal-header">
+    <h3><i class="ti ti-rocket" style="color:var(--accent)"></i> Upgrade to Pro — &#8362;25/month</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+
+    <div class="checkout-plan-card">
+      <div class="checkout-plan-left">
+        <div class="checkout-plan-icon"><i class="ti ti-star-filled"></i></div>
+        <div>
+          <div class="checkout-plan-name">RepCast Pro</div>
+          <div class="checkout-plan-desc">Full access · billed monthly · cancel any time</div>
+        </div>
+      </div>
+      <div class="checkout-plan-price">&#8362;25<span>/mo</span></div>
+    </div>
+
+    <ul class="checkout-features">
+      <li><i class="ti ti-check"></i> Full library — 200+ exercises with videos</li>
+      <li><i class="ti ti-check"></i> Unlimited custom video uploads</li>
+      <li><i class="ti ti-check"></i> Unlimited client routines &amp; sharing</li>
+      <li><i class="ti ti-check"></i> Cancel any time — no commitment</li>
+    </ul>
+
+    <div class="checkout-divider">Your Details</div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">First Name *</label>
+        <input class="form-input" id="co-first-name" type="text" placeholder="First name" autocomplete="given-name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Last Name *</label>
+        <input class="form-input" id="co-last-name" type="text" placeholder="Last name" autocomplete="family-name">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Email Address *</label>
+      <input class="form-input" id="co-email" type="email" placeholder="your@email.com" autocomplete="email">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Phone Number *</label>
+      <input class="form-input" id="co-phone" type="tel" placeholder="+972-50-000-0000" autocomplete="tel">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Business / Studio Name <span style="color:var(--muted2)">(optional)</span></label>
+      <input class="form-input" id="co-business" type="text" placeholder="My Fitness Studio">
+    </div>
+
+    <div class="checkout-divider">Order Summary</div>
+
+    <div class="checkout-summary">
+      <div class="checkout-summary-row">
+        <span>RepCast Pro — Monthly Subscription</span>
+        <span>&#8362;25.00</span>
+      </div>
+      <div class="checkout-summary-row checkout-summary-total">
+        <span>Total due today</span>
+        <span>&#8362;25.00</span>
+      </div>
+      <p style="font-size:12px;color:var(--muted2);margin-top:8px">Renews automatically every month. Cancel any time by contacting support.</p>
+    </div>
+
+    <div class="checkout-terms-row">
+      <input type="checkbox" id="terms-agree" style="width:16px;height:16px;accent-color:var(--accent);margin-top:1px;flex-shrink:0">
+      <label for="terms-agree" style="font-size:13px;color:var(--muted);line-height:1.5;cursor:pointer">
+        I have read and agree to the
+        <a href="/terms" target="_blank" style="color:var(--accent)">Terms of Service &amp; Privacy Policy</a>.
+        I confirm I am 18 years of age or older.
+      </label>
+    </div>
+
+    <div id="checkout-error" style="display:none;color:var(--danger);font-size:13px;margin-top:10px;padding:10px 14px;background:rgba(255,107,107,0.08);border-radius:8px;border:1px solid rgba(255,107,107,0.2)"></div>
+
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-primary" onclick="handleGrowPaymentChecked()" id="pay-btn" style="min-width:200px">
+      <i class="ti ti-lock"></i> Proceed to Secure Payment
+    </button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════════════════════
+     FIREBASE SDK
+     FIX 1: Version pinned to 10.12.0 (was "10.x.x" which is invalid)
+     FIX 2: Added missing imports: collection, addDoc, onAuthStateChanged, signOut
+     FIX 3: All functions exposed on window._firebase so app.js can use them
+     FIX 4: app.js loads AFTER the module script via defer, preventing race condition
+══════════════════════════════════════ -->
+<script type="module">
+  import { initializeApp }                                          from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword,
+           createUserWithEmailAndPassword, GoogleAuthProvider,
+           signInWithPopup, signInWithRedirect, getRedirectResult, signOut,
+           signInWithCredential, onAuthStateChanged, sendEmailVerification,
+           sendPasswordResetEmail,
+    fetchSignInMethodsForEmail }              from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, getDoc,
+           collection, addDoc, query, where, getDocs,
+           onSnapshot, deleteDoc }                                   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getStorage, ref, uploadBytesResumable,
+           getDownloadURL, deleteObject }                           from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+  import { getFunctions, httpsCallable }                           from "https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js";
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyCFh4Zou7cgrpmOkCeo7Dg75tYd4S0FGq8",
+    authDomain:        "repcast-7e325.firebaseapp.com",
+    projectId:         "repcast-7e325",
+    storageBucket:     "repcast-7e325.firebasestorage.app",
+    messagingSenderId: "1055475395403",
+    appId:             "1:1055475395403:web:b8b2ca224efaea3bf496ce",
+    measurementId:     "G-50SWBR5993"
+  };
+
+  const app = initializeApp(firebaseConfig);
+
+  window._auth    = getAuth(app);
+  window._storage = getStorage(app);
+
+  // Initialize Firestore — auth token is automatically attached
+  // to every request when the user is signed in via getAuth(app)
+  const db        = getFirestore(app);
+  window._db      = db;
+
+  // Firebase Functions
+  const functions = getFunctions(app, 'europe-west1');
+  window._functions = functions;
+
+  // Expose all needed Firebase functions in one object
+  window._firebase = {
+    // Auth
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    signInWithCredential,
+    GoogleAuthProvider,
+    signInWithPopup,
+    signOut,
+    signInWithRedirect,
+    getRedirectResult,
+    onAuthStateChanged,
+    sendEmailVerification,
+    sendPasswordResetEmail,
+    fetchSignInMethodsForEmail,
+    // Firestore
+    doc,
+    setDoc,
+    getDoc,
+    collection,
+    addDoc,
+    query,
+    where,
+    getDocs,
+    onSnapshot,
+    deleteDoc,
+    // Storage
+    ref,
+    uploadBytesResumable,
+    getDownloadURL,
+    deleteObject,
+    // Functions
+    httpsCallable,
+  };
+
+  // Signal app.js that Firebase is ready
+  window._firebaseReady = true;
+  window.dispatchEvent(new Event('firebaseReady'));
+</script>
+
+<script src="app.js?v=1781545210" defer></script>
+<script>
+/* ── Accessibility Widget ─────────────────────────────────────── */
+(function() {
+  var A11Y_KEY = 'repcast_a11y';
+  var fontSize = 0;
+  var activeContrast = '';
+  var activeToggles  = {};
+
+  function save() {
+    localStorage.setItem(A11Y_KEY, JSON.stringify({ fontSize, activeContrast, activeToggles }));
+  }
+
+  function load() {
+    try {
+      var d = JSON.parse(localStorage.getItem(A11Y_KEY) || '{}');
+      if (d.fontSize)       { fontSize = d.fontSize; applyFontSize(); }
+      if (d.activeContrast) { activeContrast = d.activeContrast; applyContrast(activeContrast); }
+      if (d.activeToggles)  { activeToggles = d.activeToggles; Object.keys(activeToggles).forEach(function(k){ if(activeToggles[k]) applyToggle(k, true); }); }
+    } catch(e) {}
+  }
+
+  function applyFontSize() {
+    // Remove old size classes
+    document.documentElement.classList.remove('a11y-text-sm','a11y-text-md','a11y-text-lg','a11y-text-xl','a11y-text-xxl');
+    if (fontSize === 0) {
+      document.documentElement.style.fontSize = '';
+    } else {
+      var size = 100 + (fontSize * 15);
+      document.documentElement.style.fontSize = size + '%';
+    }
+    // Also update body font size for elements using px
+    document.body.style.fontSize = fontSize === 0 ? '' : (14 + fontSize * 2) + 'px';
+  }
+
+  function applyContrast(mode) {
+    ['a11y-high-contrast','a11y-light-mode','a11y-grayscale'].forEach(function(c){ document.documentElement.classList.remove(c); });
+    ['btn-contrast-high','btn-contrast-light','btn-contrast-gray'].forEach(function(id){
+      var el = document.getElementById(id); if(el) el.setAttribute('aria-pressed','false');
+    });
+    if (mode === 'high')      { document.documentElement.classList.add('a11y-high-contrast'); var el=document.getElementById('btn-contrast-high'); if(el) el.setAttribute('aria-pressed','true'); }
+    else if (mode === 'light'){ document.documentElement.classList.add('a11y-light-mode');    var el=document.getElementById('btn-contrast-light'); if(el) el.setAttribute('aria-pressed','true'); }
+    else if (mode === 'grayscale'){ document.documentElement.classList.add('a11y-grayscale'); var el=document.getElementById('btn-contrast-gray'); if(el) el.setAttribute('aria-pressed','true'); }
+    activeContrast = mode === 'reset' ? '' : mode;
+  }
+
+  function applyToggle(cls, force) {
+    var on = force !== undefined ? force : !activeToggles[cls];
+    activeToggles[cls] = on;
+    document.documentElement.classList.toggle(cls, on);
+    var map = { 'readable-font':'btn-readable','highlight-links':'btn-links','highlight-focus':'btn-focus','stop-animations':'btn-anim' };
+    var btn = document.getElementById(map[cls]);
+    if (btn) btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  }
+
+  window.toggleA11yMenu = function() {
+    var menu   = document.getElementById('a11y-menu');
+    var toggle = document.getElementById('a11y-toggle');
+    var isOpen = !menu.hidden;
+    menu.hidden = isOpen;
+    toggle.setAttribute('aria-expanded', !isOpen ? 'true' : 'false');
+    if (!isOpen) { menu.querySelector('button, [href]').focus(); }
+  };
+  window.a11yFontSize  = function(dir) { if(dir===0) fontSize=0; else fontSize=Math.max(-2,Math.min(4,fontSize+dir)); applyFontSize(); save(); };
+  window.a11yContrast  = function(m)   { applyContrast(m); save(); };
+  window.a11yToggle    = function(cls) { applyToggle(cls); save(); };
+  window.a11yResetAll  = function() {
+    fontSize=0; activeContrast=''; activeToggles={};
+    document.documentElement.style.fontSize='';
+    ['a11y-high-contrast','a11y-light-mode','a11y-grayscale','readable-font','highlight-links','highlight-focus','stop-animations'].forEach(function(c){ document.documentElement.classList.remove(c); });
+    ['btn-contrast-high','btn-contrast-light','btn-contrast-gray','btn-readable','btn-links','btn-focus','btn-anim'].forEach(function(id){ var el=document.getElementById(id); if(el) el.setAttribute('aria-pressed','false'); });
+    save();
+  };
+
+  // ── Read Aloud — Web Speech API ──────────────────────────
+  var _speechUtterance = null;
+  var _hoverReadActive = false;
+  var _hoverTooltip    = null;
+  var _hoverTimer      = null;
+
+  function speak(text, onEnd) {
+    if (!window.speechSynthesis || !text.trim()) return;
+    window.speechSynthesis.cancel();
+    var utt = new SpeechSynthesisUtterance(text.trim());
+    utt.lang = 'he-IL';
+    utt.rate = 0.92;
+    if (onEnd) utt.onend = onEnd;
+    _speechUtterance = utt;
+    window.speechSynthesis.speak(utt);
+  }
+
+  // Read the entire page
+  window.a11yReadAloud = function() {
+    if (!window.speechSynthesis) {
+      alert('Read aloud is not supported in this browser. Please use a screen reader like NVDA or VoiceOver.');
+      return;
+    }
+    var mainEl = document.getElementById('main-content') || document.body;
+    var text   = (mainEl.innerText || mainEl.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 5000);
+    var btn    = document.getElementById('btn-read-aloud');
+    if (btn) btn.setAttribute('aria-pressed', 'true');
+    speak(text, function() { if (btn) btn.setAttribute('aria-pressed', 'false'); });
+  };
+
+  window.a11yStopReading = function() {
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    document.getElementById('btn-read-aloud') &&
+      document.getElementById('btn-read-aloud').setAttribute('aria-pressed', 'false');
+  };
+
+  // ── Translate — swap UI text between English and Hebrew ──────
+  var _currentLang = localStorage.getItem('repcast_lang') || 'en';
+
+  // Translation map: English text → Hebrew text
+  // Key = element ID or data-i18n attribute value
+
+  window.a11yTranslate = function(lang) {
+    var heBtn = document.getElementById('btn-translate-he');
+    var enBtn = document.getElementById('btn-translate-en');
+    if (heBtn) heBtn.setAttribute('aria-pressed', lang === 'he' ? 'true' : 'false');
+    if (enBtn) enBtn.setAttribute('aria-pressed', lang === 'en' ? 'true' : 'false');
+    if (lang === 'he') {
+      // Right-click the page → Translate to Hebrew (Chrome/Edge/Safari built-in)
+      // Or press F5 after setting preference
+      document.documentElement.setAttribute('lang', 'he');
+      document.documentElement.setAttribute('translate', 'yes');
+      // Show a helpful toast with instructions
+      var msg = document.getElementById('toast');
+      if (msg) {
+        msg.innerHTML = 'לתרגום לעברית: לחץ ימני על הדף ← <strong>תרגם לעברית</strong>';
+        msg.classList.add('show');
+        setTimeout(function(){ msg.classList.remove('show'); msg.textContent = ''; }, 5000);
+      }
+    } else {
+      document.documentElement.setAttribute('lang', 'en');
+      document.documentElement.removeAttribute('translate');
+      if (typeof showToast === 'function') showToast('English selected');
+    }
+    localStorage.setItem('repcast_lang', lang);
+  };
+
+  // ── Hover-to-read ─────────────────────────────────────────
+  function createHoverTooltip() {
+    if (_hoverTooltip) return;
+    _hoverTooltip = document.createElement('div');
+    _hoverTooltip.id = 'a11y-hover-tooltip';
+    _hoverTooltip.setAttribute('aria-hidden', 'true');
+    _hoverTooltip.innerHTML = '<i class="ti ti-volume"></i> <span></span>';
+    document.body.appendChild(_hoverTooltip);
+  }
+
+  function showHoverTooltip(text, x, y) {
+    if (!_hoverTooltip) return;
+    var span = _hoverTooltip.querySelector('span');
+    if (span) span.textContent = text.length > 60 ? text.slice(0, 60) + '…' : text;
+    _hoverTooltip.style.left = Math.min(x + 12, window.innerWidth - 280) + 'px';
+    _hoverTooltip.style.top  = (y - 44) + 'px';
+    _hoverTooltip.classList.add('visible');
+  }
+
+  function hideHoverTooltip() {
+    if (_hoverTooltip) _hoverTooltip.classList.remove('visible');
+  }
+
+  function getReadableText(el) {
+    // Walk up to find a meaningful text container
+    var node = el;
+    for (var i = 0; i < 4; i++) {
+      if (!node || node === document.body) break;
+      var text = (node.innerText || node.textContent || '').replace(/\s+/g, ' ').trim();
+      // Skip tiny fragments, icons, buttons with single icon
+      if (text.length > 3 && !/^[\s\W]{0,3}$/.test(text)) return text.slice(0, 300);
+      node = node.parentElement;
+    }
+    return '';
+  }
+
+  function onHoverMouseMove(e) {
+    if (!_hoverReadActive) return;
+    clearTimeout(_hoverTimer);
+    var el = e.target;
+    // Skip the accessibility widget itself
+    if (el.closest && el.closest('#a11y-widget')) { hideHoverTooltip(); return; }
+    var text = getReadableText(el);
+    if (!text) { hideHoverTooltip(); return; }
+    showHoverTooltip(text, e.clientX, e.clientY);
+    _hoverTimer = setTimeout(function() { speak(text); }, 600);
+  }
+
+  function onHoverMouseLeave() {
+    clearTimeout(_hoverTimer);
+    hideHoverTooltip();
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+  }
+
+  window.a11yToggleHoverRead = function() {
+    _hoverReadActive = !_hoverReadActive;
+    var btn = document.getElementById('btn-hover-read');
+    if (btn) btn.setAttribute('aria-pressed', _hoverReadActive ? 'true' : 'false');
+
+    if (_hoverReadActive) {
+      createHoverTooltip();
+      document.addEventListener('mousemove', onHoverMouseMove);
+      document.addEventListener('mouseleave', onHoverMouseLeave);
+      document.body.classList.add('hover-read-active');
+      speak('Hover-to-read is active. Hover over any text to hear it read aloud.');
+    } else {
+      document.removeEventListener('mousemove', onHoverMouseMove);
+      document.removeEventListener('mouseleave', onHoverMouseLeave);
+      document.body.classList.remove('hover-read-active');
+      hideHoverTooltip();
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+    }
+  };
+
+  // Close menu on Escape
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      var menu = document.getElementById('a11y-menu');
+      if (menu && !menu.hidden) { toggleA11yMenu(); document.getElementById('a11y-toggle').focus(); }
+    }
+  });
+
+  // Restore settings on load
+  document.addEventListener('DOMContentLoaded', load);
+})();
+</script>
+<!-- MOBILE BOTTOM TAB BAR — fixed, global level -->
+<nav class="mobile-tab-bar" id="mobile-tab-bar" aria-label="Mobile navigation">
+  <button class="mobile-tab-btn active" id="mtab-library" onclick="mobileTab('library',this)">
+    <i class="ti ti-layout-grid"></i>Library
+  </button>
+  <button class="mobile-tab-btn" id="mtab-routines" onclick="mobileTab('routines',this)">
+    <i class="ti ti-list-check"></i>Routines
+  </button>
+  <button class="mobile-tab-btn" id="mtab-nutrition" onclick="mobileTab('nutrition',this)">
+    <i class="ti ti-salad"></i>Nutrition
+  </button>
+  <button class="mobile-tab-btn" id="mtab-programs" onclick="mobileTab('programs',this)">
+    <i class="ti ti-calendar"></i>Programs
+  </button>
+  <button class="mobile-tab-btn" id="mtab-recipes" onclick="mobileTab('recipes',this)">
+    <i class="ti ti-chef-hat"></i>Recipes
+  </button>
+  <button class="mobile-tab-btn" id="mtab-research" onclick="mobileTab('research',this)">
+    <i class="ti ti-microscope"></i>Research
+  </button>
+  <button class="mobile-tab-btn" id="mtab-clients" onclick="mobileTab('clients',this)">
+    <i class="ti ti-users"></i>Clients
+  </button>
+  <button class="mobile-tab-btn" id="mtab-profile" onclick="mobileTab('profile',this)">
+    <i class="ti ti-user-circle"></i>Profile
+  </button>
+</nav>
+
+<!-- FORGOT PASSWORD MODAL -->
+<div class="modal" id="modal-forgot-password">
+  <div class="modal-header">
+    <h3><i class="ti ti-lock-open" style="color:var(--accent)"></i> Reset Password</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+    <p style="font-size:14px;color:var(--muted);margin-bottom:16px;line-height:1.6">
+      Enter your email address and we'll send you a link to reset your password.
+    </p>
+    <div class="form-group">
+      <label class="form-label">Email Address</label>
+      <input class="form-input" type="email" id="forgot-email" placeholder="your@email.com" autocomplete="email">
+    </div>
+    <div id="forgot-error" style="display:none;padding:10px 14px;background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.3);border-radius:10px;font-size:13px;color:var(--danger);margin-bottom:10px"></div>
+    <div id="forgot-success" style="display:none;background:rgba(126,232,162,0.08);border:1px solid rgba(126,232,162,0.3);border-radius:10px;padding:14px;text-align:center;margin-top:12px">
+      <i class="ti ti-circle-check" style="color:var(--accent);font-size:24px;display:block;margin-bottom:6px"></i>
+      <div style="font-size:14px;font-weight:600;color:var(--accent)">Reset link sent!</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:4px">Check your inbox and follow the link to reset your password.</div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-primary" onclick="sendPasswordReset()">
+      <i class="ti ti-send"></i> Send Reset Link
+    </button>
+  </div>
+</div>
+
+<!-- ══ ADMIN FOOD EDIT MODAL ══ -->
+<div class="modal" id="modal-admin-food">
+  <div class="modal-header">
+    <h3 id="food-modal-title"><i class="ti ti-plus"></i> Add Food</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      <label class="form-label">Food Name</label>
+      <input class="form-input" id="food-name" placeholder="e.g. Chicken Breast">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Category</label>
+      <input class="form-input" id="food-category" placeholder="e.g. Proteins, Dairy, Carbohydrates, Fruits" list="food-cat-list">
+      <datalist id="food-cat-list">
+        <option value="Proteins"><option value="Dairy"><option value="Carbohydrates">
+        <option value="Fruits"><option value="Vegetables"><option value="Fats & Nuts">
+        <option value="Beverages"><option value="Snacks"><option value="Supplements">
+      </datalist>
+    </div>
+    <div style="display:flex;gap:10px">
+      <div class="form-group" style="flex:1">
+        <label class="form-label">Serving Size</label>
+        <input class="form-input" type="number" id="food-serving" value="100">
+      </div>
+      <div class="form-group" style="flex:1">
+        <label class="form-label">Unit</label>
+        <input class="form-input" id="food-unit" value="g" placeholder="g / ml / unit">
+      </div>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin:4px 0 10px">Enter nutrition values per the serving size above</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div class="form-group" style="flex:1;min-width:100px">
+        <label class="form-label">Calories</label>
+        <input class="form-input" type="number" id="food-calories" placeholder="165">
+      </div>
+      <div class="form-group" style="flex:1;min-width:100px">
+        <label class="form-label">Protein (g)</label>
+        <input class="form-input" type="number" id="food-protein" placeholder="31">
+      </div>
+      <div class="form-group" style="flex:1;min-width:100px">
+        <label class="form-label">Carbs (g)</label>
+        <input class="form-input" type="number" id="food-carbs" placeholder="0">
+      </div>
+      <div class="form-group" style="flex:1;min-width:100px">
+        <label class="form-label">Fat (g)</label>
+        <input class="form-input" type="number" id="food-fat" placeholder="4">
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveAdminFood()"><i class="ti ti-check"></i> Save Food</button>
+  </div>
+</div>
+
+<!-- ══ FOOD PICKER MODAL (trainer) ══ -->
+<div class="modal modal-wide" id="modal-food-picker">
+  <div class="modal-header">
+    <h3><i class="ti ti-apple" style="color:var(--accent)"></i> Add Food from Database</h3>
+    <button class="modal-close" onclick="closeFoodPicker()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+    <!-- List view -->
+    <div id="food-picker-list-view">
+      <div class="search-wrap" style="margin-bottom:10px">
+        <i class="ti ti-search"></i>
+        <input type="text" id="food-picker-search" placeholder="Search foods..." oninput="filterFoodPicker(this.value)">
+      </div>
+      <!-- Category filter pills -->
+      <div id="food-picker-cats" style="display:flex;gap:6px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:8px;margin-bottom:10px;scrollbar-width:none;-webkit-overflow-scrolling:touch"></div>
+      <div id="food-picker-body" style="max-height:45vh;overflow-y:auto"></div>
+    </div>
+    <!-- Quantity view -->
+    <div id="food-picker-qty-view" style="display:none">
+      <button class="btn btn-ghost btn-sm" onclick="backToFoodList()" style="margin-bottom:14px"><i class="ti ti-arrow-left"></i> Back to list</button>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center">
+        <div id="food-qty-name" style="font-size:18px;font-weight:700;margin-bottom:4px"></div>
+        <div id="food-qty-base" style="font-size:12px;color:var(--muted);margin-bottom:16px"></div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px">
+          <label style="font-size:14px;color:var(--muted)">Quantity:</label>
+          <input class="form-input" type="number" id="food-qty-input" style="width:100px;text-align:center;font-size:18px;font-weight:700" oninput="updateFoodQtyPreview()">
+          <span id="food-qty-unit" style="font-size:14px;color:var(--muted)">g</span>
+        </div>
+        <div id="food-qty-preview" style="padding:14px;background:rgba(126,232,162,0.08);border-radius:10px;margin-bottom:16px"></div>
+        <button class="btn btn-primary btn-full" onclick="confirmFoodQty()"><i class="ti ti-plus"></i> Add to Meal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BULK IMPORT — FOODS ══ -->
+<div class="modal modal-wide" id="modal-bulk-foods">
+  <div class="modal-header">
+    <h3><i class="ti ti-apple" style="color:var(--accent)"></i> Bulk Import Foods</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:10px;padding:8px 12px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--accent)">
+      Required: <code>name</code>, <code>category</code>, <code>calories</code>. Optional: <code>serving</code> (default 100), <code>unit</code> (default g), <code>protein</code>, <code>carbs</code>, <code>fat</code>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <button class="btn btn-ghost btn-sm" onclick="downloadBulkTemplate('foods')"><i class="ti ti-download"></i> Template JSON</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bulk-file-foods').click()"><i class="ti ti-upload"></i> Upload File</button>
+      <input type="file" id="bulk-file-foods" accept=".json" style="display:none" onchange="loadBulkFile(this,'foods-textarea')">
+    </div>
+    <textarea id="foods-textarea" class="form-textarea" style="font-family:monospace;font-size:12px;min-height:220px;resize:vertical" placeholder='[{"name":"Chicken Breast","category":"Proteins","serving":100,"unit":"g","calories":165,"protein":31,"carbs":0,"fat":4}]'></textarea>
+    <div id="bulk-foods-result" style="display:none;margin-top:10px"></div>
+    <div id="bulk-foods-progress" style="display:none;margin-top:10px">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:4px">Importing... <span id="bulk-foods-prog-text">0/0</span></div>
+      <div style="height:6px;background:var(--surface2);border-radius:3px"><div id="bulk-foods-prog-bar" style="height:100%;background:var(--accent);width:0%;border-radius:3px;transition:width 0.2s"></div></div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-ghost" onclick="validateSectionBulk('foods')"><i class="ti ti-check"></i> Validate</button>
+    <button class="btn btn-primary" onclick="runSectionBulkImport('foods')"><i class="ti ti-file-import"></i> Import Foods</button>
+  </div>
+</div>
+
+
+<!-- ══ BULK IMPORT — MENUS (Hebrew) ══ -->
+<div class="modal modal-wide" id="modal-bulk-menus-he">
+  <div class="modal-header">
+    <h3><i class="ti ti-salad" style="color:var(--accent)"></i> ייבוא תפריטים — עברית</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:10px;padding:8px 12px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--accent)">
+      Required: <code>name</code>, <code>goal</code> (cut/bulk/maintain), <code>meals</code> (array) → saves to <strong>menus_he</strong>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <button class="btn btn-ghost btn-sm" onclick="downloadBulkTemplate('menus')"><i class="ti ti-download"></i> Template</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bulk-file-menus-he').click()"><i class="ti ti-upload"></i> Upload</button>
+      <input type="file" id="bulk-file-menus-he" accept=".json" style="display:none" onchange="loadBulkFile(this,'menus-he-textarea')">
+    </div>
+    <textarea id="menus-he-textarea" class="form-textarea" style="font-family:monospace;font-size:12px;min-height:220px;resize:vertical" placeholder='[{"name":"תפריט חיטוב","goal":"cut","isPublic":true,"meals":[{"name":"ארוחת בוקר","items":[{"name":"שיבולת שועל","qty":80,"unit":"g","calories":300,"protein":10,"carbs":55,"fat":5}]}]}]' dir="auto"></textarea>
+    <div id="bulk-menus-he-result" style="display:none;margin-top:10px"></div>
+    <div id="bulk-menus-he-progress" style="display:none;margin-top:10px">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:4px">מייבא... <span id="bulk-menus-he-prog-text">0/0</span></div>
+      <div style="height:6px;background:var(--surface2);border-radius:3px"><div id="bulk-menus-he-prog-bar" style="height:100%;background:var(--accent);width:0%;border-radius:3px"></div></div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">ביטול</button>
+    <button class="btn btn-ghost" onclick="validateSectionBulk('menus-he')"><i class="ti ti-check"></i> אמת</button>
+    <button class="btn btn-primary" onclick="runSectionBulkImport('menus-he')"><i class="ti ti-file-import"></i> ייבוא לעברית</button>
+  </div>
+</div>
+
+<!-- ══ BULK IMPORT — PROGRAMS (Hebrew) ══ -->
+<div class="modal modal-wide" id="modal-bulk-programs-he">
+  <div class="modal-header">
+    <h3><i class="ti ti-calendar" style="color:var(--accent)"></i> ייבוא תוכניות — עברית</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:10px;padding:8px 12px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--accent)">
+      Required: <code>name</code>, <code>goal</code>, <code>level</code>, <code>trainingDays</code> → saves to <strong>programs_he</strong>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <button class="btn btn-ghost btn-sm" onclick="downloadBulkTemplate('programs')"><i class="ti ti-download"></i> Template</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bulk-file-programs-he').click()"><i class="ti ti-upload"></i> Upload</button>
+      <input type="file" id="bulk-file-programs-he" accept=".json" style="display:none" onchange="loadBulkFile(this,'programs-he-textarea')">
+    </div>
+    <textarea id="programs-he-textarea" class="form-textarea" style="font-family:monospace;font-size:12px;min-height:220px;resize:vertical" dir="auto" placeholder='[{"name":"תוכנית כוח 12 שבועות","goal":"hypertrophy","level":"Intermediate","weeks":12,"days":4,"isPublic":true,"trainingDays":[]}]'></textarea>
+    <div id="bulk-programs-he-result" style="display:none;margin-top:10px"></div>
+    <div id="bulk-programs-he-progress" style="display:none;margin-top:10px">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:4px">מייבא... <span id="bulk-programs-he-prog-text">0/0</span></div>
+      <div style="height:6px;background:var(--surface2);border-radius:3px"><div id="bulk-programs-he-prog-bar" style="height:100%;background:var(--accent);width:0%;border-radius:3px"></div></div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">ביטול</button>
+    <button class="btn btn-ghost" onclick="validateSectionBulk('programs-he')"><i class="ti ti-check"></i> אמת</button>
+    <button class="btn btn-primary" onclick="runSectionBulkImport('programs-he')"><i class="ti ti-file-import"></i> ייבוא לעברית</button>
+  </div>
+</div>
+
+<!-- ══ BULK IMPORT — RECIPES (Hebrew) ══ -->
+<div class="modal modal-wide" id="modal-bulk-recipes-he">
+  <div class="modal-header">
+    <h3><i class="ti ti-chef-hat" style="color:var(--accent)"></i> ייבוא מתכונים — עברית</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:10px;padding:8px 12px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--accent)">
+      Required: <code>name</code>, <code>category</code>, <code>calories</code>, <code>ingredients</code>, <code>instructions</code> → saves to <strong>recipes_he</strong>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <button class="btn btn-ghost btn-sm" onclick="downloadBulkTemplate('recipes')"><i class="ti ti-download"></i> Template</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bulk-file-recipes-he').click()"><i class="ti ti-upload"></i> Upload</button>
+      <input type="file" id="bulk-file-recipes-he" accept=".json" style="display:none" onchange="loadBulkFile(this,'recipes-he-textarea')">
+    </div>
+    <textarea id="recipes-he-textarea" class="form-textarea" style="font-family:monospace;font-size:12px;min-height:220px;resize:vertical" dir="auto" placeholder='[{"name":"לביבות חלבון","category":"breakfast","calories":380,"protein":35,"carbs":40,"fat":8,"ingredients":"2 סקופ חלבון\n2 ביצים","instructions":"ערבב הכל ובשל.","isPublic":true}]'></textarea>
+    <div id="bulk-recipes-he-result" style="display:none;margin-top:10px"></div>
+    <div id="bulk-recipes-he-progress" style="display:none;margin-top:10px">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:4px">מייבא... <span id="bulk-recipes-he-prog-text">0/0</span></div>
+      <div style="height:6px;background:var(--surface2);border-radius:3px"><div id="bulk-recipes-he-prog-bar" style="height:100%;background:var(--accent);width:0%;border-radius:3px"></div></div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">ביטול</button>
+    <button class="btn btn-ghost" onclick="validateSectionBulk('recipes-he')"><i class="ti ti-check"></i> אמת</button>
+    <button class="btn btn-primary" onclick="runSectionBulkImport('recipes-he')"><i class="ti ti-file-import"></i> ייבוא לעברית</button>
+  </div>
+</div>
+
+<!-- ══ BULK IMPORT — FOODS (Hebrew) ══ -->
+<div class="modal modal-wide" id="modal-bulk-foods-he">
+  <div class="modal-header">
+    <h3><i class="ti ti-apple" style="color:var(--accent)"></i> ייבוא מזון — עברית</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:10px;padding:8px 12px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--accent)">
+      Required: <code>name</code>, <code>category</code>, <code>calories</code> → saves to <strong>foods_he</strong>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <button class="btn btn-ghost btn-sm" onclick="downloadBulkTemplate('foods')"><i class="ti ti-download"></i> Template</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bulk-file-foods-he').click()"><i class="ti ti-upload"></i> Upload</button>
+      <input type="file" id="bulk-file-foods-he" accept=".json" style="display:none" onchange="loadBulkFile(this,'foods-he-textarea')">
+    </div>
+    <textarea id="foods-he-textarea" class="form-textarea" style="font-family:monospace;font-size:12px;min-height:220px;resize:vertical" dir="auto" placeholder='[{"name":"חזה עוף (מבושל)","category":"חלבונים","serving":100,"unit":"g","calories":165,"protein":31,"carbs":0,"fat":4}]'></textarea>
+    <div id="bulk-foods-he-result" style="display:none;margin-top:10px"></div>
+    <div id="bulk-foods-he-progress" style="display:none;margin-top:10px">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:4px">מייבא... <span id="bulk-foods-he-prog-text">0/0</span></div>
+      <div style="height:6px;background:var(--surface2);border-radius:3px"><div id="bulk-foods-he-prog-bar" style="height:100%;background:var(--accent);width:0%;border-radius:3px"></div></div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">ביטול</button>
+    <button class="btn btn-ghost" onclick="validateSectionBulk('foods-he')"><i class="ti ti-check"></i> אמת</button>
+    <button class="btn btn-primary" onclick="runSectionBulkImport('foods-he')"><i class="ti ti-file-import"></i> ייבוא לעברית</button>
+  </div>
+</div>
+
+</body>
+</html>

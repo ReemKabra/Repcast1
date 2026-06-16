@@ -1,0 +1,27 @@
+{
+  "appId": "co.il.repcast",
+  "appName": "RepCast",
+  "webDir": "public",
+"server": {
+  "androidScheme": "https",
+  "hostname": "localhost",
+  "errorPath": "index-native.html"
+},
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": true
+  },
+  "plugins": {
+    "GoogleAuth": {
+      "scopes": ["profile", "email"],
+      "serverClientId": "1055475395403-kc7vqjas5duve2ri4u1kf6745a6o79vo.apps.googleusercontent.com",
+      "forceCodeForRefreshToken": true
+    },
+    "SplashScreen": {
+      "launchShowDuration": 1500,
+      "backgroundColor": "#0a0c0f",
+      "showSpinner": false
+    }
+  }
+}

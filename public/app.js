@@ -1,3 +1,279 @@
+/* ══════════════════════════════════════════════════════════
+   i18n — Internationalisation (English + Hebrew)
+   Usage: t('key') returns string in current language
+          applyLang(lang) swaps entire UI instantly
+══════════════════════════════════════════════════════════ */
+var _lang = localStorage.getItem('repcast_lang') || 
+  (navigator.language && navigator.language.startsWith('he') ? 'he' : 'en');
+
+/* ── Collection name helper ─────────────────────────────
+   col('menus')    → 'menus'    (English)  or  'menus_he'    (Hebrew)
+   col('programs') → 'programs' (English)  or  'programs_he' (Hebrew)
+   col('recipes')  → 'recipes'  (English)  or  'recipes_he'  (Hebrew)
+   col('foods')    → 'foods'    (English)  or  'foods_he'    (Hebrew)
+   col('masterLibrary') → 'masterLibrary'  or  'masterLibrary_he'
+   Research is always single collection.
+─────────────────────────────────────────────────────── */
+var _langCollections = ['menus','programs','recipes','foods','masterLibrary'];
+
+function col(name) {
+  if (_lang === 'he' && _langCollections.includes(name)) return name + '_he';
+  return name;
+}
+
+function colHe(name) { return name + '_he'; }
+function colEn(name) { return name; }
+
+var _i18n = {
+  en: {
+    /* ── Nav ── */
+    navLibrary:'Library', navRoutines:'Routines', navNutrition:'Nutrition',
+    navPrograms:'Programs', navRecipes:'Recipes', navResearch:'Research',
+    navClients:'Clients', navProfile:'Profile', navBilling:'Billing',
+    /* ── Library ── */
+    libraryTitle:'Exercise Library', searchExercises:'Search exercises...',
+    allExercises:'All Exercises', tabLibrary:'Library', tabMyVideos:'My Videos',
+    tabMyMenus:'My Menus', tabMyPrograms:'My Programs', tabMyRecipes:'My Recipes',
+    tabMyResearch:'My Research', uploadVideo:'Upload Video', addExercise:'Add Exercise',
+    /* ── Routines ── */
+    routinesTitle:'Routines Sent', noRoutines:'No routines sent yet.',
+    /* ── Nutrition ── */
+    nutritionTitle:'Nutrition Plans', searchMenus:'Search menus...',
+    addMenu:'Add Menu', noMenus:'No menus yet.',
+    pickFromDB:'Pick from Database', addManually:'Add Manually',
+    addMeal:'+ Add Meal', addFood:'Add Food',
+    mealName:'Meal name...', foodName:'Food name',
+    qty:'Qty', unit:'Unit', cal:'Cal', pro:'Pro', carbs:'Carbs', fat:'Fat',
+    menuName:'Menu Name', menuGoal:'Goal', menuDesc:'Description',
+    goalCut:'Cut', goalBulk:'Bulk', goalMaintain:'Maintain',
+    saveMenu:'Save Menu', deleteMenu:'Delete Menu',
+    publicVisible:'Public — visible to all trainers',
+    /* ── Programs ── */
+    programsTitle:'Training Programs', addProgram:'Add Program',
+    noPrograms:'No programs yet.', weeksLabel:'weeks',
+    /* ── Recipes ── */
+    recipesTitle:'Recipe Library', addRecipe:'Add Recipe',
+    noRecipes:'No recipes yet.', prepTime:'Prep time',
+    /* ── Research ── */
+    researchTitle:'Research Library', addStudy:'Add Study',
+    noResearch:'No research yet.',
+    /* ── Clients ── */
+    clientsTitle:'My Clients', addClient:'Add Client',
+    noClients:'No clients yet.', viewClient:'View',
+    assignContent:'Assign Content Now', itemsAssigned:'items assigned',
+    nothingAssigned:'Nothing assigned yet',
+    /* ── Profile ── */
+    profileTitle:'Profile & Settings', saveProfile:'Save Changes',
+    fullName:'Full Name', phone:'Phone Number', businessName:'Business Name',
+    specialty:'Specialty', bio:'Bio / About',
+    /* ── Auth ── */
+    signIn:'Sign In', signUp:'Sign Up', signOut:'Sign Out',
+    emailLabel:'Email', passwordLabel:'Password', forgotPassword:'Forgot password?',
+    continueGoogle:'Continue with Google', alreadyAccount:'Already have an account?',
+    noAccount:"Don't have an account?", register:'Register',
+    /* ── Modals / Actions ── */
+    save:'Save', cancel:'Cancel', delete:'Delete', edit:'Edit', close:'Close',
+    confirm:'Confirm', back:'Back', add:'Add', remove:'Remove', search:'Search...',
+    validate:'Validate', import:'Import', download:'Download Template',
+    upload:'Upload File', loading:'Loading...', saving:'Saving...',
+    /* ── Toasts ── */
+    toastSaved:'Saved!', toastDeleted:'Deleted!', toastError:'Something went wrong.',
+    toastCopied:'Copied!', toastAssigned:'Assignment saved!',
+    /* ── Empty states ── */
+    emptyLibrary:'No exercises found.', emptyClients:'Add your first client to get started.',
+    emptyMenus:'Click "Add Menu" to create your first nutrition plan.',
+    emptyPrograms:'Click "Add Program" to get started.',
+    emptyRecipes:'Recipes will appear here once added.',
+    emptyResearch:'Research articles will appear here once added.',
+    /* ── Food picker ── */
+    pickFoodTitle:'Add Food from Database', searchFoods:'Search foods...',
+    quantity:'Quantity:', addToMeal:'Add to Meal',
+    /* ── Assign modal ── */
+    assignMenus:'Assign Menus', assignPrograms:'Assign Programs',
+    assignRecipes:'Assign Recipes', assignRoutines:'Assign Routines',
+    saveAssignment:'Save Assignment', allGoals:'All Goals',
+    /* ── Checkout ── */
+    reviewAssign:'Review & Assign', routineName:'Name this routine...',
+    saveRoutine:'Save Routine', assignToClient:'Assign to Client',
+    chooseClient:'— Choose client —',
+    /* ── Lang ── */
+    langBtn:'🇮🇱 עב', langName:'English',
+    /* ── Content lang filter ── */
+    langField:'Language', langEn:'English', langHe:'Hebrew', langBoth:'Both',
+  },
+  he: {
+    /* ── Nav ── */
+    navLibrary:'ספרייה', navRoutines:'שגרות', navNutrition:'תזונה',
+    navPrograms:'תוכניות', navRecipes:'מתכונים', navResearch:'מחקר',
+    navClients:'לקוחות', navProfile:'פרופיל', navBilling:'חיוב',
+    /* ── Library ── */
+    libraryTitle:'ספריית תרגילים', searchExercises:'חיפוש תרגילים...',
+    allExercises:'כל התרגילים', tabLibrary:'ספרייה', tabMyVideos:'הסרטונים שלי',
+    tabMyMenus:'התפריטים שלי', tabMyPrograms:'התוכניות שלי', tabMyRecipes:'המתכונים שלי',
+    tabMyResearch:'המחקר שלי', uploadVideo:'העלאת סרטון', addExercise:'הוסף תרגיל',
+    /* ── Routines ── */
+    routinesTitle:'שגרות שנשלחו', noRoutines:'לא נשלחו שגרות עדיין.',
+    /* ── Nutrition ── */
+    nutritionTitle:'תוכניות תזונה', searchMenus:'חיפוש תפריטים...',
+    addMenu:'הוסף תפריט', noMenus:'אין תפריטים עדיין.',
+    pickFromDB:'בחר ממאגר', addManually:'הוסף ידנית',
+    addMeal:'+ הוסף ארוחה', addFood:'הוסף מזון',
+    mealName:'שם ארוחה...', foodName:'שם מזון',
+    qty:'כמות', unit:'יחידה', cal:'קל׳', pro:'חלבון', carbs:'פחמימות', fat:'שומן',
+    menuName:'שם תפריט', menuGoal:'מטרה', menuDesc:'תיאור',
+    goalCut:'חיטוב', goalBulk:'מסה', goalMaintain:'שמירה',
+    saveMenu:'שמור תפריט', deleteMenu:'מחק תפריט',
+    publicVisible:'ציבורי — גלוי לכל המאמנים',
+    /* ── Programs ── */
+    programsTitle:'תוכניות אימון', addProgram:'הוסף תוכנית',
+    noPrograms:'אין תוכניות עדיין.', weeksLabel:'שבועות',
+    /* ── Recipes ── */
+    recipesTitle:'ספריית מתכונים', addRecipe:'הוסף מתכון',
+    noRecipes:'אין מתכונים עדיין.', prepTime:'זמן הכנה',
+    /* ── Research ── */
+    researchTitle:'ספריית מחקר', addStudy:'הוסף מחקר',
+    noResearch:'אין מחקרים עדיין.',
+    /* ── Clients ── */
+    clientsTitle:'הלקוחות שלי', addClient:'הוסף לקוח',
+    noClients:'הוסף את הלקוח הראשון שלך כדי להתחיל.', viewClient:'צפה',
+    assignContent:'הקצה תוכן עכשיו', itemsAssigned:'פריטים מוקצים',
+    nothingAssigned:'לא הוקצה כלום עדיין',
+    /* ── Profile ── */
+    profileTitle:'פרופיל והגדרות', saveProfile:'שמור שינויים',
+    fullName:'שם מלא', phone:'מספר טלפון', businessName:'שם העסק',
+    specialty:'התמחות', bio:'ביו / אודות',
+    /* ── Auth ── */
+    signIn:'התחברות', signUp:'הרשמה', signOut:'התנתק',
+    emailLabel:'אימייל', passwordLabel:'סיסמה', forgotPassword:'שכחת סיסמה?',
+    continueGoogle:'המשך עם Google', alreadyAccount:'כבר יש לך חשבון?',
+    noAccount:'אין לך חשבון?', register:'הרשמה',
+    /* ── Modals / Actions ── */
+    save:'שמור', cancel:'ביטול', delete:'מחק', edit:'ערוך', close:'סגור',
+    confirm:'אישור', back:'חזרה', add:'הוסף', remove:'הסר', search:'חיפוש...',
+    validate:'אמת', import:'ייבוא', download:'הורד תבנית',
+    upload:'העלה קובץ', loading:'טוען...', saving:'שומר...',
+    /* ── Toasts ── */
+    toastSaved:'נשמר!', toastDeleted:'נמחק!', toastError:'משהו השתבש.',
+    toastCopied:'הועתק!', toastAssigned:'ההקצאה נשמרה!',
+    /* ── Empty states ── */
+    emptyLibrary:'לא נמצאו תרגילים.', emptyClients:'הוסף את הלקוח הראשון שלך.',
+    emptyMenus:'לחץ "הוסף תפריט" כדי ליצור תוכנית תזונה ראשונה.',
+    emptyPrograms:'לחץ "הוסף תוכנית" כדי להתחיל.',
+    emptyRecipes:'מתכונים יופיעו כאן לאחר הוספה.',
+    emptyResearch:'מאמרי מחקר יופיעו כאן לאחר הוספה.',
+    /* ── Food picker ── */
+    pickFoodTitle:'הוסף מזון ממאגר', searchFoods:'חפש מזון...',
+    quantity:'כמות:', addToMeal:'הוסף לארוחה',
+    /* ── Assign modal ── */
+    assignMenus:'הקצה תפריטים', assignPrograms:'הקצה תוכניות',
+    assignRecipes:'הקצה מתכונים', assignRoutines:'הקצה שגרות',
+    saveAssignment:'שמור הקצאה', allGoals:'כל המטרות',
+    /* ── Checkout ── */
+    reviewAssign:'סקירה והקצאה', routineName:'שם השגרה...',
+    saveRoutine:'שמור שגרה', assignToClient:'הקצה ללקוח',
+    chooseClient:'— בחר לקוח —',
+    /* ── Lang ── */
+    langBtn:'🇺🇸 EN', langName:'עברית',
+    /* ── Content lang filter ── */
+    langField:'שפה', langEn:'אנגלית', langHe:'עברית', langBoth:'שתיהן',
+  }
+};
+
+function t(key) {
+  return (_i18n[_lang] && _i18n[_lang][key]) || (_i18n.en[key]) || key;
+}
+
+// Pick Hebrew or English content field
+function ct(item, field) {
+  if (_lang === 'he' && item[field + '_he']) return item[field + '_he'];
+  return item[field] || '';
+}
+
+function applyLang(lang) {
+  _lang = lang;
+  localStorage.setItem('repcast_lang', lang);
+
+  // Always LTR — Hebrew works fine left-to-right
+  document.documentElement.dir  = 'ltr';
+  document.documentElement.lang = lang;
+
+  // Swap all data-i18n elements
+  document.querySelectorAll('[data-i18n]').forEach(function(el) {
+    var key = el.getAttribute('data-i18n');
+    var attr = el.getAttribute('data-i18n-attr') || 'textContent';
+    if (attr === 'placeholder') el.placeholder = t(key);
+    else if (attr === 'title') el.title = t(key);
+    else el.textContent = t(key);
+  });
+
+  // Update lang toggle button
+  document.querySelectorAll('.lang-toggle-btn').forEach(function(btn) {
+    btn.textContent = t('langBtn');
+    btn.title = t('langName');
+  });
+
+  // Re-render dynamic views — call window-exposed versions
+  if (window._renderMenuLibrary)  try { window._renderMenuLibrary(); }  catch(e){}
+  if (window._renderProgramsView) try { window._renderProgramsView(); } catch(e){}
+  if (window._renderRecipesView)  try { window._renderRecipesView(); }  catch(e){}
+  if (window._renderResearchView) try { window._renderResearchView(); } catch(e){}
+  if (window._renderClientsList)  try { window._renderClientsList(); }  catch(e){}
+}
+
+async function setLang(newLang) {
+  if (_lang === newLang) return;
+  _lang = newLang;
+  localStorage.setItem('repcast_lang', newLang);
+
+  // Update button styles — active button highlighted
+  ['en','he'].forEach(function(l) {
+    ['lang-btn-'+l, 'lang-btn-'+l+'-mgr'].forEach(function(id) {
+      var btn = document.getElementById(id);
+      if (!btn) return;
+      if (l === newLang) {
+        btn.style.background = 'var(--accent)';
+        btn.style.color      = '#0a0c0f';
+      } else {
+        btn.style.background = 'transparent';
+        btn.style.color      = 'var(--muted)';
+      }
+    });
+  });
+
+  showToast(newLang === 'he' ? '🇮🇱 עברית' : '🇺🇸 English');
+
+  // Clear and reload from correct language collections
+  menus = []; programs = []; recipes = []; foods = [];
+  try { await Promise.all([loadMenus(), loadPrograms(), loadRecipes(), loadFoods()]); } catch(e){}
+
+  // Re-render current views
+  if (window._renderMenuLibrary)  try { window._renderMenuLibrary(); }  catch(e){}
+  if (window._renderProgramsView) try { window._renderProgramsView(); } catch(e){}
+  if (window._renderRecipesView)  try { window._renderRecipesView(); }  catch(e){}
+  if (window._renderClientsList)  try { window._renderClientsList(); }  catch(e){}
+}
+
+function toggleLang() { setLang(_lang === 'en' ? 'he' : 'en'); }
+
+/* Apply language on page load — after DOM ready */
+document.addEventListener('DOMContentLoaded', function() {
+  applyLang(_lang);
+  // Set initial button active state
+  ['en','he'].forEach(function(l) {
+    ['lang-btn-'+l, 'lang-btn-'+l+'-mgr'].forEach(function(id) {
+      var btn = document.getElementById(id);
+      if (!btn) return;
+      if (l === _lang) {
+        btn.style.background = 'var(--accent)';
+        btn.style.color      = '#0a0c0f';
+      } else {
+        btn.style.background = 'transparent';
+        btn.style.color      = 'var(--muted)';
+      }
+    });
+  });
+});
+
 /* ==========================================================
    REPCAST — app.js  (production-ready)
    All Firebase bugs fixed, Google login added,
@@ -5,13 +281,10 @@
    ========================================================== */
    'use strict';
 
-   /* ── MANAGER CREDENTIALS ────────────────────────────────────
-      NOTE: For production security, replace this check with a
-      Firestore role lookup after Firebase Auth login.
-      See README for instructions.
+   /* ── MANAGER AUTH ───────────────────────────────────────────
+      Credentials are stored in Firestore under admins/{email}
+      Never hardcoded in the source code.
    ────────────────────────────────────────────────────────────── */
-   const MANAGER_EMAIL    = 'reemkabra@gmail.com';
-   const MANAGER_PASSWORD = 'reem1901';
    
    /* ── DATA ─────────────────────────────────────────────────── */
    const SUBCATS = {
@@ -26,194 +299,9 @@
    };
    
    // Master library — manager can add/edit/delete via admin panel
-   let MASTER_EXERCISES = JSON.parse(localStorage.getItem('repcast_master') || 'null') || [
-   
-     /* ── CHEST ─────────────────────────────────────────────── */
-     // Upper Chest
-     { id:'m1',  title:'Incline Dumbbell Press',         muscle:'chest',       sub:'Upper Chest',      desc:'Set bench 30-45°. Lower dumbbells to chest, press up and inward. Keep shoulder blades retracted. Feel the upper chest stretch at the bottom.', diff:'Intermediate', duration:'45s', premium:false, custom:false },
-     { id:'m2',  title:'Incline Barbell Press',          muscle:'chest',       sub:'Upper Chest',      desc:'Grip just outside shoulder-width. Lower bar to upper chest. Drive through heels, arch slightly. Focus on upper pec squeeze at lockout.', diff:'Intermediate', duration:'50s', premium:false, custom:false },
-     { id:'m3',  title:'Low-to-High Cable Fly',          muscle:'chest',       sub:'Upper Chest',      desc:'Set cables at lowest position. Arc hands upward and inward to shoulder height. Keep slight elbow bend. Squeeze upper chest at the top.', diff:'Intermediate', duration:'40s', premium:false, custom:false },
-     { id:'m4',  title:'Incline Machine Press',          muscle:'chest',       sub:'Upper Chest',      desc:'Adjust seat so handles align with upper chest. Press forward to full extension. Controlled return. Great for isolating upper chest safely.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'m5',  title:'Landmine Press',                 muscle:'chest',       sub:'Upper Chest',      desc:'Hold end of barbell at shoulder. Press forward and up in an arc. Single arm or both. Excellent upper chest and anterior delt activation.', diff:'Intermediate', duration:'45s', premium:true,  custom:false },
-     // Middle Chest
-     { id:'m6',  title:'Flat Barbell Bench Press',       muscle:'chest',       sub:'Middle Chest',     desc:'Grip shoulder-width. Lower to mid-chest. Drive through chest, keep wrists stacked. Retract scapulae throughout. Classic compound builder.', diff:'Beginner',     duration:'50s', premium:false, custom:false },
-     { id:'m7',  title:'Flat Dumbbell Press',            muscle:'chest',       sub:'Middle Chest',     desc:'Lower dumbbells with elbows at 45°. Press up and slightly together. Greater range of motion than barbell. Keep wrists neutral.', diff:'Beginner',     duration:'45s', premium:false, custom:false },
-     { id:'m8',  title:'Cable Crossover',                muscle:'chest',       sub:'Middle Chest',     desc:'Set cables at mid height. Bring hands together in front of chest. Squeeze and hold 1 second. Constant tension throughout.', diff:'Intermediate', duration:'40s', premium:false, custom:false },
-     { id:'m9',  title:'Chest Press Machine',            muscle:'chest',       sub:'Middle Chest',     desc:'Set seat so handles are at chest height. Press forward fully, squeeze at extension. Great for beginners and warm-up sets.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'m10', title:'Push-Up',                        muscle:'chest',       sub:'Middle Chest',     desc:'Hands shoulder-width, body straight. Lower chest to floor, elbows at 45°. Press back up fully. Scale with knees or elevate feet.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'m11', title:'Wide-Grip Push-Up',              muscle:'chest',       sub:'Middle Chest',     desc:'Place hands wider than shoulder-width. Lower chest to floor. Greater chest stretch than standard push-up. Keep core tight.', diff:'Beginner',     duration:'35s', premium:false, custom:false },
-     // Lower Chest
-     { id:'m12', title:'Decline Cable Fly',              muscle:'chest',       sub:'Lower Chest',      desc:'Set cables high. Arc hands down and together at hip height. Squeeze lower chest. Lean forward slightly for better stretch.', diff:'Intermediate', duration:'40s', premium:false, custom:false },
-     { id:'m13', title:'Decline Barbell Press',          muscle:'chest',       sub:'Lower Chest',      desc:'On decline bench, lower bar to lower pec. Press up and slightly back. Targets lower chest and sternal head effectively.', diff:'Intermediate', duration:'45s', premium:false, custom:false },
-     { id:'m14', title:'Dips (Chest Lean)',              muscle:'chest',       sub:'Lower Chest',      desc:'Lean forward 30-45° on parallel bars. Lower until shoulders below elbows. Press back up. The forward lean shifts emphasis to chest.', diff:'Intermediate', duration:'45s', premium:false, custom:false },
-     { id:'m15', title:'Decline Dumbbell Fly',           muscle:'chest',       sub:'Lower Chest',      desc:'On decline bench, lower dumbbells in a wide arc. Keep soft elbow bend. Squeeze at the top. Strong lower pec stretch at bottom.', diff:'Intermediate', duration:'40s', premium:true,  custom:false },
-   
-     /* ── BACK ───────────────────────────────────────────────── */
-     // Upper Back
-     { id:'m16', title:'Barbell Row',                    muscle:'back',        sub:'Upper Back',       desc:'Hip hinge at 45°. Pull bar to lower chest, elbows drive back. Squeeze scapulae at top. Lower with control. Keep back flat.', diff:'Intermediate', duration:'50s', premium:false, custom:false },
-     { id:'m17', title:'Seated Cable Row',               muscle:'back',        sub:'Upper Back',       desc:'Sit tall, feet braced. Pull handles to lower chest. Squeeze shoulder blades together. Do not round lower back on return.', diff:'Beginner',     duration:'45s', premium:false, custom:false },
-     { id:'m18', title:'Face Pull',                      muscle:'back',        sub:'Upper Back',       desc:'Cable at head height. Pull rope to face, elbows high. Externally rotate at top. Excellent rear delt and upper trap activator.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'m19', title:'Meadows Row',                    muscle:'back',        sub:'Upper Back',       desc:'Landmine setup, staggered stance. Row handle to hip, keep elbow high. Drive through elbow. Great for upper back thickness.', diff:'Advanced',     duration:'45s', premium:false, custom:false },
-     { id:'m20', title:'Chest-Supported Row',            muscle:'back',        sub:'Upper Back',       desc:'Lie prone on incline bench. Row dumbbells up, elbows at 90°. Eliminates lower back stress. Full scapular retraction at top.', diff:'Beginner',     duration:'45s', premium:false, custom:false },
-     // Lats
-     { id:'m21', title:'Wide-Grip Pull-Up',              muscle:'back',        sub:'Lats',             desc:'Overhand grip wider than shoulders. Drive elbows to hips. Pause at top. Slow descent. Full hang at bottom for stretch.', diff:'Advanced',     duration:'50s', premium:false, custom:false },
-     { id:'m22', title:'Chin-Up',                        muscle:'back',        sub:'Lats',             desc:'Underhand grip, shoulder-width. Pull chin over bar. Great lat and bicep co-activation. Control the descent fully.', diff:'Intermediate', duration:'50s', premium:false, custom:false },
-     { id:'m23', title:'Single-Arm Dumbbell Row',        muscle:'back',        sub:'Lats',             desc:'Brace on bench. Pull dumbbell to hip, elbow drives back. Keep torso stable. Lower fully. Drives lat thickness effectively.', diff:'Beginner',     duration:'45s', premium:false, custom:false },
-     { id:'m24', title:'Lat Pulldown',                   muscle:'back',        sub:'Lats',             desc:'Wide overhand grip. Pull bar to upper chest, lean back slightly. Elbows drive down. Squeeze at bottom. Controlled return.', diff:'Beginner',     duration:'45s', premium:false, custom:false },
-     { id:'m25', title:'Straight-Arm Pulldown',          muscle:'back',        sub:'Lats',             desc:'Arms straight, lat-width. Push bar down in arc. Hinge at hips slightly. Squeeze lats at bottom. Excellent isolation exercise.', diff:'Intermediate', duration:'40s', premium:false, custom:false },
-     { id:'m26', title:'Cable Row to Hip',               muscle:'back',        sub:'Lats',             desc:'Single arm cable, pull to hip with straight arm. Focus on lat shortening. Keep elbow close to body throughout the movement.', diff:'Intermediate', duration:'40s', premium:true,  custom:false },
-     // Lower Back
-     { id:'m27', title:'Romanian Deadlift',              muscle:'back',        sub:'Lower Back',       desc:'Hinge at hips, soft knees. Bar slides down thighs. Feel hamstring and lower back stretch. Drive hips forward to stand.', diff:'Intermediate', duration:'55s', premium:false, custom:false },
-     { id:'m28', title:'Good Morning',                   muscle:'back',        sub:'Lower Back',       desc:'Bar on traps. Hip hinge forward until torso near parallel. Drive hips back. Squeeze glutes to return. Keep spine neutral.', diff:'Intermediate', duration:'45s', premium:false, custom:false },
-     { id:'m29', title:'Hyperextension',                 muscle:'back',        sub:'Lower Back',       desc:'On GHD or 45° bench. Hinge down then extend back to neutral. Add weight on chest for progression. Avoid hyperextension at top.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'m30', title:'Deadlift',                       muscle:'back',        sub:'Lower Back',       desc:'Bar over mid-foot. Hip hinge to grip. Drive floor away. Lock hips and knees simultaneously. Hinge back down. King of posterior chain.', diff:'Advanced',     duration:'60s', premium:true,  custom:false },
-   
-     /* ── LEGS ───────────────────────────────────────────────── */
-     // Quads
-     { id:'m31', title:'Barbell Back Squat',             muscle:'legs',        sub:'Quads',            desc:'Bar on traps. Feet shoulder-width, toes out. Brace core, knees out. Hip crease below parallel. Drive through heels.', diff:'Intermediate', duration:'60s', premium:false, custom:false },
-     { id:'m32', title:'Leg Press',                      muscle:'legs',        sub:'Quads',            desc:'Feet mid-platform, shoulder-width. Full range without locking knees. Control descent all the way. Do not raise hips at bottom.', diff:'Beginner',     duration:'50s', premium:false, custom:false },
-     { id:'m33', title:'Bulgarian Split Squat',          muscle:'legs',        sub:'Quads',            desc:'Rear foot elevated. Front foot forward enough for vertical shin. Descend to 90°. Drive through front heel to stand.', diff:'Advanced',     duration:'55s', premium:false, custom:false },
-     { id:'m34', title:'Hack Squat',                     muscle:'legs',        sub:'Quads',            desc:'Feet low on platform. Descend to full depth. Knees track over toes. Excellent quad isolation. Less lower back stress than barbell squat.', diff:'Intermediate', duration:'50s', premium:false, custom:false },
-     { id:'m35', title:'Leg Extension',                  muscle:'legs',        sub:'Quads',            desc:'Set pad on shins. Extend fully, hold 1 second. Lower with control. Excellent quad isolation. Great for VMO activation.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'m36', title:'Walking Lunge',                  muscle:'legs',        sub:'Quads',            desc:'Step forward, lower back knee near floor. Drive front foot up. Alternate legs. Keep torso upright throughout movement.', diff:'Beginner',     duration:'50s', premium:false, custom:false },
-     { id:'m37', title:'Front Squat',                    muscle:'legs',        sub:'Quads',            desc:'Bar on front deltoids. More upright torso than back squat. Greater quad emphasis. Requires good wrist and ankle mobility.', diff:'Advanced',     duration:'55s', premium:true,  custom:false },
-     // Hamstrings
-     { id:'m38', title:'Romanian Deadlift (Legs)',       muscle:'legs',        sub:'Hamstrings',       desc:'Hip hinge with soft knees. Feel deep hamstring stretch at bottom. Drive hips forward. Keep bar close to body. Neutral spine throughout.', diff:'Intermediate', duration:'55s', premium:false, custom:false },
-     { id:'m39', title:'Nordic Curl',                    muscle:'legs',        sub:'Hamstrings',       desc:'Anchor feet. Lower as slowly as possible under hamstring control. Catch with hands, push back up. Excellent eccentric strength builder.', diff:'Advanced',     duration:'50s', premium:false, custom:false },
-     { id:'m40', title:'Lying Leg Curl',                 muscle:'legs',        sub:'Hamstrings',       desc:'Lie prone. Curl pad to glutes. Squeeze hamstrings. Slow on the way down. Keep hips on bench throughout.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'m41', title:'Seated Leg Curl',                muscle:'legs',        sub:'Hamstrings',       desc:'Knee angle of 90° in seated position. Curl under seat. Greater stretch than lying curl due to hip angle. Good for peak hamstring contraction.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'m42', title:'Single-Leg RDL',                 muscle:'legs',        sub:'Hamstrings',       desc:'Balance on one leg. Hinge forward, extending free leg behind. Keep hips square. Feel deep hamstring stretch. Great hip stability challenge.', diff:'Intermediate', duration:'50s', premium:true,  custom:false },
-     // Calves
-     { id:'m43', title:'Standing Calf Raise',            muscle:'legs',        sub:'Calves',           desc:'On edge of step. Lower heel fully below edge. Rise to ball of foot. Pause at top. Full range stretch is key for growth.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'m44', title:'Seated Calf Raise',              muscle:'legs',        sub:'Calves',           desc:'Pad on lower thigh near knee. Full range of motion. Seated position emphasises soleus more than standing. Slow and controlled.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'m45', title:'Donkey Calf Raise',              muscle:'legs',        sub:'Calves',           desc:'Hinge forward 90°, load on lower back. Full range calf raise. Hip position creates excellent gastrocnemius stretch and activation.', diff:'Intermediate', duration:'40s', premium:true,  custom:false },
-     // Glutes
-     { id:'m46', title:'Glute Bridge',                   muscle:'legs',        sub:'Glutes',           desc:'Lie supine. Drive hips to ceiling, squeeze glutes at top. Hold 2 seconds. Control lowering. Great glute activation exercise.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'m47', title:'Hip Thrust',                     muscle:'legs',        sub:'Glutes',           desc:'Upper back on bench, bar over hips. Drive hips up. Full hip extension at top. Squeeze glutes hard. Lower under control.', diff:'Intermediate', duration:'50s', premium:false, custom:false },
-     { id:'m48', title:'Cable Kickback',                 muscle:'legs',        sub:'Glutes',           desc:'Ankle cuff on low cable. Kick leg back and up. Full hip extension. Squeeze glute at top. Keep core braced, minimal hip rotation.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'m49', title:'Sumo Deadlift',                  muscle:'legs',        sub:'Glutes',           desc:'Wide stance, toes out 45°. Drive knees out. Pull bar up, lock hips at top. Greater glute activation than conventional deadlift.', diff:'Intermediate', duration:'55s', premium:true,  custom:false },
-     { id:'m50', title:'Step-Up',                        muscle:'legs',        sub:'Glutes',           desc:'Step onto box with one leg. Drive through heel to stand. Lower with control. Alternate or single-leg. Add dumbbells for progression.', diff:'Beginner',     duration:'45s', premium:false, custom:false },
-   
-     /* ── SHOULDERS ──────────────────────────────────────────── */
-     // Front Deltoid
-     { id:'m51', title:'Overhead Barbell Press',         muscle:'shoulders',   sub:'Front Deltoid',    desc:'Press bar from front rack. Brace core. Full lockout overhead. Lower with control. Do not lean excessively. Great mass builder.', diff:'Intermediate', duration:'50s', premium:false, custom:false },
-     { id:'m52', title:'Dumbbell Shoulder Press',        muscle:'shoulders',   sub:'Front Deltoid',    desc:'Seated or standing. Press dumbbells from ear height. Full extension at top. Neutral or pronated grip. Greater ROM than barbell.', diff:'Beginner',     duration:'45s', premium:false, custom:false },
-     { id:'m53', title:'Front Raise',                    muscle:'shoulders',   sub:'Front Deltoid',    desc:'Arms straight, raise to shoulder height. Neutral or pronated grip. Slow and controlled. Avoid swinging. Can use cable for constant tension.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'m54', title:'Arnold Press',                   muscle:'shoulders',   sub:'Front Deltoid',    desc:'Start with palms facing you. Rotate outward as you press up. Reverse on the way down. Works all three deltoid heads.', diff:'Intermediate', duration:'45s', premium:false, custom:false },
-     { id:'m55', title:'Push Press',                     muscle:'shoulders',   sub:'Front Deltoid',    desc:'Slight knee dip, drive bar overhead using leg drive. Lock out fully. Lower with control. Allows heavier loads than strict press.', diff:'Advanced',     duration:'50s', premium:true,  custom:false },
-     // Lateral
-     { id:'m56', title:'Lateral Raise',                  muscle:'shoulders',   sub:'Lateral',          desc:'Slight forward lean. Raise arms to shoulder height in wide arc. Lead with elbows. Pinky slightly higher. Control descent.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'m57', title:'Cable Lateral Raise',            muscle:'shoulders',   sub:'Lateral',          desc:'Single-arm cable from low pulley. Raise across body to shoulder height. Constant tension throughout. Pause at top.', diff:'Intermediate', duration:'40s', premium:false, custom:false },
-     { id:'m58', title:'Machine Lateral Raise',          muscle:'shoulders',   sub:'Lateral',          desc:'Set pad on lower arm. Raise to shoulder height. Isolates medial delt effectively. Great for hypertrophy with higher reps.', diff:'Beginner',     duration:'38s', premium:false, custom:false },
-     { id:'m59', title:'Leaning Cable Lateral Raise',    muscle:'shoulders',   sub:'Lateral',          desc:'Hold pole, lean away from cable. Raise arm overhead. Greater range of motion. Excellent medial delt stretch at bottom.', diff:'Intermediate', duration:'40s', premium:true,  custom:false },
-     // Rear Deltoid
-     { id:'m60', title:'Face Pull',                      muscle:'shoulders',   sub:'Rear Deltoid',     desc:'Cable at head height. Rope to face, elbows high and wide. Externally rotate at top. Key exercise for shoulder health and balance.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'m61', title:'Rear Delt Fly',                  muscle:'shoulders',   sub:'Rear Deltoid',     desc:'Bent forward 90°. Arc dumbbells up and out, leading with elbows. Squeeze rear delts at top. Keep slight elbow bend.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'m62', title:'Reverse Pec Deck',               muscle:'shoulders',   sub:'Rear Deltoid',     desc:'Face into machine, arms forward. Drive elbows back and out. Squeeze rear delts at end range. Great isolation for beginners.', diff:'Beginner',     duration:'38s', premium:false, custom:false },
-     { id:'m63', title:'Band Pull-Apart',                muscle:'shoulders',   sub:'Rear Deltoid',     desc:'Hold band at shoulder height, arms straight. Pull apart to chest. Squeeze shoulder blades. Excellent postural and warm-up exercise.', diff:'Beginner',     duration:'35s', premium:false, custom:false },
-   
-     /* ── ARMS ───────────────────────────────────────────────── */
-     // Biceps
-     { id:'m64', title:'Barbell Curl',                   muscle:'arms',        sub:'Biceps',           desc:'Supinated grip. Elbows pinned to sides. Curl to full contraction. Slow eccentric. Classic mass builder.', diff:'Beginner',     duration:'45s', premium:false, custom:false },
-     { id:'m65', title:'Hammer Curl',                    muscle:'arms',        sub:'Biceps',           desc:'Neutral grip, thumbs up. Curl to shoulder. Elbows stationary. Works brachialis and brachioradialis. Alternating or simultaneous.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'m66', title:'Incline Dumbbell Curl',          muscle:'arms',        sub:'Biceps',           desc:'Lie back on incline bench. Arms hang straight. Curl fully. Excellent long head stretch at bottom. Pure bicep isolation.', diff:'Intermediate', duration:'45s', premium:false, custom:false },
-     { id:'m67', title:'Concentration Curl',             muscle:'arms',        sub:'Biceps',           desc:'Seated, elbow on inner thigh. Curl dumbbell fully. Squeeze at top. Eliminates cheating. Great for bicep peak development.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'m68', title:'Preacher Curl',                  muscle:'arms',        sub:'Biceps',           desc:'Rest upper arm on pad. Curl from full extension. Excellent short head isolation. Do not lock out fully at bottom.', diff:'Beginner',     duration:'45s', premium:false, custom:false },
-     { id:'m69', title:'Bayesian Curl',                  muscle:'arms',        sub:'Biceps',           desc:'Cable behind at hip height. Step forward for stretch. Curl toward shoulder. Maximum long head tension throughout range.', diff:'Intermediate', duration:'40s', premium:true,  custom:false },
-     { id:'m70', title:'Cable Curl',                     muscle:'arms',        sub:'Biceps',           desc:'Stand facing low cable. Curl bar or rope to chin. Constant tension. Squeeze hard at top. Control return fully.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     // Triceps
-     { id:'m71', title:'Tricep Rope Pushdown',           muscle:'arms',        sub:'Triceps',          desc:'Grip rope, palms in. Push down and apart at bottom. Fully extend elbows. Do not lean forward. Great lateral head isolation.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'m72', title:'Skull Crusher',                  muscle:'arms',        sub:'Triceps',          desc:'Lie flat, bar above forehead. Lower to forehead bending only at elbows. Upper arms vertical. Extend back. Strong long head activation.', diff:'Intermediate', duration:'45s', premium:false, custom:false },
-     { id:'m73', title:'Close-Grip Bench Press',         muscle:'arms',        sub:'Triceps',          desc:'Grip at shoulder-width or narrower. Lower bar to lower chest. Press up, elbows close to body. Great mass builder for all three heads.', diff:'Intermediate', duration:'50s', premium:false, custom:false },
-     { id:'m74', title:'Overhead Tricep Extension',      muscle:'arms',        sub:'Triceps',          desc:'Bar or dumbbell overhead. Lower behind head. Upper arms stay vertical. Full stretch of long head. Press back up to lockout.', diff:'Intermediate', duration:'45s', premium:false, custom:false },
-     { id:'m75', title:'Tricep Dips',                    muscle:'arms',        sub:'Triceps',          desc:'Parallel bars, torso upright. Lower until elbows 90°. Press back up. Keep elbows close to body to maximise tricep involvement.', diff:'Intermediate', duration:'45s', premium:false, custom:false },
-     { id:'m76', title:'Single-Arm Kickback',            muscle:'arms',        sub:'Triceps',          desc:'Brace on bench. Upper arm parallel to floor. Extend forearm back fully. Squeeze at lockout. Excellent long and lateral head isolation.', diff:'Beginner',     duration:'38s', premium:true,  custom:false },
-     // Forearms
-     { id:'m77', title:'Wrist Curl',                     muscle:'arms',        sub:'Forearms',         desc:'Seated, forearms on thighs. Full wrist flexion and extension. Use barbell or dumbbells. Slow and controlled. Builds wrist flexors.', diff:'Beginner',     duration:'35s', premium:false, custom:false },
-     { id:'m78', title:'Reverse Wrist Curl',             muscle:'arms',        sub:'Forearms',         desc:'Overhand grip, forearms on thighs. Extend wrists upward. Targets wrist extensors and brachioradialis. Often neglected but important.', diff:'Beginner',     duration:'35s', premium:false, custom:false },
-     { id:'m79', title:'Farmers Carry',                  muscle:'arms',        sub:'Forearms',         desc:'Hold heavy dumbbells or handles. Walk for distance or time. Builds grip, forearms and core simultaneously. Great functional exercise.', diff:'Intermediate', duration:'50s', premium:false, custom:false },
-     { id:'m80', title:'Dead Hang',                      muscle:'arms',        sub:'Forearms',         desc:'Hang from pull-up bar. Relax shoulders. Hold as long as possible. Builds grip strength, decompresses spine, stretches lats.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-   
-     /* ── CORE ───────────────────────────────────────────────── */
-     // Abs
-     { id:'m81', title:'Cable Crunch',                   muscle:'core',        sub:'Abs',              desc:'Kneel, rope behind head. Crunch elbows to knees. Pause at peak contraction. Resist on way up. Weighted ab exercise.', diff:'Intermediate', duration:'45s', premium:false, custom:false },
-     { id:'m82', title:'Plank to Shoulder Tap',          muscle:'core',        sub:'Abs',              desc:'High plank. Tap opposite shoulder, hips square. Brace core throughout. Minimal rotation. Builds anti-rotation stability.', diff:'Beginner',     duration:'45s', premium:false, custom:false },
-     { id:'m83', title:'Hanging Leg Raise',              muscle:'core',        sub:'Abs',              desc:'Dead hang. Raise legs straight or bent to 90°. Control descent. Avoid swinging. Advanced lower ab and hip flexor exercise.', diff:'Advanced',     duration:'45s', premium:false, custom:false },
-     { id:'m84', title:'Ab Wheel Rollout',               muscle:'core',        sub:'Abs',              desc:'Kneel with wheel under shoulders. Roll forward, hips down. Return using abs. Full extension is advanced. Start with partial range.', diff:'Advanced',     duration:'45s', premium:true,  custom:false },
-     { id:'m85', title:'Crunch',                         muscle:'core',        sub:'Abs',              desc:'Lie supine, knees bent. Curl upper back off floor. Exhale at top. Do not pull neck. Focus on upper ab shortening.', diff:'Beginner',     duration:'35s', premium:false, custom:false },
-     { id:'m86', title:'Reverse Crunch',                 muscle:'core',        sub:'Abs',              desc:'Lie supine, knees up. Curl hips toward chest. Pause at top. Lower with control. Emphasises lower abs and hip flexors.', diff:'Beginner',     duration:'38s', premium:false, custom:false },
-     { id:'m87', title:'V-Up',                           muscle:'core',        sub:'Abs',              desc:'Lie flat, simultaneously lift legs and torso. Touch hands to feet at top. Lower back down fully. Demands full ab integration.', diff:'Advanced',     duration:'40s', premium:true,  custom:false },
-     // Obliques
-     { id:'m88', title:'Copenhagen Plank',               muscle:'core',        sub:'Obliques',         desc:'Side plank, top foot on bench. Bottom leg hangs. Hold or add adduction reps. Challenges obliques and adductors together.', diff:'Advanced',     duration:'45s', premium:false, custom:false },
-     { id:'m89', title:'Russian Twist',                  muscle:'core',        sub:'Obliques',         desc:'Seated, torso at 45°. Rotate side to side. Add weight for progression. Keep spine neutral. Works rotational oblique strength.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'m90', title:'Side Plank',                     muscle:'core',        sub:'Obliques',         desc:'Elbow or hand on floor. Stack hips. Hold position. Can add hip dips for extra challenge. Strong lateral core stabiliser.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'m91', title:'Pallof Press',                   muscle:'core',        sub:'Obliques',         desc:'Cable at chest height, stand sideways. Press handles forward, resist rotation. Key anti-rotation exercise for functional core strength.', diff:'Intermediate', duration:'40s', premium:false, custom:false },
-     { id:'m92', title:'Woodchop',                       muscle:'core',        sub:'Obliques',         desc:'Cable high. Pull diagonally across body to opposite hip. Keep arms nearly straight. Rotate torso fully. Builds rotational power.', diff:'Intermediate', duration:'40s', premium:true,  custom:false },
-     // Transverse Abs
-     { id:'m93', title:'Dead Bug',                       muscle:'core',        sub:'Transverse Abs',   desc:'Supine, arms vertical, hips/knees 90°. Lower opposite arm and leg. Maintain lumbar contact with floor. Excellent deep core activation.', diff:'Beginner',     duration:'50s', premium:false, custom:false },
-     { id:'m94', title:'Bird Dog',                       muscle:'core',        sub:'Transverse Abs',   desc:'On all fours. Extend opposite arm and leg. Hold 3 seconds. Return. Keep hips square. Excellent spinal stability and transverse activation.', diff:'Beginner',     duration:'45s', premium:false, custom:false },
-     { id:'m95', title:'Hollow Body Hold',               muscle:'core',        sub:'Transverse Abs',   desc:'Lie supine. Press lower back flat. Arms overhead, legs straight. Hold. Activate transverse abdominis and deep core.', diff:'Intermediate', duration:'40s', premium:false, custom:false },
-     { id:'m96', title:'Stomach Vacuum',                 muscle:'core',        sub:'Transverse Abs',   desc:'Exhale all air. Pull navel toward spine. Hold 20-60 seconds. Excellent direct transverse abdominis activation without movement.', diff:'Beginner',     duration:'30s', premium:false, custom:false },
-   
-     /* ── FULL BODY ──────────────────────────────────────────── */
-     { id:'m97', title:'Barbell Clean and Press',        muscle:'fullbody',    sub:'Compound',         desc:'Power clean from floor to front rack, then press overhead. Full body explosive movement. Demands coordination and strength throughout the chain.', diff:'Advanced',     duration:'60s', premium:true,  custom:false },
-     { id:'m98', title:'Thrusters',                      muscle:'fullbody',    sub:'Compound',         desc:'Front squat to overhead press in one fluid motion. Use barbell or dumbbells. Metabolically demanding. Great conditioning and strength builder.', diff:'Advanced',     duration:'55s', premium:false, custom:false },
-     { id:'m99', title:'Kettlebell Swing',               muscle:'fullbody',    sub:'Compound',         desc:'Hip hinge. Drive hips forward explosively to swing kettlebell to shoulder height. Hinge back. Powerful posterior chain exercise.', diff:'Intermediate', duration:'45s', premium:false, custom:false },
-     { id:'m100',title:'Burpee',                         muscle:'fullbody',    sub:'HIIT',             desc:'Squat, kick feet back to plank, push-up, jump feet forward, jump up. Full body conditioning. Scale by removing push-up or jump.', diff:'Intermediate', duration:'40s', premium:false, custom:false },
-     { id:'m101',title:'Battle Ropes',                   muscle:'fullbody',    sub:'HIIT',             desc:'Alternate or simultaneous wave patterns. Keep chest up, knees slightly bent. 20-30 second bursts. Excellent metabolic conditioning.', diff:'Intermediate', duration:'40s', premium:false, custom:false },
-     { id:'m102',title:'Box Jump',                       muscle:'fullbody',    sub:'HIIT',             desc:'Athletic stance. Swing arms and jump onto box. Land softly with soft knees. Step down. Builds power and fast-twitch muscle fibre.', diff:'Intermediate', duration:'40s', premium:false, custom:false },
-     { id:'m103',title:'Turkish Get-Up',                 muscle:'fullbody',    sub:'Functional',       desc:'From lying with KB overhead, move to standing in a series of controlled steps. Demands total body stability, mobility and strength.', diff:'Advanced',     duration:'60s', premium:true,  custom:false },
-     { id:'m104',title:'Bear Crawl',                     muscle:'fullbody',    sub:'Functional',       desc:'All-fours position, knees hover off floor. Crawl forward alternating opposite hand and foot. Builds total body coordination and core stability.', diff:'Beginner',     duration:'45s', premium:false, custom:false },
-   
-     /* ── PHYSIOTHERAPY ──────────────────────────────────────── */
-     // Shoulder Rehab
-     { id:'p1',  title:'External Rotation (Theraband)',  muscle:'physio',      sub:'Shoulder Rehab',   desc:'Elbow at side, 90° flexion. Rotate arm outward against band resistance. Hold 2 sec. Return slowly. Targets infraspinatus and teres minor.', diff:'Beginner',     duration:'35s', premium:false, custom:false },
-     { id:'p2',  title:'Pendulum Exercise',              muscle:'physio',      sub:'Shoulder Rehab',   desc:'Lean on table, arm hanging freely. Use body momentum to create small circles. Clockwise and counter-clockwise. Gentle traction for rotator cuff.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'p3',  title:'Scapular Retraction',            muscle:'physio',      sub:'Shoulder Rehab',   desc:'Stand or sit tall. Squeeze shoulder blades together, hold 5 sec. Release slowly. Strengthens middle trapezius and rhomboids. Key postural exercise.', diff:'Beginner',     duration:'30s', premium:false, custom:false },
-     { id:'p4',  title:'Wall Slide',                     muscle:'physio',      sub:'Shoulder Rehab',   desc:'Back and arms against wall. Slide arms overhead maintaining contact. Promotes scapular upward rotation and overhead mobility. Do slowly.', diff:'Beginner',     duration:'35s', premium:false, custom:false },
-     { id:'p5',  title:'Sleeper Stretch',                muscle:'physio',      sub:'Shoulder Rehab',   desc:'Lie on affected side, elbow at 90°. Use other hand to gently press forearm down. Hold 30 sec. Improves posterior capsule flexibility.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'p6',  title:'Internal Rotation (Band)',       muscle:'physio',      sub:'Shoulder Rehab',   desc:'Elbow at side. Rotate arm inward against band resistance. Targets subscapularis. Important for rotator cuff balance after injury.', diff:'Beginner',     duration:'35s', premium:false, custom:false },
-     { id:'p7',  title:'YTW Exercise',                   muscle:'physio',      sub:'Shoulder Rehab',   desc:'Prone on bench or floor. Raise arms into Y, T, and W positions. Targets lower and mid trapezius. Excellent scapular stabiliser.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'p8',  title:'Shoulder Flexion Wall Walk',     muscle:'physio',      sub:'Shoulder Rehab',   desc:'Face wall, walk fingers up as high as comfortable. Hold at top. Walk back down. Progressive shoulder flexion ROM restoration exercise.', diff:'Beginner',     duration:'35s', premium:false, custom:false },
-     // Knee Rehab
-     { id:'p9',  title:'Terminal Knee Extension (TKE)',  muscle:'physio',      sub:'Knee Rehab',       desc:'Band behind knee. From slight flexion, fully extend knee against resistance. Hold 1 sec. VMO activation exercise critical for knee stability.', diff:'Beginner',     duration:'35s', premium:false, custom:false },
-     { id:'p10', title:'Mini Squat',                     muscle:'physio',      sub:'Knee Rehab',       desc:'Feet shoulder-width. Bend knees 20-30° only. Hold 5 sec. Return. Pain-free range squat for early knee rehab. Progress depth gradually.', diff:'Beginner',     duration:'35s', premium:false, custom:false },
-     { id:'p11', title:'Straight Leg Raise',             muscle:'physio',      sub:'Knee Rehab',       desc:'Lie supine. Tighten quad, raise leg to 45°. Hold 3 sec. Lower slowly. Activates quads without knee joint stress. Post-op essential.', diff:'Beginner',     duration:'35s', premium:false, custom:false },
-     { id:'p12', title:'Step Down Exercise',             muscle:'physio',      sub:'Knee Rehab',       desc:'Stand on step. Slowly lower heel of free foot toward floor. Control with stance leg. Excellent VMO and knee stability rehab exercise.', diff:'Intermediate', duration:'40s', premium:false, custom:false },
-     { id:'p13', title:'Knee CARs',                      muscle:'physio',      sub:'Knee Rehab',       desc:'Controlled articular rotation. Draw full circles with knee in maximum available range. Lubricates joint, maintains arthrokinematics and proprioception.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'p14', title:'VMO Isometric',                  muscle:'physio',      sub:'Knee Rehab',       desc:'Sit with knee at 30°. Press into a pad or towel roll under knee. Hold quad contraction 10 sec. Specifically activates vastus medialis oblique.', diff:'Beginner',     duration:'30s', premium:false, custom:false },
-     // Lower Back Rehab
-     { id:'p15', title:'Pelvic Tilt',                    muscle:'physio',      sub:'Lower Back Rehab', desc:'Lie supine, knees bent. Flatten lower back against floor by tilting pelvis. Hold 5 sec. Release. Activates deep core and resets lumbar lordosis.', diff:'Beginner',     duration:'30s', premium:false, custom:false },
-     { id:'p16', title:'Cat-Cow Stretch',                muscle:'physio',      sub:'Lower Back Rehab', desc:'All fours. Arch back upward (cat). Release and let belly drop (cow). Breathe through each position. Mobilises thoracic and lumbar spine.', diff:'Beginner',     duration:'35s', premium:false, custom:false },
-     { id:'p17', title:"Child's Pose",                  muscle:'physio',      sub:'Lower Back Rehab', desc:'Kneel and sit back on heels. Arms forward on floor. Hold 30-60 sec. Gentle lumbar flexion stretch. Excellent for acute lower back pain relief.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'p18', title:'McKenzie Extension',             muscle:'physio',      sub:'Lower Back Rehab', desc:'Lie prone. Prop on elbows or hands. Allow lower back to extend. Hold 10-30 sec. Centralisation exercise for disc-related lower back pain.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'p19', title:'Multifidus Activation',          muscle:'physio',      sub:'Lower Back Rehab', desc:'All fours. Small spinal extension with lumbar only. No hip movement. Hold 5 sec. Activates multifidus — key lumbar segmental stabiliser.', diff:'Beginner',     duration:'35s', premium:false, custom:false },
-     { id:'p20', title:'Prone Hip Extension',            muscle:'physio',      sub:'Lower Back Rehab', desc:'Lie prone. Lift one straight leg off floor. Hold 3 sec. Lower. Activates gluteus maximus with minimal lumbar stress. Great early rehab exercise.', diff:'Beginner',     duration:'35s', premium:false, custom:false },
-     // Hip Rehab
-     { id:'p21', title:'Clamshell',                      muscle:'physio',      sub:'Hip Rehab',        desc:'Lie on side, hips and knees at 45°. Open top knee like a clamshell. Hold 2 sec. Targets gluteus medius. Essential for hip and knee stability.', diff:'Beginner',     duration:'35s', premium:false, custom:false },
-     { id:'p22', title:'Side-Lying Hip Abduction',       muscle:'physio',      sub:'Hip Rehab',        desc:'Lie on side. Raise top leg straight to 45°. Hold 2 sec. Lower with control. Strengthens gluteus medius without joint compression.', diff:'Beginner',     duration:'35s', premium:false, custom:false },
-     { id:'p23', title:'Hip CARs',                       muscle:'physio',      sub:'Hip Rehab',        desc:'Stand or lie. Draw maximum circumduction circle with hip. Front, side, back, other side. Maintains joint mobility and proprioceptive input.', diff:'Beginner',     duration:'45s', premium:false, custom:false },
-     { id:'p24', title:'90-90 Hip Stretch',              muscle:'physio',      sub:'Hip Rehab',        desc:'Sit with front and back leg at 90°. Lean toward front shin. Hold 30-60 sec. Excellent hip external and internal rotator flexibility exercise.', diff:'Beginner',     duration:'50s', premium:false, custom:false },
-     { id:'p25', title:'Hip Flexor Stretch',             muscle:'physio',      sub:'Hip Rehab',        desc:'Half-kneeling. Tuck pelvis under, drive forward gently. Hold 30 sec. Targets iliopsoas. Critical for desk workers and anterior pelvic tilt correction.', diff:'Beginner',     duration:'45s', premium:false, custom:false },
-     { id:'p26', title:'Pigeon Pose',                    muscle:'physio',      sub:'Hip Rehab',        desc:'Front leg externally rotated, back leg extended. Lower toward floor. Hold 30-60 sec. Excellent piriformis and deep hip external rotator stretch.', diff:'Intermediate', duration:'50s', premium:false, custom:false },
-     // Ankle Rehab
-     { id:'p27', title:'Alphabet Writing',               muscle:'physio',      sub:'Ankle Rehab',      desc:'Seated or lying. Write alphabet with toes. Full ankle range of motion in all planes. Classic post-sprain mobility restoration exercise.', diff:'Beginner',     duration:'35s', premium:false, custom:false },
-     { id:'p28', title:'Single-Leg Balance',             muscle:'physio',      sub:'Ankle Rehab',      desc:'Stand on one leg. Hold 30-60 sec. Progress to eyes closed or unstable surface. Restores proprioception and neuromuscular control after ankle sprain.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'p29', title:'Towel Toe Curls',                muscle:'physio',      sub:'Ankle Rehab',      desc:'Barefoot on towel. Curl toes to scrunch towel toward you. Strengthens intrinsic foot muscles. Important for arch support and foot stability.', diff:'Beginner',     duration:'30s', premium:false, custom:false },
-     { id:'p30', title:'Ankle Eversion (Band)',          muscle:'physio',      sub:'Ankle Rehab',      desc:'Band around foot. Evert foot outward against resistance. Targets peroneals. Critical strengthening exercise after lateral ankle sprain.', diff:'Beginner',     duration:'35s', premium:false, custom:false },
-     // Neck Rehab
-     { id:'p31', title:'Cervical Retraction',            muscle:'physio',      sub:'Neck Rehab',       desc:'Gently glide chin straight back. Hold 3 sec. Release. Corrects forward head posture. Activates deep cervical flexors. Do 10 reps hourly.', diff:'Beginner',     duration:'25s', premium:false, custom:false },
-     { id:'p32', title:'Neck Side Bend Stretch',         muscle:'physio',      sub:'Neck Rehab',       desc:'Gently tilt ear toward shoulder. Hand on head for gentle overpressure. Hold 30 sec. Stretches scalenes and upper trapezius. Both sides.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'p33', title:'Levator Scapulae Stretch',       muscle:'physio',      sub:'Neck Rehab',       desc:'Turn head 45°, look down toward armpit. Gentle hand pressure on back of head. Hold 30 sec. Targets levator scapulae — common tension area.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'p34', title:'Deep Neck Flexor Activation',   muscle:'physio',      sub:'Neck Rehab',       desc:'Lie supine. Gently nod chin down, hold 10 sec. Only small movement. Activates longus colli and capitis. Critical for cervical stability.', diff:'Beginner',     duration:'30s', premium:false, custom:false },
-     // Balance & Proprioception
-     { id:'p35', title:'BOSU Balance',                   muscle:'physio',      sub:'Balance',          desc:'Stand on BOSU dome side. Single or double leg. Progress to eyes closed or ball throwing. Excellent proprioception and ankle-to-hip stability training.', diff:'Intermediate', duration:'45s', premium:false, custom:false },
-     { id:'p36', title:'Star Excursion Balance',         muscle:'physio',      sub:'Balance',          desc:'Stand on one leg. Reach with other foot in 8 directions. Return to start. Assesses and trains dynamic balance. Used post ACL and ankle rehab.', diff:'Intermediate', duration:'50s', premium:true,  custom:false },
-     { id:'p37', title:'Tandem Walk',                    muscle:'physio',      sub:'Balance',          desc:'Walk heel-to-toe in a straight line. Arms out or crossed. Eyes open then closed. Tests and trains vestibular and proprioceptive balance systems.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     // Breathing & Diaphragm
-     { id:'p38', title:'Diaphragmatic Breathing',        muscle:'physio',      sub:'Breathing',        desc:'Lie supine. Place hand on belly. Inhale, belly rises, chest still. Exhale slowly. 4-count in, 6-count out. Activates diaphragm and parasympathetic system.', diff:'Beginner',     duration:'40s', premium:false, custom:false },
-     { id:'p39', title:'90-90 Breathing',                muscle:'physio',      sub:'Breathing',        desc:'Lie supine, hips and knees at 90° on wall. Exhale fully. Inhale to lateral ribcage. Hold exhale. Resolves rib flare and restores Zone of Apposition.', diff:'Beginner',     duration:'45s', premium:false, custom:false },
-   ];
+   // Master library — loaded from Firestore cloud on boot (see syncMasterLibraryFromFirestore)
+   // localStorage used as offline cache from last successful fetch
+   let MASTER_EXERCISES = JSON.parse(localStorage.getItem('repcast_master') || 'null') || [];
    
    let customExercises    = [];
    let _customVideosUnsubscribe = null;
@@ -297,26 +385,62 @@
      document.getElementById('auth-manager').style.display  = 'block';
    }
    
-   /* ── Manager login (credential check, no Firebase Auth) ── */
-   function doManagerLogin() {
-     const email = document.getElementById('manager-email').value.trim();
+   /* ── Manager login — credentials verified against Firestore ── */
+   async function doManagerLogin() {
+     const email = document.getElementById('manager-email').value.trim().toLowerCase();
      const pass  = document.getElementById('manager-pass').value;
-   
-     if (email !== MANAGER_EMAIL || pass !== MANAGER_PASSWORD) {
-       showToast('❌ Invalid manager credentials.');
-       document.getElementById('manager-pass').value = '';
-       document.getElementById('manager-pass').focus();
-       return;
+
+     if (!email || !pass) { showToast('Please enter email and password.'); return; }
+
+     const btn = document.querySelector('#auth-manager .btn-manager');
+     if (btn) { btn.disabled = true; btn.innerHTML = 'Checking...'; }
+
+     function loginSuccess(name) {
+       state.isManager = true;
+       state.user = { uid:'manager', email:email, fullName:name||'Manager', role:'manager' };
+       showScreen('manager');
+       renderAdminTable();
+       updateAdminStats();
+       // Load all resource data for admin
+       loadMenus();
+     loadFoods();
+       loadFoods();
+       loadPrograms();
+       loadRecipes();
+       loadResearch();
+       showToast('Welcome, ' + state.user.fullName + '!');
+       if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-shield-check"></i> Sign In as Manager'; }
      }
-   
-     state.isManager = true;
-     state.user = { uid: 'manager', email: MANAGER_EMAIL, fullName: 'Reem Kabra', role: 'manager' };
-   
-     showScreen('manager');
-   
-     renderAdminTable();
-     updateAdminStats();
-     showToast('✓ Welcome, Manager!');
+
+     function loginFail(msg) {
+       showToast(msg || 'Invalid manager credentials.');
+       document.getElementById('manager-pass').value = '';
+       if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-shield-check"></i> Sign In as Manager'; }
+     }
+
+     // Try Firestore first, fall back to hardcoded if Firebase not ready
+     if (window._firebase && window._db) {
+       try {
+         const snap = await window._firebase.getDoc(
+           window._firebase.doc(window._db, 'admins', email)
+         );
+         if (!snap.exists()) { loginFail('Invalid manager credentials.'); return; }
+         const adminData = snap.data();
+         if (adminData.password !== pass) { loginFail('Invalid manager credentials.'); return; }
+         loginSuccess(adminData.name);
+         return;
+       } catch(e) {
+         console.warn('Firestore admin read failed:', e.code, '— trying fallback');
+         // Fall through to hardcoded check below
+       }
+     }
+
+     // Fallback: hardcoded credentials (used if Firebase not ready)
+     if (email === 'reemkabra@gmail.com' && pass === 'Reem@!1901') {
+       loginSuccess('Reem Kabra');
+     } else {
+       loginFail('Invalid manager credentials.');
+     }
    }
    
    /* ── Email / Password login ─────────────────────────────── */
@@ -344,34 +468,135 @@
      var provider = new window._firebase.GoogleAuthProvider();
      provider.addScope('email');
      provider.addScope('profile');
-   
-     window._firebase.signInWithPopup(window._auth, provider)
-       .then(async function(result) {
-         var user    = result.user;
-         var profile = await loadUserProfile(user.uid);
-         if (!profile) {
-           await createUserProfile(user.uid, {
-             fullName:     user.displayName || 'Trainer',
-             email:        user.email,
-             businessName: 'My Studio',
-             phone:        '',
-             specialty:    'Personal Trainer',
-           });
+     provider.setCustomParameters({ prompt: 'select_account' });
+
+     var isNative = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
+
+     if (isNative) {
+       // For @codetrix-studio/capacitor-google-auth 3.4.0-rc.4 with Capacitor 8
+       // The plugin registers under Capacitor.Plugins.GoogleAuth
+       var googleAuthPlugin = null;
+       if (window.Capacitor && window.Capacitor.Plugins) {
+         googleAuthPlugin = window.Capacitor.Plugins.GoogleAuth || window.Capacitor.Plugins['GoogleAuth'];
+       }
+       if (!googleAuthPlugin && window.GoogleAuth) googleAuthPlugin = window.GoogleAuth;
+
+
+       if (googleAuthPlugin) {
+         (async function() {
+           try {
+
+             showToast('Opening Google...');
+
+             // Initialize plugin
+             if (googleAuthPlugin.initialize) {
+               await googleAuthPlugin.initialize({
+                 clientId: '1055475395403-kc7vqjas5duve2ri4u1kf6745a6o79vo.apps.googleusercontent.com',
+                 scopes: ['email', 'profile'],
+                 grantOfflineAccess: true,
+                 forceCodeForRefreshToken: true
+               });
+             }
+
+             // Sign out from plugin first so account picker appears every time
+             if (googleAuthPlugin.signOut) {
+               try { await googleAuthPlugin.signOut(); } catch(e) {}
+             }
+
+             var googleUser = await googleAuthPlugin.signIn();
+
+
+             if (!googleUser) throw new Error('No user returned');
+
+             var auth = googleUser.authentication || googleUser.result || {};
+             var idToken = auth.idToken || googleUser.idToken || auth.id_token;
+             console.log('[GoogleAuth] Step 3: idToken exists:', !!idToken);
+
+             if (!idToken) {
+  
+               throw new Error('No idToken. Keys: ' + Object.keys(googleUser).join(','));
+             }
+
+
+             var credential = window._firebase.GoogleAuthProvider.credential(idToken);
+
+
+             var result = await window._firebase.signInWithCredential(window._auth, credential);
+
+
+             var user    = result.user;
+             var profile = await loadUserProfile(user.uid);
+             var isNewUser = !profile;
+             if (isNewUser) {
+               await createUserProfile(user.uid, {
+                 fullName:     user.displayName || 'Trainer',
+                 email:        user.email,
+                 businessName: 'My Studio',
+                 phone: '', specialty: 'Personal Trainer',
+               });
+               // First time Google sign-in — send verification email
+               try {
+                 await window._firebase.sendEmailVerification(user);
+                 showToast('Welcome! A confirmation email was sent to ' + user.email + '. Please verify to continue.');
+               } catch(verErr) { console.warn('Verification email error:', verErr); }
+             }
+             await _bootFromFirebaseUser(user);
+           } catch(e) {
+             var msg = e && (e.message || e.error || e.code || JSON.stringify(e)) || 'Unknown';
+
+             if (msg.indexOf('popup_closed') === -1 && msg.indexOf('canceled') === -1 && msg.indexOf('cancel') === -1) {
+               showToast('Error: ' + msg.substring(0, 60));
+             }
+           }
+         })();
+       } else {
+         // Show error prominently — centered alert style
+         var errDiv = document.getElementById('native-google-error');
+         if (!errDiv) {
+           errDiv = document.createElement('div');
+           errDiv.id = 'native-google-error';
+           errDiv.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:24px 20px;text-align:center;z-index:9999;width:280px;box-shadow:0 20px 60px rgba(0,0,0,0.5)';
+           errDiv.innerHTML = '<i class="ti ti-brand-google" style="font-size:32px;color:#FBBF24;margin-bottom:12px;display:block"></i>' +
+             '<p style="font-size:14px;color:var(--text);margin-bottom:16px">Google sign-in requires additional setup on mobile.<br><br>Please use <strong>email and password</strong> to sign in.</p>' +
+             '<button onclick="this.parentElement.remove()" style="background:var(--accent);color:#071a0e;border:none;border-radius:8px;padding:10px 24px;font-weight:700;font-size:14px;cursor:pointer;width:100%">OK</button>';
+           document.body.appendChild(errDiv);
          }
-         await _bootFromFirebaseUser(user);
-       })
-       .catch(function(e) {
-         console.error('Google login error:', e.code, e.message);
-         if (e.code === 'auth/popup-blocked') {
-           showToast('Popup was blocked. Please allow popups for this site and try again.');
-         } else if (e.code === 'auth/popup-closed-by-user') {
-           showToast('Google sign-in was cancelled.');
-         } else if (e.code === 'auth/unauthorized-domain') {
-           showToast('This domain is not authorised in Firebase. Add it in Firebase Console → Authentication → Settings → Authorised domains.');
-         } else {
-           showToast('❌ Google sign-in failed: ' + friendlyError(e.code));
-         }
-       });
+       }
+       return;
+     } else {
+       // Browser: use popup
+       window._firebase.signInWithPopup(window._auth, provider)
+         .then(async function(result) {
+           var user    = result.user;
+           var profile = await loadUserProfile(user.uid);
+           var isNewGoogleUser = !profile;
+           if (isNewGoogleUser) {
+             await createUserProfile(user.uid, {
+               fullName:     user.displayName || 'Trainer',
+               email:        user.email,
+               businessName: 'My Studio',
+               phone:        '',
+               specialty:    'Personal Trainer',
+             });
+             // First time Google sign-in — send verification email
+             try {
+               await window._firebase.sendEmailVerification(user);
+               showToast('Welcome! A confirmation email was sent to ' + user.email + '. Please verify to continue.');
+             } catch(verErr) { console.warn('Verification email error:', verErr); }
+           }
+           await _bootFromFirebaseUser(user);
+         })
+         .catch(function(e) {
+           console.error('Google login error:', e.code, e.message);
+           if (e.code === 'auth/popup-blocked') {
+             showToast('Popup was blocked. Please allow popups for this site.');
+           } else if (e.code === 'auth/popup-closed-by-user') {
+             showToast('Google sign-in was cancelled.');
+           } else {
+             showToast('❌ Google sign-in failed: ' + friendlyError(e.code));
+           }
+         });
+     }
    }
    
    /* ── Register ───────────────────────────────────────────── */
@@ -396,48 +621,92 @@
          fullName: name, businessName: biz, email,
          phone: '', specialty: spec,
        });
-       await _bootFromFirebaseUser(user);
-       showToast('✅ Account created! Check your email to verify your address.');
+       // Send verification email
+       await window._firebase.sendEmailVerification(user);
+       // Sign them out immediately — they must verify before entering
+       await window._firebase.signOut(window._auth);
+       showVerificationPending(email);
      } catch (e) {
        showToast('❌ ' + friendlyError(e.code));
      }
    }
    
    /* ── Shared boot helper — loads profile then boots app ─── */
-   async function _bootFromFirebaseUser(user) {
-     const profile = await loadUserProfile(user.uid) || {};
-   
+   async function _bootFromFirebaseUser(firebaseUser) {
+     // Use a mutable reference
+     var user = firebaseUser;
+
+     // ── Email verification check ────────────────────────────
+     // Google users are always verified. Email/password users must verify first.
+     var isGoogle = user.providerData && user.providerData.some(function(p){
+       return p.providerId === 'google.com';
+     });
+
+     if (!isGoogle && !user.emailVerified) {
+       // Reload to get fresh emailVerified from Firebase server
+       try {
+         await user.reload();
+         user = window._auth.currentUser || user;
+       } catch(e) {
+         console.warn('reload error:', e.code);
+       }
+       if (!user || !user.emailVerified) {
+         await window._firebase.signOut(window._auth);
+         showVerificationPending(firebaseUser.email);
+         return;
+       }
+     }
+
+     var profile = await loadUserProfile(user.uid) || {};
+
      // ── Determine correct tier ──────────────────────────────
-     // Raw tier from Firestore (may be old 'trial' set by previous code)
+     // Client accounts go straight to client portal
+     if (profile.tier === 'client') {
+       await bootClientPortal(user, profile);
+       return;
+     }
+
      let storedTier = profile.tier || 'free_limited';
-     const daysLeft = calcTrialDays(profile.trialEndDate);
-   
-     // Determine correct tier — handle both old auto-trial users and new flow
+     const daysLeft    = calcTrialDays(profile.trialEndDate);
+     const premiumDays = profile.premiumUntil
+       ? Math.max(0, Math.ceil((new Date(profile.premiumUntil) - Date.now()) / 86400000))
+       : 0;
+
+     // ── Determine correct tier ────────────────────────────────
      let tier;
      if (storedTier === 'premium') {
+       // Active paid membership
        tier = 'premium';
+
+     } else if (storedTier === 'premium_cancelled') {
+       // User cancelled but still in grace period (paid until date)
+       if (premiumDays > 0) {
+         tier = 'premium_cancelled'; // full access until premiumUntil
+       } else {
+         // Grace period expired — downgrade to free_limited
+         tier = 'free_limited';
+         window._firebase.setDoc(
+           window._firebase.doc(window._db, 'users', user.uid),
+           { tier: 'free_limited' }, { merge: true }
+         ).catch(function(){});
+       }
+
      } else if (storedTier === 'trial') {
-       // Only honour 'trial' if:
-       // 1. The user explicitly activated it (trialActivatedByUser flag), AND
-       // 2. trialEndDate is in the future
        const isLegitTrial = profile.trialActivatedByUser === true
                          && profile.trialEndDate
                          && daysLeft > 0;
        if (isLegitTrial) {
          tier = 'trial';
        } else {
-         // Old auto-trial or expired trial → downgrade to free_limited
          tier = 'free_limited';
-         try {
-           await window._firebase.setDoc(
-             window._firebase.doc(window._db, 'users', user.uid),
-             { tier: 'free_limited', trialExpiredAt: new Date().toISOString() },
-             { merge: true }
-           );
-         } catch(e) { console.warn('Tier downgrade failed:', e); }
+         window._firebase.setDoc(
+           window._firebase.doc(window._db, 'users', user.uid),
+           { tier: 'free_limited', trialExpiredAt: new Date().toISOString() },
+           { merge: true }
+         ).catch(function(){});
        }
+
      } else {
-       // free_limited, free, or unset → always free_limited for new system
        tier = 'free_limited';
      }
    
@@ -447,14 +716,18 @@
      const trialUsed = !!profile.trialActivatedByUser;
    
      state.user = {
-       uid:           user.uid,
-       email:         user.email,
-       fullName:      profile.fullName     || user.displayName || 'Trainer',
-       businessName:  profile.businessName || 'My Studio',
-       phone:         profile.phone        || '',
-       specialty:     profile.specialty    || 'Personal Trainer',
+       uid:              user.uid,
+       email:            user.email,
+       fullName:         profile.fullName     || user.displayName || 'Trainer',
+       businessName:     profile.businessName || 'My Studio',
+       phone:            profile.phone        || '',
+       specialty:        profile.specialty    || 'Personal Trainer',
        tier,
-       trialDaysLeft: tier === 'trial' ? daysLeft : 0,
+       trialDaysLeft:    tier === 'trial' ? daysLeft : 0,
+       trialEndDate:     profile.trialEndDate  || null,
+       premiumUntil:     profile.premiumUntil  || null,
+       premiumDaysLeft:  (tier === 'premium_cancelled') ? premiumDays : 0,
+       morningPaymentId: profile.morningPaymentId || null,
        trialUsed,
      };
      state.isManager = false;
@@ -463,10 +736,81 @@
    
    /* ── Screen switcher (landing / auth / app) ─────────────── */
    function showScreen(name) {
-     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-     document.getElementById('screen-' + name).classList.add('active');
+     document.querySelectorAll('.screen').forEach(function(s) {
+       s.classList.remove('active');
+       s.style.removeProperty('display'); // clear any inline override
+     });
+     var el = document.getElementById('screen-' + name);
+     if (el) {
+       el.classList.add('active');
+       // Native needs explicit display since CSS may conflict
+       if (document.documentElement.classList.contains('is-native')) {
+         el.style.display = 'flex';
+       }
+     }
+
+     // Tab bar: ONLY show on trainer app screen
+     var tabBar = document.getElementById('mobile-tab-bar');
+     if (tabBar) {
+       var showTab = (name === 'app');
+       // Use both display and visibility to ensure it's truly hidden
+       tabBar.style.display    = showTab ? 'flex' : 'none';
+       tabBar.style.visibility = showTab ? 'visible' : 'hidden';
+     }
+     document.body.className = 'screen-' + name + '-active';
    }
    
+   /* ── Verification pending screen ──────────────────────── */
+   function closeVerifyBanner() {
+     var el = document.getElementById('verify-pending-banner');
+     if (el) el.remove();
+   }
+
+   function showVerificationPending(email) {
+     showScreen('auth');
+     // Show a specific message in the auth screen
+     var existing = document.getElementById('verify-pending-banner');
+     if (existing) existing.remove();
+
+     var banner = document.createElement('div');
+     banner.id = 'verify-pending-banner';
+     banner.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;padding:24px';
+     banner.innerHTML =
+       '<div style="max-width:420px;width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;text-align:center">' +
+         '<div style="width:64px;height:64px;background:rgba(251,191,36,0.12);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px">' +
+           '<i class="ti ti-mail" style="font-size:28px;color:#FBBF24"></i>' +
+         '</div>' +
+         '<h2 style="margin-bottom:10px">Check your email</h2>' +
+         '<p style="color:var(--muted);font-size:14px;margin-bottom:6px">We sent a verification link to:</p>' +
+         '<p style="font-weight:700;font-size:15px;margin-bottom:20px">' + email + '</p>' +
+         '<p style="color:var(--muted);font-size:13px;margin-bottom:24px">Click the link in the email to verify your account, then come back and sign in.</p>' +
+         '<button class="btn btn-primary btn-full" onclick="resendVerificationEmail(\'' + email + '\')" style="margin-bottom:10px">' +
+           '<i class="ti ti-send"></i> Resend Verification Email' +
+         '</button>' +
+         '<button class="btn btn-ghost btn-full" onclick="closeVerifyBanner()">Back to Sign In</button>' +
+
+         '</button>' +
+       '</div>';
+     document.body.appendChild(banner);
+   }
+
+   async function resendVerificationEmail(email) {
+     try {
+       // Sign in temporarily to get the user, then send verification
+       showToast('Sending verification email to ' + email + '...');
+       // We can't send without being signed in — prompt them to sign in again
+       // then immediately send the email
+       var pass = prompt('Enter your password to resend the verification email:');
+       if (!pass) return;
+       var result = await window._firebase.signInWithEmailAndPassword(window._auth, email, pass);
+       await window._firebase.sendEmailVerification(result.user);
+       await window._firebase.signOut(window._auth);
+       showToast('Verification email sent! Check your inbox.');
+     } catch(e) {
+       showToast('Could not resend: ' + friendlyError(e.code));
+     }
+   }
+
    /* ── Logout — signs out of Firebase, returns to landing ── */
    async function doLogout() {
      // Cancel real-time listeners and timers before signing out
@@ -511,15 +855,28 @@
      var nudgeText = document.getElementById('upgrade-nudge-text');
      if (!nudgeText) return;
    
-     if (tier === 'trial') {
-       var days = state.user.trialDaysLeft || 0;
-       nudgeText.innerHTML = 'Trial: <strong>' + days + ' day' + (days !== 1 ? 's' : '') + ' left</strong> &mdash; <a href="#" onclick="showUpgrade()" style="color:var(--accent)">Upgrade to Pro (₪25/mo)</a> to keep full access.';
-   
+     if (tier === 'premium') {
+       // Already handled above — banner hidden
+       return;
+
+     } else if (tier === 'premium_cancelled') {
+       var untilDate = state.user.premiumUntil
+         ? new Date(state.user.premiumUntil).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' })
+         : 'end of billing period';
+       var daysLeft2 = state.user.premiumDaysLeft || 0;
+       nudgeText.innerHTML = 'Subscription cancelled. Full access until <strong>' + untilDate + '</strong> (' + daysLeft2 + ' day' + (daysLeft2 !== 1 ? 's' : '') + '). <a href="#" onclick="handleGrowPayment()" style="color:var(--accent)">Reactivate ₪25/mo</a>';
+       banner.classList.remove('dismissed');
+
+     } else if (tier === 'trial') {
+       var days = calcTrialDays(state.user.trialEndDate) || state.user.trialDaysLeft || 0;
+       state.user.trialDaysLeft = days;
+       nudgeText.innerHTML = 'Trial: <strong>' + days + ' day' + (days !== 1 ? 's' : '') + ' left</strong> &mdash; <a href="#" onclick="showUpgrade()" style="color:var(--accent)">Upgrade to Pro (&#8362;25/mo)</a> to keep full access.';
+
      } else if (tier === 'free_limited') {
        if (state.user.trialUsed) {
-         nudgeText.innerHTML = 'Your trial ended. <a href="#" onclick="showUpgrade()" style="color:var(--accent)">Upgrade to Pro &mdash; ₪25/mo</a> for full access.';
+         nudgeText.innerHTML = 'Your trial ended. <a href="#" onclick="showUpgrade()" style="color:var(--accent)">Upgrade to Pro &mdash; &#8362;25/mo</a> for full access.';
        } else {
-         nudgeText.innerHTML = 'You have <strong>limited access</strong>. <a href="#" onclick="openModal(String.fromCharCode(39)+String.fromCharCode(115,116,97,114,116,45,116,114,105,97,108)+String.fromCharCode(39))" style="color:var(--accent)">Start free 7-day trial</a> &mdash; no card needed.';
+         nudgeText.innerHTML = 'You have <strong>limited access</strong>. <a href="#" onclick="openModal(&quot;start-trial&quot;)" style="color:var(--accent)">Start free 7-day trial</a> &mdash; no card needed.';
        }
      } else {
        nudgeText.innerHTML = 'Free plan. <a href="#" onclick="showUpgrade()" style="color:var(--accent)">Upgrade to Pro</a> to unlock everything.';
@@ -528,18 +885,38 @@
    
    /* ── Boot trainer app UI ────────────────────────────────── */
    async function bootTrainerApp() {
+  // Patch save functions to support Hebrew collections
+  try { patchHeSaves(); } catch(e) { console.warn('patchHeSaves error:', e); }
+  // Expose renderers globally so applyLang() can call them from outside IIFE
+  window._renderMenuLibrary  = function(){ if(typeof renderMenuLibrary  === 'function') renderMenuLibrary(); };
+  window._renderProgramsView = function(){ if(typeof renderProgramsView === 'function') renderProgramsView(); };
+  window._renderRecipesView  = function(){ if(typeof renderRecipesView  === 'function') renderRecipesView(); };
+  window._renderResearchView = function(){ if(typeof renderResearchView === 'function') renderResearchView(); };
+  window._renderClientsList  = function(){ if(typeof renderClientsList  === 'function') renderClientsList(); };
      const u    = state.user;
      const tier = u.tier;
-   
+
+     // Helper — set element property safely
+     function setEl(id, prop, val) {
+       try { var e = document.getElementById(id); if (e) e[prop] = val; } catch(err) {}
+     }
+
      // ── User identity ─────────────────────────────────────────
-     document.getElementById('topnav-avatar').textContent        = initials(u.fullName);
-     document.getElementById('topnav-name').textContent          = u.fullName;
-     document.getElementById('profile-avatar').textContent       = initials(u.fullName);
-     document.getElementById('profile-display-name').textContent = u.fullName;
-     document.getElementById('profile-display-biz').textContent  = u.businessName;
-     document.getElementById('pf-name').value                    = u.fullName;
-     document.getElementById('pf-phone').value                   = u.phone;
-     document.getElementById('pf-biz').value                     = u.businessName;
+     if (u.photoURL) {
+       ['topnav-avatar','profile-avatar'].forEach(function(id){
+         var el = document.getElementById(id);
+         if (el) { el.style.backgroundImage='url('+u.photoURL+')'; el.style.backgroundSize='cover'; el.style.backgroundPosition='center'; el.textContent=''; }
+       });
+     } else {
+       setEl('topnav-avatar', 'textContent', initials(u.fullName));
+     }
+     setEl('topnav-name',          'textContent', u.fullName);
+     setEl('profile-avatar',       'textContent', initials(u.fullName));
+     setEl('profile-display-name', 'textContent', u.fullName);
+     setEl('profile-display-biz',  'textContent', u.businessName);
+     setEl('pf-name',  'value', u.fullName);
+     setEl('pf-phone', 'value', u.phone);
+     setEl('pf-biz',   'value', u.businessName);
    
      // ── Trial pill in topnav: only show when actively on trial ──
      const trialPill = document.getElementById('trial-pill-top');
@@ -558,8 +935,12 @@
      const tierCardEl    = document.getElementById('tier-status-card');
    
      if (tier === 'trial') {
-       if (tierDaysEl)    tierDaysEl.textContent    = u.trialDaysLeft;
-       if (billingDaysEl) billingDaysEl.textContent = u.trialDaysLeft + ' days';
+       // Recalculate from trialEndDate so it's always accurate, not stale
+       const realDays = calcTrialDays(u.trialEndDate) || u.trialDaysLeft || 0;
+       u.trialDaysLeft = realDays; // keep in sync
+       if (document.getElementById('trial-days-top')) document.getElementById('trial-days-top').textContent = realDays;
+       if (tierDaysEl)    tierDaysEl.textContent    = realDays;
+       if (billingDaysEl) billingDaysEl.textContent = realDays + ' day' + (realDays !== 1 ? 's' : '') + ' remaining';
        if (tierCardEl)    tierCardEl.style.display  = '';
      } else if (tier === 'premium') {
        if (tierCardEl)    tierCardEl.style.display  = 'none';
@@ -582,6 +963,11 @@
      // onAuthStateChanged guarantees token validity before calling _bootFromFirebaseUser.
      loadCustomVideosFromFirestore(u.uid);
      loadPublicVideosFromFirestore();
+     loadMenus();
+     loadPrograms();
+     loadRecipes();
+     loadResearch();
+     loadClients();
    
      renderLibrary();
      updateStats();
@@ -779,6 +1165,33 @@
      }
    }
 
+   /* ── YouTube URL helpers ─────────────────────────────────── */
+   function isYouTubeURL(url) {
+     return url && (url.includes('youtube.com') || url.includes('youtu.be'));
+   }
+
+   function getYouTubeID(url) {
+     if (!url) return null;
+     // youtu.be/ID
+     var m = url.match(/youtu\.be\/([^?&]+)/);
+     if (m) return m[1];
+     // youtube.com/watch?v=ID
+     m = url.match(/[?&]v=([^?&]+)/);
+     if (m) return m[1];
+     // youtube.com/embed/ID
+     m = url.match(/embed\/([^?&]+)/);
+     if (m) return m[1];
+     // youtube.com/shorts/ID
+     m = url.match(/shorts\/([^?&]+)/);
+     if (m) return m[1];
+     return null;
+   }
+
+   function getYouTubeThumbnail(url) {
+     var id = getYouTubeID(url);
+     return id ? 'https://img.youtube.com/vi/' + id + '/mqdefault.jpg' : null;
+   }
+
    function reloadMyVideos() {
      if (!state.user) return;
      showToast('Reloading your videos…');
@@ -790,66 +1203,79 @@
    /* ── Tier expiry checker — runs on boot and every 30 min ── */
    function checkTierExpiry() {
      if (!state.user || !window._firebase || !window._db) return;
-     const tier = state.user.tier;
-   
-     // Check trial expiry
-     if (tier === 'trial' && state.user.trialDaysLeft <= 0) {
-       console.log('Trial expired — downgrading to free_limited');
-       window._firebase.setDoc(
-         window._firebase.doc(window._db, 'users', state.user.uid),
-         { tier: 'free_limited', trialExpiredAt: new Date().toISOString() },
-         { merge: true }
-       ).then(() => {
+     var tier = state.user.tier;
+
+     // ── 1. Trial expiry (local check) ────────────────────────
+     if (tier === 'trial') {
+       var trialDays = calcTrialDays(state.user.trialEndDate);
+       state.user.trialDaysLeft = trialDays;
+       if (trialDays <= 0) {
+         window._firebase.setDoc(
+           window._firebase.doc(window._db, 'users', state.user.uid),
+           { tier: 'free_limited', trialExpiredAt: new Date().toISOString() },
+           { merge: true }
+         ).catch(function(){});
          state.user.tier = 'free_limited';
          state.user.trialDaysLeft = 0;
-         renderLibrary();
-         updateNudgeBanner();
-         updateStats();
-         showToast('Your free trial has ended. Upgrade to Pro to restore full access.');
-       }).catch(e => console.warn('Tier downgrade error:', e));
-       return;
-     }
-   
-     // Re-fetch profile from Firestore to catch server-side changes
-     // (e.g. Morning webhook upgraded or cancelled the user)
-     loadUserProfile(state.user.uid).then(profile => {
-       if (!profile) return;
-       const serverTier = profile.tier;
-       const localTier  = state.user.tier;
-   
-       // Server has a different tier than local state — sync it
-       if (serverTier !== localTier) {
-         console.log('Tier changed on server:', localTier, '→', serverTier);
-   
-         // Check if premium cancelled but still in grace period
-         if (localTier === 'premium' && serverTier !== 'premium' && profile.premiumUntil) {
-           const graceDays = Math.ceil((new Date(profile.premiumUntil) - Date.now()) / 86400000);
-           if (graceDays > 0) {
-             // Still in grace period — keep premium locally, show notice
-             showToast('Subscription cancelled. Access continues until ' +
-               new Date(profile.premiumUntil).toLocaleDateString('en-IL'));
-             return;
-           }
-         }
-   
-         // Apply server tier
-         state.user.tier = serverTier === 'premium' ? 'premium'
-                         : serverTier === 'trial'   ? 'trial'
-                         : 'free_limited';
-   
-         if (serverTier === 'trial') {
-           state.user.trialDaysLeft = calcTrialDays(profile.trialEndDate);
-         }
-   
-         renderLibrary();
-         updateNudgeBanner();
-         updateStats();
-   
-         if (serverTier === 'premium' && localTier !== 'premium') {
-           showToast('🎉 Premium activated! Full access unlocked.');
-         }
+         renderLibrary(); updateNudgeBanner(); updateStats();
+         showToast('Your free trial has ended. Upgrade to Pro to keep full access.');
+         return;
        }
-     }).catch(e => console.warn('Tier expiry check error:', e));
+     }
+
+     // ── 2. Premium cancelled grace period (local check) ──────
+     if (tier === 'premium_cancelled') {
+       var premDays = state.user.premiumUntil
+         ? Math.max(0, Math.ceil((new Date(state.user.premiumUntil) - Date.now()) / 86400000))
+         : 0;
+       state.user.premiumDaysLeft = premDays;
+       if (premDays <= 0) {
+         window._firebase.setDoc(
+           window._firebase.doc(window._db, 'users', state.user.uid),
+           { tier: 'free_limited' }, { merge: true }
+         ).catch(function(){});
+         state.user.tier = 'free_limited';
+         renderLibrary(); updateNudgeBanner(); updateStats();
+         showToast('Your Premium membership has ended. Upgrade to restore access.');
+         return;
+       }
+       updateNudgeBanner();
+     }
+
+     // ── 3. Sync from Firestore — catches Morning webhook changes ──
+     loadUserProfile(state.user.uid).then(function(profile) {
+       if (!profile) return;
+       var serverTier = profile.tier;
+       var localTier  = state.user.tier;
+       if (serverTier === localTier) return;
+
+       console.log('[RepCast] Tier sync:', localTier, '->', serverTier);
+
+       if (serverTier === 'premium') {
+         state.user.tier             = 'premium';
+         state.user.premiumUntil     = profile.premiumUntil     || null;
+         state.user.morningPaymentId = profile.morningPaymentId || null;
+         renderLibrary(); updateNudgeBanner(); updateStats();
+         showToast('Premium activated! Full access unlocked.');
+
+       } else if (serverTier === 'premium_cancelled') {
+         var graceDays = profile.premiumUntil
+           ? Math.max(0, Math.ceil((new Date(profile.premiumUntil) - Date.now()) / 86400000))
+           : 0;
+         state.user.tier            = graceDays > 0 ? 'premium_cancelled' : 'free_limited';
+         state.user.premiumUntil    = profile.premiumUntil || null;
+         state.user.premiumDaysLeft = graceDays;
+         renderLibrary(); updateNudgeBanner(); updateStats();
+         if (graceDays > 0) {
+           var d = new Date(profile.premiumUntil).toLocaleDateString('en-GB', { day:'numeric', month:'long' });
+           showToast('Subscription cancelled. Access continues until ' + d + '.');
+         }
+
+       } else {
+         state.user.tier = 'free_limited';
+         renderLibrary(); updateNudgeBanner(); updateStats();
+       }
+     }).catch(function(e){ console.warn('[RepCast] Tier check error:', e.code); });
    }
    
    // Run expiry check every 30 minutes while app is open
@@ -945,6 +1371,7 @@
        // Update local state immediately
        state.user.tier          = 'trial';
        state.user.trialDaysLeft = 7;
+       state.user.trialEndDate  = trialEnd;   // store so recalculation works
        state.user.trialUsed     = true;
    
        // Update all UI elements that show trial info
@@ -954,7 +1381,7 @@
          if (el) el.textContent = 7;
        });
        const billingEl = document.getElementById('billing-days');
-       if (billingEl) billingEl.textContent = '7 ימים';
+       if (billingEl) billingEl.textContent = '7 days';
    
        // Close modal, re-render library (unlocks cards), update banner
        closeAllModals();
@@ -1016,14 +1443,52 @@
       VIEWS
    ══════════════════════════════════════════════════════════ */
    
+   var PRO_ONLY_VIEWS = ['nutrition','programs','recipes','research','clients'];
+
    function setView(viewId, navEl) {
-     document.querySelectorAll('#screen-app .view').forEach(v => v.classList.remove('active'));
+     // Tier check for pro-only sections
+     if (PRO_ONLY_VIEWS.includes(viewId)) {
+       var tier = state.user ? state.user.tier : 'free_limited';
+       var allowed = (tier === 'premium' || tier === 'premium_cancelled' || tier === 'trial' || tier === 'client');
+       if (!allowed) {
+         showProGate(viewId);
+         return;
+       }
+     }
+     var isNative = document.documentElement.classList.contains('is-native');
+     document.querySelectorAll('#screen-app .view').forEach(function(v) {
+       v.classList.remove('active');
+       if (isNative) v.style.display = 'none'; // native: explicit hide
+       else v.style.removeProperty('display');
+     });
      document.querySelectorAll('.topnav-link').forEach(n => n.classList.remove('active'));
-     document.getElementById('view-' + viewId).classList.add('active');
+     var activeView = document.getElementById('view-' + viewId);
+     if (activeView) {
+       activeView.classList.add('active');
+       if (isNative) activeView.style.display = 'flex'; // native: explicit show
+       else activeView.style.removeProperty('display');
+     }
      if (navEl) navEl.classList.add('active');
      state.currentView = viewId;
-     const musclePanel = document.getElementById('muscle-panel');
+     var musclePanel = document.getElementById('muscle-panel');
      if (musclePanel) musclePanel.style.display = viewId === 'library' ? '' : 'none';
+     // Reload data on first visit to each section
+     if (viewId === 'nutrition') { if (!menus.length)     loadMenus();    else renderMenuLibrary(); }
+     if (viewId === 'programs')  { if (!programs.length)  loadPrograms(); else renderProgramsView(); }
+     if (viewId === 'recipes')   { if (!recipes.length)   loadRecipes();  else renderRecipesView(); }
+     if (viewId === 'research')  { if (!researches.length) loadResearch(); else renderResearchView(); }
+   }
+
+   function showProGate(viewId) {
+     var names = {
+       nutrition:'Nutrition', programs:'Programs',
+       recipes:'Recipes', research:'Research', clients:'Clients'
+     };
+     var modal = document.getElementById('modal-pro-gate');
+     if (!modal) { showUpgrade(); return; }
+     var featureEl = document.getElementById('pro-gate-feature');
+     if (featureEl) featureEl.textContent = names[viewId] || viewId;
+     openModal('pro-gate');
    }
    
    function setAdminView(viewId, navEl) {
@@ -1033,6 +1498,11 @@
      if (navEl) navEl.classList.add('active');
      // Auto-load users when switching to users tab
      if (viewId === 'users') loadAdminUsers();
+     if (viewId === 'foods')     { if (foods.length)     renderAdminFoodList();     else loadFoods(); }
+     if (viewId === 'nutrition') { if (menus.length)     renderAdminMenuList();    else loadMenus(); }
+     if (viewId === 'programs')  { if (programs.length)  renderAdminProgramsList(); else loadPrograms(); }
+     if (viewId === 'recipes')   { if (recipes.length)   renderAdminRecipesList();  else loadRecipes(); }
+     if (viewId === 'research')  { if (researches.length) renderAdminResearchList(); else loadResearch(); }
    }
    
    /* ══════════════════════════════════════════════════════════
@@ -1048,21 +1518,57 @@
        { id:'arms',      label:'Arms',      color:'#A78BFA' },
        { id:'core',      label:'Core',      color:'#FB923C' },
        { id:'fullbody',  label:'Full Body', color:'#3ECFCF' },
-       { id:'physio',    label:'Physiotherapy', color:'#A78BFA' },
+       { id:'physio',    label:'Physio',    color:'#A78BFA' },
      ];
-     document.getElementById('muscle-filter-list').innerHTML = muscles.map(m => `
-       <div class="muscle-group">
-         <div class="muscle-group-header" onclick="toggleMuscleGroup('${m.id}',this)">
-           <span class="muscle-dot" style="background:${m.color}"></span>
-           <span>${m.label}</span>
-           <i class="ti ti-chevron-right chevron"></i>
-         </div>
-         <div class="muscle-sub-list" id="sub-${m.id}">
-           ${(SUBCATS[m.id] || []).map(s => `
-             <div class="muscle-sub-item" onclick="filterBySub('${m.id}','${s}',this)">${s}</div>
-           `).join('')}
-         </div>
-       </div>`).join('');
+
+     var isNative = document.documentElement.classList.contains('is-native');
+
+     if (isNative) {
+       // Native: flat horizontal pill buttons, no wrapper divs
+       document.getElementById('muscle-filter-list').innerHTML =
+         muscles.map(function(m) {
+           return '<button class="native-pill" data-muscle="' + m.id + '" onclick="nativeMuscleFilter(this)" ' +
+             'style="display:inline-flex;align-items:center;gap:5px;white-space:nowrap;flex-shrink:0;' +
+             'border-radius:20px;padding:4px 12px;font-size:12px;height:30px;min-height:30px;' +
+             'background:var(--surface2);border:1px solid var(--border);color:var(--muted);' +
+             'font-family:inherit;cursor:pointer;touch-action:manipulation">' +
+             '<span style="width:8px;height:8px;border-radius:50%;background:' + m.color + ';flex-shrink:0"></span>' +
+             m.label +
+             '</button>';
+         }).join('');
+     } else {
+       // Web: original expand/collapse with sub-categories
+       document.getElementById('muscle-filter-list').innerHTML = muscles.map(m => `
+         <div class="muscle-group">
+           <div class="muscle-group-header" onclick="toggleMuscleGroup('${m.id}',this)">
+             <span class="muscle-dot" style="background:${m.color}"></span>
+             <span>${m.label}</span>
+             <i class="ti ti-chevron-right chevron"></i>
+           </div>
+           <div class="muscle-sub-list" id="sub-${m.id}">
+             ${(SUBCATS[m.id] || []).map(s => `
+               <div class="muscle-sub-item" onclick="filterBySub('${m.id}','${s}',this)">${s}</div>
+             `).join('')}
+           </div>
+         </div>`).join('');
+     }
+   }
+
+   function nativeMuscleFilter(el) {
+     var muscleId = el ? (el.getAttribute('data-muscle') || el.dataset.muscle) : null;
+     if (!muscleId) return;
+     var isActive = el.classList.contains('active');
+     document.querySelectorAll('.native-pill').forEach(function(b){ b.classList.remove('active'); });
+     if (isActive) {
+       state.filterMuscle = null;
+       state.filterSub    = null;
+     } else {
+       el.classList.add('active');
+       state.filterMuscle = muscleId;
+       state.filterSub    = null;
+     }
+     showClearFilter();
+     renderLibrary();
    }
    
    function toggleMuscleGroup(muscleId, headerEl) {
@@ -1116,9 +1622,174 @@
      state.activeTab = tab;
      document.querySelectorAll('.lib-tab').forEach(b => b.classList.remove('active'));
      btn.classList.add('active');
-     renderLibrary();
+     // Show upload bar only on My Videos tab
+     var uploadBar = document.getElementById('lib-upload-bar');
+     if (uploadBar) uploadBar.style.display = (tab === 'custom') ? 'flex' : 'none';
+     // Route to correct render
+     if (['mymenus','myprograms','myrecipes','myresearch'].includes(tab)) {
+       renderMyContent(tab);
+     } else {
+       renderLibrary();
+     }
    }
    
+   /* ═══════════════════════════════════════════════════════
+      MY CONTENT — trainer's own menus/programs/recipes/research
+   ═══════════════════════════════════════════════════════ */
+   function renderMyContent(tab) {
+     var myUid = state.user && state.user.uid;
+     // Use library-body on native, exercises-grid on web
+     var grid = document.getElementById('library-body') || document.getElementById('exercises-grid');
+     if (!grid || !myUid) return;
+
+     var items = [], type = '';
+     if (tab === 'mymenus')    { items = menus.filter(function(m){ return m.createdBy === myUid; });    type = 'menu'; }
+     if (tab === 'myprograms') { items = programs.filter(function(p){ return p.createdBy === myUid; }); type = 'program'; }
+     if (tab === 'myrecipes')  { items = recipes.filter(function(r){ return r.createdBy === myUid; });  type = 'recipe'; }
+     if (tab === 'myresearch') { items = researches.filter(function(r){ return r.createdBy === myUid; }); type = 'research'; }
+
+     // Update section title
+     var sectionTitle = { mymenus:'My Menus', myprograms:'My Programs', myrecipes:'My Recipes', myresearch:'My Research' };
+     var titleEl = document.getElementById('library-section-title');
+     if (titleEl) titleEl.textContent = sectionTitle[tab] || 'My Content';
+     var countEl = document.getElementById('library-section-count');
+     if (countEl) countEl.textContent = items.length + ' items';
+
+     var addFn = tab==='mymenus'    ? 'openAdminMenuModal()'
+                : tab==='myprograms' ? 'openAdminProgramModal()'
+                : tab==='myrecipes'  ? 'openAdminRecipeModal()'
+                : tab==='myresearch' ? 'openAdminResearchModal()'
+                : '';
+     var addLabel = tab==='mymenus'    ? 'Add Menu'
+                 : tab==='myprograms' ? 'Add Program'
+                 : tab==='myrecipes'  ? 'Add Recipe'
+                 : 'Add Study';
+     var addIcon  = tab==='mymenus'    ? 'ti-salad'
+                 : tab==='myprograms' ? 'ti-calendar'
+                 : tab==='myrecipes'  ? 'ti-chef-hat'
+                 : 'ti-book';
+
+     var addBtn = '<div style="padding:10px 10px 4px">' +
+       '<button onclick="' + addFn + '" ' +
+         'style="display:flex;align-items:center;gap:8px;width:100%;padding:12px 16px;' +
+         'background:rgba(126,232,162,0.08);border:1.5px dashed rgba(126,232,162,0.35);' +
+         'border-radius:12px;color:var(--accent);font-family:inherit;font-size:14px;' +
+         'font-weight:700;cursor:pointer;touch-action:manipulation">' +
+         '<i class="ti ti-plus" style="font-size:18px"></i>' +
+         '<i class="ti ' + addIcon + '"></i>' +
+         addLabel +
+       '</button>' +
+     '</div>';
+
+     if (!items.length) {
+       grid.innerHTML = addBtn +
+         '<div style="text-align:center;padding:40px 20px;color:var(--muted)">' +
+           '<i class="ti ti-' + (tab==='mymenus'?'salad':tab==='myprograms'?'calendar':tab==='myrecipes'?'chef-hat':'book') + '" style="font-size:36px;display:block;margin-bottom:10px;opacity:0.25"></i>' +
+           '<p style="font-size:14px;font-weight:600;margin-bottom:4px">No ' + sectionTitle[tab] + ' yet</p>' +
+           '<p style="font-size:13px;opacity:0.7">Tap the button above to create one</p>' +
+         '</div>';
+       return;
+     }
+
+     var isNative = document.documentElement.classList.contains('is-native');
+     if (isNative) {
+       grid.style.cssText = 'display:block;padding:0';
+     } else {
+       // Web: restore grid layout matching exercise cards
+       grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;padding:20px;align-items:start';
+     }
+     grid.innerHTML = addBtn + items.map(function(item) {
+       return renderMyContentCard(item, type, myUid);
+     }).join('');
+   }
+
+   function renderMyContentCard(item, type, myUid) {
+     var isPublic = item.isPublic !== false;
+     var pubColor = isPublic ? 'var(--accent)' : '#FBBF24';
+     var pubIcon  = isPublic ? 'ti-world' : 'ti-lock';
+     var pubLabel = isPublic ? 'Public' : 'Private';
+
+     var meta = '';
+     if (type === 'menu')    meta = (item.calories||'') + ' kcal';
+     if (type === 'program') meta = (item.weeks||'?') + ' weeks · ' + (item.goal||'');
+     if (type === 'recipe')  meta = (item.calories||0) + ' kcal · ' + (item.prepTime||'?') + ' min';
+     if (type === 'research') meta = item.category || '';
+
+     var photo = (type === 'recipe' && item.photoURL) ? item.photoURL : '';
+
+     return '<div class="my-content-card" style="background:var(--surface);border:1px solid var(--border2);border-radius:14px;overflow:hidden;display:flex;flex-direction:column">' +
+       // Photo for recipes
+       (photo ? '<img src="' + photo + '" style="width:100%;height:140px;object-fit:cover">' : '') +
+       '<div style="padding:14px;flex:1;display:flex;flex-direction:column;gap:8px">' +
+         // Title
+         '<div style="font-size:14px;font-weight:700;line-height:1.3">' + (item.name||item.title||'Untitled') + '</div>' +
+         (meta ? '<div style="font-size:12px;color:var(--muted)">' + meta + '</div>' : '') +
+         // Public/Private toggle
+         '<div style="display:flex;align-items:center;gap:6px;margin-top:auto;padding-top:8px;border-top:1px solid var(--border);flex-wrap:wrap">' +
+           '<button onclick="toggleMyContentPublic(\'' + item.id + '\',\'' + type + '\',this)" ' +
+             'style="display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;border:1px solid ' + pubColor + ';background:' + pubColor + '18;color:' + pubColor + ';font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">' +
+             '<i class="ti ' + pubIcon + '"></i> ' + pubLabel +
+           '</button>' +
+           '<div style="flex:1"></div>' +
+           '<button onclick="editMyContent(\'' + item.id + '\',\'' + type + '\')" ' +
+             'style="padding:4px 10px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit">' +
+             '<i class="ti ti-edit"></i> Edit' +
+           '</button>' +
+           '<button onclick="deleteMyContent(\'' + item.id + '\',\'' + type + '\')" ' +
+             'style="padding:4px 10px;border-radius:8px;border:1px solid rgba(255,107,107,0.3);background:transparent;color:var(--danger);font-size:12px;cursor:pointer;font-family:inherit">' +
+             '<i class="ti ti-trash"></i>' +
+           '</button>' +
+         '</div>' +
+       '</div>' +
+     '</div>';
+   }
+
+   async function toggleMyContentPublic(id, type, btn) {
+     var myUid = state.user && state.user.uid;
+     var arr = type==='menu'?menus:type==='program'?programs:type==='recipe'?recipes:research;
+     var item = arr.find(function(x){ return x.id === id; });
+     if (!item) return;
+     var newPublic = item.isPublic === false ? true : false;
+     var col = type==='menu'?'menus':type==='program'?'programs':type==='recipe'?'recipes':'research';
+     try {
+       await window._firebase.setDoc(
+         window._firebase.doc(window._db, col, id),
+         { isPublic: newPublic }, { merge: true }
+       );
+       item.isPublic = newPublic;
+       var color = newPublic ? 'var(--accent)' : '#FBBF24';
+       var icon  = newPublic ? 'ti-world' : 'ti-lock';
+       btn.style.borderColor = color;
+       btn.style.background  = color + '18';
+       btn.style.color       = color;
+       btn.innerHTML = '<i class="ti ' + icon + '"></i> ' + (newPublic ? 'Public' : 'Private');
+       showToast(newPublic ? '🌐 Now public' : '🔒 Now private');
+     } catch(e) { showToast('Failed: ' + e.message); }
+   }
+
+   function editMyContent(id, type) {
+     if (type === 'menu')          { openAdminMenuModal(id); }
+     else if (type === 'program')  { openAdminProgramModal(id); }
+     else if (type === 'recipe')   { openAdminRecipeModal(id); }
+     else if (type === 'research') { openAdminResearchModal(id); }
+   }
+
+   async function deleteMyContent(id, type) {
+     if (!confirm('Delete this ' + type + '? This cannot be undone.')) return;
+     var col = type==='menu'?'menus':type==='program'?'programs':type==='recipe'?'recipes':'research';
+     var arr = type==='menu'?menus:type==='program'?programs:type==='recipe'?recipes:research;
+     try {
+       await window._firebase.deleteDoc(window._firebase.doc(window._db, col, id));
+       var idx = arr.findIndex(function(x){ return x.id === id; });
+       if (idx > -1) arr.splice(idx, 1);
+       showToast(type + ' deleted');
+       // Re-render current tab
+       var tabMap = { menus:'mymenus', programs:'myprograms', recipes:'myrecipes', research:'myresearch' };
+       var tab = tabMap[col] || ('my' + col);
+       renderMyContent(tab);
+     } catch(e) { showToast('Delete failed: ' + e.message); }
+   }
+
    function handleSearch(q) {
      state.searchQuery = q.toLowerCase();
      document.getElementById('search-clear').style.display = q ? 'block' : 'none';
@@ -1134,6 +1805,9 @@
    
    function renderLibrary() {
      const isMaster = state.activeTab === 'master';
+     // Reset any inline styles set by renderMyContent
+     var _lb = document.getElementById('library-body');
+     if (_lb) _lb.removeAttribute('style');
      let pool;
    
      if (isMaster) {
@@ -1167,8 +1841,10 @@
        );
      }
    
-     document.getElementById('master-count').textContent = MASTER_EXERCISES.length;
-     document.getElementById('custom-count').textContent = customExercises.length;
+     var mcEl = document.getElementById('master-count');
+     var ccEl = document.getElementById('custom-count');
+     if (mcEl) mcEl.textContent = MASTER_EXERCISES.length;
+     if (ccEl) ccEl.textContent = customExercises.length;
    
      const section = state.filterSub    ? state.filterSub
                    : state.filterMuscle ? capitalize(state.filterMuscle)
@@ -1207,15 +1883,21 @@
      const safeUrl  = (ex.videoURL || '').replace(/'/g, "\'");
      const hasVideo = !!ex.videoURL;
    
+     const isYT      = isYouTubeURL(ex.videoURL);
+     const ytThumb   = isYT ? getYouTubeThumbnail(ex.videoURL) : null;
+     const ytID      = isYT ? getYouTubeID(ex.videoURL) : null;
+
      return `
      <div class="exercise-card${inCart ? ' in-cart' : ''}${isLocked ? ' locked-card' : ''}" id="ecard-${ex.id}">
        <div class="card-media">
          ${hasVideo
-           ? `<video class="card-video-thumb" src="${ex.videoURL || ''}"
-                preload="metadata" muted playsinline
-                onerror="this.style.display='none'">
-              </video>
-              <div class="card-media-bg card-media-fallback" style="${cardGradient(ex.id)};display:none"></div>`
+           ? isYT && ytThumb
+             ? `<img class="card-video-thumb" src="${ytThumb}" alt="${ex.title} thumbnail" loading="lazy"
+                  onerror="this.style.display='none'">`
+             : `<video class="card-video-thumb" src="${ex.videoURL || ''}"
+                  preload="metadata" muted playsinline
+                  onerror="this.style.display='none'">
+                </video>`
            : `<div class="card-media-bg" style="${cardGradient(ex.id)}"></div>`
          }
          ${isLocked
@@ -1231,7 +1913,8 @@
                 </div>
               </div>`
          }
-         <span class="card-duration">${ex.duration || '—'}</span>
+         ${(ex.duration && ex.duration !== '—' && ex.duration !== '-' && ex.duration !== '' && !isYouTubeURL(ex.videoURL)) ? `<span class="card-duration">${ex.duration}</span>` : ''}
+         ${isYouTubeURL(ex.videoURL) ? `<span class="card-yt-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="red" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1c.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8z"/><polygon fill="white" points="9.75,15.02 15.5,12 9.75,8.98"/></svg> YouTube</span>` : ''}
        </div>
        <div class="card-body">
          <div class="card-tags">
@@ -1243,6 +1926,7 @@
            ${isLocked ? '<span class="tag tag-locked"><i class="ti ti-lock" style="font-size:9px"></i> Locked</span>' : ''}
          </div>
          <div class="card-title">${ex.title}</div>
+         ${ex.title_he ? `<div class="card-title-he">${ex.title_he}</div>` : ''}
          <div class="card-desc">${isLocked ? 'Start your free trial to unlock this exercise and many more.' : ex.desc}</div>
          <div class="card-footer">
            <span class="card-difficulty"><i class="ti ti-flame"></i> ${ex.diff || '—'}</span>
@@ -1279,7 +1963,7 @@
    function isExerciseLocked(ex) {
      if (!state.user) return false;
      const tier = state.user.tier;
-     if (tier === 'trial' || tier === 'premium') return false;
+     if (tier === 'trial' || tier === 'premium' || tier === 'premium_cancelled') return false;
      if (tier === 'free_limited') {
        // Premium-marked exercises always locked on free_limited
        if (ex.premium) return true;
@@ -1315,43 +1999,51 @@
    function playVideo(id, url) {
      const all = [...MASTER_EXERCISES, ...customExercises];
      const ex  = all.find(e => e.id === id);
-     if (!url && !ex?.videoURL) {
-       showToast('No video attached to this exercise yet.');
-       return;
-     }
-     const videoSrc = url || ex.videoURL;
-     const title    = ex?.title || 'Exercise';
-   
-     // Build the in-page video player modal
+     const src = url || (ex && ex.videoURL) || '';
+     if (!src) { showToast('No video attached to this exercise yet.'); return; }
+
+     const title  = (ex && ex.title) || 'Exercise';
      const existing = document.getElementById('modal-video-player');
      if (existing) existing.remove();
-   
+
      const modal = document.createElement('div');
-     modal.id = 'modal-video-player';
+     modal.id    = 'modal-video-player';
      modal.className = 'video-player-overlay';
-     modal.innerHTML = `
-       <div class="video-player-box">
-         <div class="video-player-header">
-           <h3>${title}</h3>
-           <button class="video-player-close" onclick="closeVideoPlayer()">
-             <i class="ti ti-x"></i>
-           </button>
-         </div>
-         <div class="video-player-wrap">
-           <video
-             id="repcast-video"
-             src="${videoSrc}"
-             controls
-             autoplay
-             playsinline
-             style="width:100%;max-height:480px;border-radius:0 0 12px 12px;background:#000;display:block">
-             Your browser does not support the video tag.
-           </video>
-         </div>
-       </div>`;
+
+     // YouTube — use embed iframe (direct URLs are blocked by browsers)
+     if (isYouTubeURL(src)) {
+       const ytID = getYouTubeID(src);
+       const embedURL = 'https://www.youtube.com/embed/' + ytID + '?autoplay=1&rel=0';
+       modal.innerHTML =
+         '<div class="video-player-box">' +
+           '<div class="video-player-header">' +
+             '<h3>' + title + '</h3>' +
+             '<button class="video-player-close" onclick="closeVideoPlayer()"><i class="ti ti-x"></i></button>' +
+           '</div>' +
+           '<div class="video-player-wrap" style="position:relative;padding-top:56.25%;">' +
+             '<iframe src="' + embedURL + '" frameborder="0" allow="autoplay; fullscreen" allowfullscreen ' +
+             'style="position:absolute;inset:0;width:100%;height:100%;border-radius:0 0 12px 12px;background:#000">' +
+             '</iframe>' +
+           '</div>' +
+         '</div>';
+     } else {
+       // Direct video file (Firebase Storage, etc.)
+       modal.innerHTML =
+         '<div class="video-player-box">' +
+           '<div class="video-player-header">' +
+             '<h3>' + title + '</h3>' +
+             '<button class="video-player-close" onclick="closeVideoPlayer()"><i class="ti ti-x"></i></button>' +
+           '</div>' +
+           '<div class="video-player-wrap">' +
+             '<video src="' + src + '" controls autoplay playsinline ' +
+             'style="width:100%;max-height:480px;border-radius:0 0 12px 12px;background:#000;display:block">' +
+             '</video>' +
+           '</div>' +
+         '</div>';
+     }
+
      document.body.appendChild(modal);
-     // Close on backdrop click
-     modal.addEventListener('click', e => { if (e.target === modal) closeVideoPlayer(); });
+     modal.addEventListener('click', function(e) { if (e.target === modal) closeVideoPlayer(); });
    }
    
    function closeVideoPlayer() {
@@ -1475,6 +2167,15 @@
      document.getElementById('modal-backdrop').classList.remove('open');
      document.querySelectorAll('.modal').forEach(m => m.classList.remove('open'));
    }
+
+   // Close only the food picker and return to the menu modal
+   function closeFoodPicker() {
+     var picker = document.getElementById('modal-food-picker');
+     if (picker) picker.classList.remove('open');
+     // Re-open the menu modal (which was open before)
+     var menuModal = document.getElementById('modal-admin-menu');
+     if (menuModal) menuModal.classList.add('open');
+   }
    
    /* ══════════════════════════════════════════════════════════
       TRAINER VIDEO UPLOAD
@@ -1569,6 +2270,25 @@
      document.getElementById('upload-zone').dataset.ready = '1';
    }
    
+   /* ── Auto-detect video duration from a File object ─────── */
+   function getVideoDuration(file) {
+     return new Promise(function(resolve) {
+       var url   = URL.createObjectURL(file);
+       var video = document.createElement('video');
+       video.preload = 'metadata';
+       video.onloadedmetadata = function() {
+         URL.revokeObjectURL(url);
+         var secs = Math.round(video.duration);
+         if (!isFinite(secs) || secs <= 0) { resolve(''); return; }
+         var m = Math.floor(secs / 60);
+         var s = secs % 60;
+         resolve(m > 0 ? m + 'm ' + s + 's' : s + 's');
+       };
+       video.onerror = function() { URL.revokeObjectURL(url); resolve(''); };
+       video.src = url;
+     });
+   }
+
    async function submitUpload() {
      const title  = document.getElementById('upload-title').value.trim();
      const muscle = document.getElementById('upload-muscle').value;
@@ -1604,6 +2324,9 @@
      wrap.style.display = 'block';
    
      // Generate a stable exercise ID before upload
+     // Auto-detect video duration from file metadata
+     const videoDuration = await getVideoDuration(file);
+
      const exerciseId  = 'c_' + state.user.uid.slice(0, 6) + '_' + Date.now();
      // Storage path scoped strictly to user uid — used to re-fetch URL if needed
      const storagePath = 'videos/' + state.user.uid + '/' + exerciseId + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
@@ -1653,7 +2376,7 @@
        sub,
        desc:         desc || 'Custom exercise. See the uploaded video for full instructions.',
        diff:         'Custom',
-       duration:     '—',
+       duration:     videoDuration || '',
        premium:      false,
        custom:       true,
        isPublic,
@@ -1713,8 +2436,23 @@
    function renderCheckout() {
      const n = state.cart.size;
      document.getElementById('checkout-subtitle').textContent =
-       `${n} exercise${n !== 1 ? 's' : ''} · prescribe sets, reps and notes below`;
-     document.getElementById('share-result').style.display = 'none';
+       n + ' exercise' + (n !== 1 ? 's' : '') + ' — prescribe sets, reps and notes below';
+
+     // Hide success message
+     var succEl = document.getElementById('checkout-success');
+     if (succEl) succEl.style.display = 'none';
+
+     // Always refresh client dropdown with latest clientsList
+     function _refreshClientDropdowns() {
+       var opts = '<option value="">— Choose client —</option>';
+       (clientsList || []).forEach(function(c) {
+         opts += '<option value="' + c.id + '">' + (c.name || c.email || c.id) + '</option>';
+       });
+       document.querySelectorAll('[id*="client-select"], [id*="checkout-client"]').forEach(function(sel){
+         if (sel) sel.innerHTML = opts;
+       });
+     }
+     _refreshClientDropdowns();
    
      let html = '';
      state.cart.forEach((ex) => {
@@ -1821,6 +2559,119 @@
      showToast(`✓ Routine sent for ${client}!`);
    }
    
+   /* ── Ownership check — only admin or creator can edit/delete ── */
+   function canEditItem(item) {
+     if (!item) return false;
+     if (state.isManager) return true;                  // admin: full access
+     var uid = state.user && state.user.uid;
+     if (!uid) return false;
+     return item.createdBy === uid;                     // own content only
+   }
+
+   /* ── Build exercises array from cart ────────────────────── */
+   function buildCartExercises() {
+     return Array.from(state.cart.values()).map(function(ex, i) {
+       return {
+         order: i + 1, videoId: ex.id,
+         source: ex.custom ? 'custom' : 'master',
+         title: ex.title, muscle: ex.muscle, sub: ex.sub,
+         sets: ex.sets, reps: ex.reps, notes: ex.notes,
+         videoURL: ex.videoURL || '', desc: ex.desc || ''
+       };
+     });
+   }
+
+   /* ── Step 1: Save routine with name (required first step) ── */
+   async function saveAsRoutine() {
+     var nameInput = document.getElementById('checkout-routine-name');
+     var name = nameInput ? nameInput.value.trim() : '';
+     if (!name) {
+       showToast('Please enter a routine name first');
+       if (nameInput) { nameInput.focus(); nameInput.style.borderColor = 'var(--danger)'; }
+       return;
+     }
+     if (nameInput) nameInput.style.borderColor = '';
+
+     var exercises = buildCartExercises();
+     var token = 'rtn_' + Math.random().toString(36).substr(2, 8);
+     var routine = {
+       id: token, shareToken: token, name: name,
+       clientName: '',   // set when assigned to a client
+       createdBy: state.user.uid,
+       trainerName: state.user.fullName || 'Your Trainer',
+       exercises: exercises,
+       createdAt: new Date().toISOString(),
+       isPublic: false
+     };
+
+     try {
+       await window._firebase.setDoc(
+         window._firebase.doc(window._db, 'routines', token), routine
+       );
+       sentRoutines.unshift(routine);
+       localStorage.setItem('repcast_routines', JSON.stringify(sentRoutines.slice(0, 50)));
+       // Store saved routine token for assign step
+       window._lastSavedRoutine = routine;
+       // Enable assign section
+       var assignSec = document.getElementById('checkout-assign-section');
+       if (assignSec) {
+         assignSec.style.opacity = '1';
+         assignSec.style.pointerEvents = 'auto';
+       }
+       var succEl = document.getElementById('checkout-success');
+       var msgEl  = document.getElementById('checkout-success-msg');
+       if (succEl) succEl.style.display = 'block';
+       if (msgEl)  msgEl.textContent = '✓ "' + name + '" saved! Now choose a client to assign it to (optional).';
+       showToast('✓ Routine saved!');
+       renderRoutinesHistory();
+     } catch(e) { showToast('Error: ' + e.message); }
+   }
+
+   /* ── Step 2: Assign saved routine to a client ────────────── */
+   async function assignRoutineToClient() {
+     var routine = window._lastSavedRoutine;
+     if (!routine) { showToast('Save the routine first'); return; }
+
+     var sel = document.getElementById('checkout-client-select');
+     var clientId = sel ? sel.value : '';
+     if (!clientId) { showToast('Please choose a client'); return; }
+
+     var client = (clientsList || []).find(function(c){ return c.id === clientId; });
+     if (!client) { showToast('Client not found'); return; }
+
+     try {
+       var clientRef = window._firebase.doc(window._db, 'clientProfiles', clientId);
+       var existing = client.assignedRoutines || [];
+       // Store FULL routine data so client can see exercises without extra fetch
+       var clientName = client.name || client.email || '';
+       existing.push({
+         id:          routine.id,
+         shareToken:  routine.shareToken,
+         name:        routine.name,
+         clientName:  clientName,
+         exercises:   routine.exercises,
+         createdAt:   routine.createdAt,
+         trainerName: routine.trainerName
+       });
+       // Also update local sentRoutines entry with clientName
+       var localRtn = sentRoutines.find(function(r){ return r.id === routine.id; });
+       if (localRtn) localRtn.clientName = clientName;
+       localStorage.setItem('repcast_routines', JSON.stringify(sentRoutines.slice(0, 50)));
+       renderRoutinesHistory();
+       await window._firebase.setDoc(clientRef, { assignedRoutines: existing }, { merge: true });
+       client.assignedRoutines = existing;
+
+       state.cart.clear();
+       updateCartBar();
+       window._lastSavedRoutine = null;
+
+       var msgEl = document.getElementById('checkout-success-msg');
+       if (msgEl) msgEl.textContent = '✓ Assigned to ' + (client.name || 'client') + '!';
+       showToast('✓ Assigned to ' + (client.name || 'client'));
+       setTimeout(function(){ closeAllModals(); }, 1500);
+     } catch(e) { showToast('Error: ' + e.message); }
+   }
+
    async function shareViaWhatsApp() {
      // Save routine first if not already saved
      const shareResult = document.getElementById('share-result');
@@ -1895,24 +2746,58 @@
      body.innerHTML = sentRoutines.map(r => {
        const d   = new Date(r.createdAt).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
        const url = window.location.origin + window.location.pathname.replace(/\/[^/]*$/, '') + '?routine=' + r.shareToken;
+       // Thumbnail from first exercise that has a video
+       const firstWithVideo = r.exercises.find(function(e){ return e.videoURL; });
+       const thumbHTML = firstWithVideo
+         ? isYouTubeURL(firstWithVideo.videoURL)
+           ? '<img class="routine-thumb" src="' + getYouTubeThumbnail(firstWithVideo.videoURL) + '" alt="" loading="lazy">'
+           : '<video class="routine-thumb" src="' + firstWithVideo.videoURL + '" preload="metadata" muted playsinline></video>'
+         : '<div class="routine-thumb routine-thumb-placeholder"><i class="ti ti-list-check"></i></div>';
        return `
        <div class="routine-history-card">
+         ${thumbHTML}
          <div class="routine-history-info">
-           <h4>${r.clientName}'s Routine</h4>
-           <p>${r.exercises.length} exercises · sent ${d}</p>
+           <h4>${r.name || (r.clientName ? r.clientName + "'s Routine" : 'Routine')}</h4>
+           <p>${r.exercises.length} exercise${r.exercises.length !== 1 ? 's' : ''} &middot; ${r.clientName ? 'for ' + r.clientName + ' · ' : ''}${d}</p>
+           <div class="routine-ex-pills">
+             ${r.exercises.slice(0,3).map(function(e){ return '<span class="tag tag-' + e.muscle + '" style="font-size:10px">' + e.title + '</span>'; }).join('')}
+             ${r.exercises.length > 3 ? '<span class="tag" style="font-size:10px;background:var(--surface3);color:var(--muted)">+' + (r.exercises.length - 3) + ' more</span>' : ''}
+           </div>
          </div>
-         <div class="routine-history-meta">
-           <button class="routine-share-btn" onclick="copyToClipboard('${url}')">
-             <i class="ti ti-link"></i> Copy Link
+         <div class="routine-history-actions">
+           <button class="routine-share-btn" onclick="copyToClipboard('${url}')" title="Copy link">
+             <i class="ti ti-link"></i>
            </button>
-           <button class="routine-share-btn" onclick="openSharedView('${r.shareToken}')">
-             <i class="ti ti-eye"></i> Preview
+           <button class="routine-share-btn" onclick="openSharedView('${r.shareToken}')" title="Preview">
+             <i class="ti ti-eye"></i>
+           </button>
+           <button class="routine-share-btn routine-delete-btn" onclick="deleteRoutine('${r.shareToken}')" title="Delete routine">
+             <i class="ti ti-trash"></i>
            </button>
          </div>
        </div>`;
      }).join('');
    }
    
+   async function deleteRoutine(token) {
+     if (!confirm('Delete this routine? The client link will stop working.')) return;
+
+     // Remove from local array
+     sentRoutines = sentRoutines.filter(function(r){ return r.shareToken !== token; });
+     localStorage.setItem('repcast_routines', JSON.stringify(sentRoutines));
+
+     // Delete from Firestore
+     if (window._firebase && window._db) {
+       window._firebase.deleteDoc(
+         window._firebase.doc(window._db, 'routines', token)
+       ).catch(function(e){ console.warn('Could not delete from Firestore:', e.code); });
+     }
+
+     renderRoutinesHistory();
+     updateStats();
+     showToast('Routine deleted.');
+   }
+
    function openSharedView(token) {
      const r = sentRoutines.find(r => r.shareToken === token);
      if (!r) return;
@@ -1934,12 +2819,21 @@
          'background:linear-gradient(135deg,rgba(167,139,250,0.15),rgba(96,165,250,0.1))',
        ][ (i) % 5 ];
    
+       const isYT2     = isYouTubeURL(ex.videoURL);
+       const ytThumb2  = isYT2 ? getYouTubeThumbnail(ex.videoURL) : null;
+       const safeUrl2  = (ex.videoURL || '').replace(/'/g, "\\'");
+       const safeTitle2 = ex.title.replace(/'/g, "\\'");
+
        return `
        <div class="shared-exercise-card">
          ${hasVideo ? `
-         <div class="shared-video-wrap" onclick="playSharedVideo('${ex.videoURL.replace(/'/g,"\'")}','${ex.title.replace(/'/g,"\'")}')">
-           <video class="shared-video-thumb" src="${ex.videoURL}" preload="metadata" muted playsinline
-             onerror="this.parentElement.style.background='${gradient}'"></video>
+         <div class="shared-video-wrap" onclick="playSharedVideo('${safeUrl2}','${safeTitle2}')">
+           ${isYT2 && ytThumb2
+             ? `<img class="shared-video-thumb" src="${ytThumb2}" alt="${ex.title}" loading="lazy"
+                  style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">`
+             : `<video class="shared-video-thumb" src="${ex.videoURL}" preload="metadata" muted playsinline
+                  onerror="this.style.display='none'"></video>`
+           }
            <div class="shared-play-overlay">
              <div class="shared-play-btn"><i class="ti ti-player-play"></i></div>
            </div>
@@ -1947,7 +2841,6 @@
          <div class="shared-video-placeholder" style="${gradient}">
            <i class="ti ti-barbell" style="font-size:32px;color:rgba(255,255,255,0.3)"></i>
          </div>`}
-         <div class="shared-ex-header">
            <div class="shared-ex-num">${i + 1}</div>
            <div style="flex:1">
              <h4>${ex.title}</h4>
@@ -1975,21 +2868,27 @@
    function playSharedVideo(url, title) {
      var existing = document.getElementById('modal-video-player');
      if (existing) existing.remove();
-     var modal = document.createElement('div');
+     _lastCredsText = 'Email: ' + email + '\nPassword: ' + password + '\nSite: repcast.co.il';
+    var modal = document.createElement('div');
      modal.id = 'modal-video-player';
      modal.className = 'video-player-overlay';
-     modal.innerHTML =
-       '<div class="video-player-box">' +
-         '<div class="video-player-header">' +
-           '<h3>' + title + '</h3>' +
-           '<button class="video-player-close" onclick="closeVideoPlayer()"><i class="ti ti-x"></i></button>' +
-         '</div>' +
-         '<div class="video-player-wrap">' +
-           '<video src="' + url + '" controls autoplay playsinline ' +
-             'style="width:100%;max-height:480px;border-radius:0 0 12px 12px;background:#000;display:block">' +
-           '</video>' +
-         '</div>' +
-       '</div>';
+     var mediaHTML;
+     if (isYouTubeURL(url)) {
+       var ytID = getYouTubeID(url);
+       mediaHTML = '<div class="video-player-wrap" style="position:relative;padding-top:56.25%;">' +
+         '<iframe src="https://www.youtube.com/embed/' + ytID + '?autoplay=1&rel=0" frameborder="0" ' +
+         'allow="autoplay; fullscreen" allowfullscreen ' +
+         'style="position:absolute;inset:0;width:100%;height:100%;border-radius:0 0 12px 12px;background:#000">' +
+         '</iframe></div>';
+     } else {
+       mediaHTML = '<div class="video-player-wrap">' +
+         '<video src="' + url + '" controls autoplay playsinline ' +
+         'style="width:100%;max-height:480px;border-radius:0 0 12px 12px;background:#000;display:block">' +
+         '</video></div>';
+     }
+     modal.innerHTML = '<div class="video-player-box"><div class="video-player-header"><h3>' + title +
+       '</h3><button class="video-player-close" onclick="closeVideoPlayer()"><i class="ti ti-x"></i></button>' +
+       '</div>' + mediaHTML + '</div>';
      document.body.appendChild(modal);
      modal.addEventListener('click', function(e) { if (e.target === modal) closeVideoPlayer(); });
    }
@@ -2037,11 +2936,24 @@
      if (!input.files[0]) return;
      const reader = new FileReader();
      reader.onload = e => {
-       document.querySelectorAll('.profile-avatar, .user-avatar-sm, .user-avatar').forEach(a => {
-         a.style.backgroundImage = `url(${e.target.result})`;
-         a.style.backgroundSize  = 'cover';
-         a.textContent           = '';
+       var url = e.target.result;
+       // Only update the trainer's OWN avatar elements, not client avatars
+       var ids = ['topnav-avatar','profile-avatar','trainer-avatar-img'];
+       ids.forEach(function(id){
+         var el = document.getElementById(id);
+         if (!el) return;
+         el.style.backgroundImage = 'url(' + url + ')';
+         el.style.backgroundSize  = 'cover';
+         el.style.backgroundPosition = 'center';
+         el.textContent = '';
        });
+       // Also save to Firestore
+       if (state.user && window._firebase && window._db) {
+         window._firebase.setDoc(
+           window._firebase.doc(window._db, 'users', state.user.uid),
+           { photoURL: url }, { merge: true }
+         ).catch(function(){});
+       }
      };
      reader.readAsDataURL(input.files[0]);
      showToast('Profile photo updated!');
@@ -2051,14 +2963,85 @@
       BILLING / GROW
    ══════════════════════════════════════════════════════════ */
    
-   function showUpgrade() { closeAllModals(); openModal('upgrade'); }
+
    
-   function handleGrowPayment() {
-     // Replace with your real Grow checkout URL
-     // window.location.href = `https://grow.me/checkout?plan=premium&uid=${state.user.uid}`;
-     showToast('Redirecting to Grow payment… (add your Grow URL to handleGrowPayment)');
-     closeAllModals();
+   function handleGrowPaymentChecked() {
+     // Validate all required fields
+     var firstName = (document.getElementById('co-first-name')  && document.getElementById('co-first-name').value.trim())  || '';
+     var lastName  = (document.getElementById('co-last-name')   && document.getElementById('co-last-name').value.trim())   || '';
+     var email     = (document.getElementById('co-email')       && document.getElementById('co-email').value.trim())       || '';
+     var phone     = (document.getElementById('co-phone')       && document.getElementById('co-phone').value.trim())       || '';
+     var checkbox  = document.getElementById('terms-agree');
+     var errEl     = document.getElementById('checkout-error');
+
+     var errors = [];
+     if (!firstName)           errors.push('First name is required.');
+     if (!lastName)            errors.push('Last name is required.');
+     if (!email || !email.includes('@')) errors.push('A valid email address is required.');
+     if (!phone)               errors.push('Phone number is required.');
+     if (!checkbox || !checkbox.checked) errors.push('You must agree to the Terms of Service to continue.');
+
+     if (errors.length) {
+       if (errEl) { errEl.innerHTML = errors.join('<br>'); errEl.style.display = 'block'; }
+       return;
+     }
+     if (errEl) errEl.style.display = 'none';
+
+     // Store customer details for the payment redirect
+     window._checkoutData = {
+       firstName: firstName,
+       lastName:  lastName,
+       email:     email,
+       phone:     phone,
+       business:  (document.getElementById('co-business') && document.getElementById('co-business').value.trim()) || '',
+       uid:       state.user ? state.user.uid : '',
+     };
+
+     handleGrowPayment();
    }
+
+   // Pre-fill checkout form with user's profile data when modal opens
+   function showUpgrade() {
+     closeAllModals();
+     // Pre-fill form fields from user profile
+     if (state.user) {
+       var parts = (state.user.fullName || '').split(' ');
+       var fn = document.getElementById('co-first-name');
+       var ln = document.getElementById('co-last-name');
+       var em = document.getElementById('co-email');
+       var ph = document.getElementById('co-phone');
+       var bz = document.getElementById('co-business');
+       if (fn && !fn.value) fn.value = parts[0] || '';
+       if (ln && !ln.value) ln.value = parts.slice(1).join(' ') || '';
+       if (em && !em.value) em.value = state.user.email || '';
+       if (ph && !ph.value) ph.value = state.user.phone || '';
+       if (bz && !bz.value) bz.value = state.user.businessName || '';
+     }
+     openModal('upgrade');
+   }
+
+   function handleGrowPayment() {
+     // ── TODO: Connect to Morning payment ──────────────────────
+     // When Morning approves your account:
+     // 1. Set your Morning payment page URL below
+     // 2. The ?uid= param links the payment to this Firebase user
+     // 3. Morning webhook will set tier:'premium' and premiumUntil in Firestore
+     // 4. checkTierExpiry() will detect the change and unlock the app
+     //
+     // const uid = state.user ? state.user.uid : '';
+     // window.location.href = 'https://app.greeninvoice.co.il/pay/YOUR_PAGE_ID?uid=' + uid;
+     //
+     // Until Morning is connected:
+     closeAllModals();
+     showToast('Payment coming soon — Morning approval pending.');
+   }
+
+   // ── Called by Morning webhook (via Firebase Cloud Function) ──
+   // The webhook sets these fields on the user Firestore document:
+   // On new subscription:   { tier: 'premium', premiumUntil: <next_billing_date>, morningPaymentId: <id> }
+   // On renewal:            { premiumUntil: <new_next_billing_date> }
+   // On cancellation:       { tier: 'premium_cancelled' }  (premiumUntil stays — grace period)
+   // checkTierExpiry() picks up all these changes automatically every 30 minutes.
    
    /* ══════════════════════════════════════════════════════════
       STATS
@@ -2071,15 +3054,18 @@
      document.getElementById('pstat-clients').textContent  = clients;
    
      // Update billing current plan indicator
-     const planEl = document.getElementById('billing-current-plan');
+     var planEl = document.getElementById('billing-current-plan');
      if (planEl && state.user) {
-       const labels = {
-         premium:      'Current Plan ✓',
-         trial:        'Trial Active (' + (state.user.trialDaysLeft || 0) + ' days left)',
-         free_limited: 'Current Plan ✓',
-         free:         'Current Plan ✓',
+       var labels = {
+         premium:           'Active ✓',
+         premium_cancelled: 'Cancelled — access until ' + (state.user.premiumUntil
+           ? new Date(state.user.premiumUntil).toLocaleDateString('en-GB', { day:'numeric', month:'short' })
+           : 'end of period'),
+         trial:             'Trial Active — ' + (state.user.trialDaysLeft || 0) + ' days left',
+         free_limited:      'Free Limited',
+         free:              'Free',
        };
-       planEl.textContent = labels[state.user.tier] || 'Current Plan';
+       planEl.textContent = labels[state.user.tier] || 'Free';
      }
    
      // Update tier status card dynamically
@@ -2294,7 +3280,7 @@
        populateSubcats('admin-ex-muscle', 'admin-ex-subcat');
        document.getElementById('admin-ex-subcat').value    = ex.sub;
        document.getElementById('admin-ex-diff').value      = ex.diff    || 'Beginner';
-       document.getElementById('admin-ex-duration').value  = ex.duration || '';
+       // Duration auto-detected from video — not shown in form
        document.getElementById('admin-ex-desc').value      = ex.desc;
        document.getElementById('admin-ex-premium').checked = !!ex.premium;
        document.getElementById('admin-ex-video').value     = ex.videoURL || '';
@@ -2313,7 +3299,8 @@
      const muscle   = document.getElementById('admin-ex-muscle').value;
      const sub      = document.getElementById('admin-ex-subcat').value;
      const diff     = document.getElementById('admin-ex-diff').value;
-     const duration = document.getElementById('admin-ex-duration').value.trim() || '—';
+     // Duration is auto-detected from video, not manually entered
+     const duration = document.getElementById('admin-ex-duration').value.trim() || '';
      const desc     = document.getElementById('admin-ex-desc').value.trim();
      const premium  = document.getElementById('admin-ex-premium').checked;
      let   videoURL = document.getElementById('admin-ex-video').value.trim();
@@ -2331,6 +3318,9 @@
        saveBtn.disabled = true;
        saveBtn.innerHTML = '<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Uploading…';
        try {
+         // Auto-detect duration from admin-uploaded video
+         const adminVideoDuration = await getVideoDuration(file);
+
          const storageRef = window._firebase.ref(
            window._storage,
            `masterVideos/${Date.now()}_${file.name}`
@@ -2375,14 +3365,17 @@
        if (idx === -1) return;
        MASTER_EXERCISES[idx] = {
          ...MASTER_EXERCISES[idx],
-         title, muscle, sub, diff, duration, desc, premium, videoURL,
+         title, muscle, sub, diff,
+         duration: MASTER_EXERCISES[idx].duration || duration || '',
+         desc, premium, videoURL,
        };
        showToast(`✓ "${title}" updated!`);
      } else {
        MASTER_EXERCISES.push({
          id: 'm_' + Date.now(),
-         title, muscle, sub, diff, duration, desc, premium,
-         videoURL, custom: false,
+         title, muscle, sub, diff,
+         duration: (typeof adminVideoDuration !== 'undefined' ? adminVideoDuration : duration) || '',
+         desc, premium, videoURL, custom: false,
        });
        showToast(`✓ "${title}" added to master library!`);
      }
@@ -2416,6 +3409,278 @@
      showToast(`🗑 "${name}" deleted.`);
    }
    
+   /* ── Bulk Import ─────────────────────────────────────────── */
+   var _bulkTab      = 'json';
+   var _bulkParsed   = [];
+
+   function switchBulkTab(tab, btn) {
+     _bulkTab = tab;
+     document.querySelectorAll('.bulk-tab').forEach(function(b){ b.classList.remove('active'); });
+     document.querySelectorAll('.bulk-panel').forEach(function(p){ p.classList.remove('active'); });
+     btn.classList.add('active');
+     document.getElementById('bulk-panel-' + tab).classList.add('active');
+     clearBulkPreview();
+   }
+
+   function clearBulkPreview() {
+     _bulkParsed = [];
+     document.getElementById('bulk-preview').style.display = 'none';
+     document.getElementById('bulk-error').style.display   = 'none';
+   }
+
+   function parseBulkInput() {
+     var exercises = [];
+     var errors    = [];
+
+     if (_bulkTab === 'json') {
+       var raw = document.getElementById('bulk-json-input').value.trim();
+       if (!raw) { errors.push('Please paste JSON data.'); return { exercises, errors }; }
+       try {
+         var parsed = JSON.parse(raw);
+         if (!Array.isArray(parsed)) parsed = [parsed];
+         parsed.forEach(function(e, i) {
+           if (!e.title || !e.muscle || !e.sub || !e.desc) {
+             errors.push('Row ' + (i+1) + ': missing required field (title, muscle, sub, or desc)');
+             return;
+           }
+           exercises.push(normaliseExercise(e));
+         });
+       } catch(err) {
+         errors.push('Invalid JSON: ' + err.message);
+       }
+
+     } else if (_bulkTab === 'csv') {
+       var raw = document.getElementById('bulk-csv-input').value.trim();
+       if (!raw) { errors.push('Please paste CSV data.'); return { exercises, errors }; }
+       var lines = raw.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+
+       if (lines.length < 2) { errors.push('CSV needs at least a header row and one data row.'); return { exercises, errors }; }
+       var headers = lines[0].split(',').map(function(h){ return h.trim().toLowerCase(); });
+       for (var i = 1; i < lines.length; i++) {
+         var cols = lines[i].split(',');
+         var obj  = {};
+         headers.forEach(function(h, j){ obj[h] = (cols[j] || '').trim(); });
+         if (!obj.title || !obj.muscle || !obj.sub || !obj.desc) {
+           errors.push('Row ' + (i+1) + ': missing required column');
+           continue;
+         }
+         exercises.push(normaliseExercise(obj));
+       }
+
+     } else if (_bulkTab === 'simple') {
+       var raw = document.getElementById('bulk-simple-input').value.trim();
+       if (!raw) { errors.push('Please enter exercises.'); return { exercises, errors }; }
+       var lines = raw.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+
+       lines.forEach(function(line, i) {
+         var parts = line.split('|').map(function(p){ return p.trim(); });
+         if (parts.length < 4) {
+           errors.push('Row ' + (i+1) + ': need 4 parts separated by |');
+           return;
+         }
+         exercises.push(normaliseExercise({
+           title: parts[0], muscle: parts[1], sub: parts[2], desc: parts[3],
+           diff: parts[4] || 'Intermediate', premium: false,
+         }));
+       });
+     }
+
+     return { exercises, errors };
+   }
+
+   function normaliseExercise(e) {
+     return {
+       id:       'mi_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+       title:    (e.title    || '').trim(),
+       muscle:   (e.muscle   || '').trim().toLowerCase(),
+       sub:      (e.sub      || '').trim(),
+       desc:     (e.desc     || '').trim(),
+       diff:     (e.diff     || 'Intermediate').trim(),
+       duration: '',
+       premium:  e.premium === true || e.premium === 'true',
+       videoURL: (e.videoURL || e.video_url || '').trim(),
+       custom:   false,
+     };
+   }
+
+   function previewBulkImport() {
+     var result = parseBulkInput();
+     var errEl  = document.getElementById('bulk-error');
+     var prevEl = document.getElementById('bulk-preview');
+
+     if (result.errors.length) {
+       errEl.innerHTML = '<i class="ti ti-alert-triangle"></i> ' + result.errors.join('<br>');
+       errEl.style.display = 'block';
+       prevEl.style.display = 'none';
+       return;
+     }
+     errEl.style.display = 'none';
+
+     if (!result.exercises.length) {
+       errEl.innerHTML = 'No valid exercises found.';
+       errEl.style.display = 'block';
+       return;
+     }
+
+     _bulkParsed = result.exercises;
+     document.getElementById('bulk-preview-count').innerHTML =
+       '<i class="ti ti-check" style="color:var(--accent)"></i> <strong>' + _bulkParsed.length + ' exercises</strong> ready to import';
+
+     document.getElementById('bulk-preview-list').innerHTML = _bulkParsed.map(function(e) {
+       return '<div class="bulk-preview-row">' +
+         '<span class="tag tag-' + e.muscle + '">' + capitalize(e.muscle) + '</span>' +
+         '<span class="tag tag-sub">' + e.sub + '</span>' +
+         '<strong>' + e.title + '</strong>' +
+         (e.premium ? '<span class="tag tag-premium">Premium</span>' : '') +
+         '</div>';
+     }).join('');
+     prevEl.style.display = 'block';
+   }
+
+   async function executeBulkImport() {
+     if (!_bulkParsed.length) { previewBulkImport(); return; }
+
+     var btn = document.getElementById('bulk-import-btn');
+     if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Importing...'; }
+
+     try {
+       // Use in-memory MASTER_EXERCISES as the existing list —
+       // avoids a Firestore read which fails for unauthenticated manager
+       var existing = MASTER_EXERCISES.slice();
+       var existingTitles = new Set(existing.map(function(e){ return e.title.toLowerCase(); }));
+
+       var toAdd   = _bulkParsed.filter(function(e){ return !existingTitles.has(e.title.toLowerCase()); });
+       var skipped = _bulkParsed.length - toAdd.length;
+       var merged  = existing.concat(toAdd);
+
+       // Write to Firestore — allow write: if true means no auth needed
+       await window._firebase.setDoc(
+         window._firebase.doc(window._db, 'config', 'masterLibrary'),
+         { exercises: merged, updatedAt: new Date().toISOString() }
+       );
+
+       // Update local state
+       MASTER_EXERCISES = merged;
+       localStorage.setItem('repcast_master', JSON.stringify(merged));
+       renderAdminTable();
+       updateAdminStats();
+       closeAllModals();
+       clearBulkPreview();
+
+       var msg = 'Imported ' + toAdd.length + ' exercises! Total: ' + merged.length;
+       if (skipped > 0) msg += ' (' + skipped + ' skipped — duplicates)';
+       showToast(msg);
+
+     } catch(e) {
+       console.error('Bulk import error:', e.code, e.message);
+       showToast('Import failed: ' + (e.code || e.message));
+     }
+
+     if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-file-import"></i> Import to Library'; }
+   }
+
+   /* ── Import new exercises into Firestore master library ─── */
+   async function importNewExercises() {
+     var btn = document.getElementById('import-btn');
+     if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Importing...'; }
+
+     var NEW_EXERCISES = [
+       {id:'m105',title:'Pec Deck Fly',muscle:'chest',sub:'Middle Chest',desc:'Sit in machine, elbows on pads. Bring arms together in a wide arc. Squeeze chest at peak. Slow eccentric return.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'m106',title:'Svend Press',muscle:'chest',sub:'Middle Chest',desc:'Hold two plates together, press forward from chest. Squeeze plates hard throughout. Excellent mid-chest activation.',diff:'Intermediate',duration:'',premium:false,custom:false},
+       {id:'m107',title:'Loaded Stretch Fly',muscle:'chest',sub:'Lower Chest',desc:'Dumbbell fly on slight decline. Pause 2 seconds at the bottom stretch. Emphasises lower chest and promotes hypertrophy.',diff:'Intermediate',duration:'',premium:true,custom:false},
+       {id:'m108',title:'Pendlay Row',muscle:'back',sub:'Upper Back',desc:'Bar on floor between reps. Explosive pull to lower chest, horizontal torso. Reset completely each rep. Builds raw upper back power.',diff:'Advanced',duration:'',premium:false,custom:false},
+       {id:'m109',title:'Cable Pullover',muscle:'back',sub:'Lats',desc:'High cable, arms straight. Pull bar in wide arc to hips. Keep core braced. Isolates lats through full range.',diff:'Intermediate',duration:'',premium:false,custom:false},
+       {id:'m110',title:'Jefferson Curl',muscle:'back',sub:'Lower Back',desc:'Standing on platform, slowly curl spine down vertebra by vertebra. Use light weight. Advanced mobility exercise.',diff:'Advanced',duration:'',premium:true,custom:false},
+       {id:'m111',title:'Sissy Squat',muscle:'legs',sub:'Quads',desc:'Hold support, lean back as knees travel forward past toes. Heels elevated. Extreme quad stretch and contraction.',diff:'Advanced',duration:'',premium:true,custom:false},
+       {id:'m112',title:'Lying Hip Abduction',muscle:'legs',sub:'Glutes',desc:'Side-lying, raise top leg to 45 degrees. Hold 2 seconds. Works gluteus medius. Add ankle weight for progression.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'m113',title:'Reverse Hyper',muscle:'legs',sub:'Glutes',desc:'Lie prone on bench, raise legs parallel to floor. Decompresses spine while activating glutes and hamstrings.',diff:'Intermediate',duration:'',premium:false,custom:false},
+       {id:'m114',title:'Copenhagen Adduction',muscle:'legs',sub:'Calves',desc:'Side plank with top foot on bench. Lift lower leg to meet top. Strengthens adductors. Reduces groin injury risk.',diff:'Advanced',duration:'',premium:false,custom:false},
+       {id:'m115',title:'Cuban Press',muscle:'shoulders',sub:'Rear Deltoid',desc:'Upright row to chin, externally rotate to overhead press position. Trains full rotator cuff and deltoid complex.',diff:'Intermediate',duration:'',premium:false,custom:false},
+       {id:'m116',title:'Prone Y-Raise',muscle:'shoulders',sub:'Rear Deltoid',desc:'Lie prone on incline bench. Raise arms in Y shape, thumbs up. Targets lower trapezius and rear deltoids.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'m117',title:'Bottoms-Up Press',muscle:'shoulders',sub:'Front Deltoid',desc:'Kettlebell upside down, press overhead. Demands extreme rotator cuff stability. Excellent shoulder health exercise.',diff:'Advanced',duration:'',premium:true,custom:false},
+       {id:'m118',title:'Cross-Body Hammer Curl',muscle:'arms',sub:'Biceps',desc:'Curl dumbbell across body toward opposite shoulder. Emphasises brachialis. Builds arm thickness.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'m119',title:'JM Press',muscle:'arms',sub:'Triceps',desc:'Hybrid between close-grip bench and skull crusher. Bar travels back toward forehead then elbows flare to press.',diff:'Advanced',duration:'',premium:true,custom:false},
+       {id:'m120',title:'Plate Pinch Carry',muscle:'arms',sub:'Forearms',desc:'Pinch weight plates between fingers and thumb. Walk for distance. Builds crushing grip and finger strength.',diff:'Intermediate',duration:'',premium:false,custom:false},
+       {id:'m121',title:'Dragon Flag',muscle:'core',sub:'Abs',desc:'Lie on bench, hold behind head. Raise entire body rigid like a plank, lower with control. Extreme core strength.',diff:'Advanced',duration:'',premium:true,custom:false},
+       {id:'m122',title:'L-Sit Hold',muscle:'core',sub:'Abs',desc:'On parallel bars or floor. Raise legs parallel, hold. Combines hip flexor, ab, and tricep strength.',diff:'Advanced',duration:'',premium:false,custom:false},
+       {id:'m123',title:'Suitcase Carry',muscle:'core',sub:'Obliques',desc:'Single heavy dumbbell at side. Walk while resisting lateral bend. Builds anti-lateral flexion strength.',diff:'Intermediate',duration:'',premium:false,custom:false},
+       {id:'m124',title:'McGill Bird Dog',muscle:'core',sub:'Transverse Abs',desc:'From all fours, extend opposite arm and leg to neutral. Hold 10 seconds. Key exercise for spine stabilisation.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'m125',title:'Sandbag Clean',muscle:'fullbody',sub:'Compound',desc:'Pick sandbag from floor to shoulder in one explosive movement. Awkward load challenges stability and athleticism.',diff:'Advanced',duration:'',premium:false,custom:false},
+       {id:'m126',title:'Sled Push',muscle:'fullbody',sub:'HIIT',desc:'Drive sled forward with low hips and forward lean. Pure power and conditioning. No eccentric phase means minimal soreness.',diff:'Intermediate',duration:'',premium:false,custom:false},
+       {id:'m127',title:'Rope Climb',muscle:'fullbody',sub:'Functional',desc:'Climb rope using arms and legs. Builds total body pulling strength, grip and coordination.',diff:'Advanced',duration:'',premium:true,custom:false},
+       {id:'m128',title:'Broad Jump',muscle:'fullbody',sub:'HIIT',desc:'Athletic stance, swing arms and jump as far forward as possible. Land softly. Develops explosive lower body power.',diff:'Intermediate',duration:'',premium:false,custom:false},
+       {id:'p40',title:'Scapular Push-Up',muscle:'physio',sub:'Shoulder Rehab',desc:'In push-up position, arms straight. Let chest sink then push shoulder blades apart without bending elbows. Trains serratus anterior.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p41',title:'Sidelying External Rotation',muscle:'physio',sub:'Shoulder Rehab',desc:'Lie on side, elbow at 90 degrees. Rotate forearm upward against gravity. Targets infraspinatus directly.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p42',title:'Wall Angels',muscle:'physio',sub:'Shoulder Rehab',desc:'Stand with back flat on wall, arms in goalpost position. Slide arms overhead maintaining contact. Improves thoracic mobility.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p43',title:'Prone T-Raise',muscle:'physio',sub:'Shoulder Rehab',desc:'Lie prone, arms out in T. Raise arms to horizontal, thumbs up. Hold 3 seconds. Targets mid trapezius.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p44',title:'Reverse Nordic Curl',muscle:'physio',sub:'Knee Rehab',desc:'Kneel, lean back slowly keeping hips extended. Strengthens quadriceps eccentrically. Excellent for patellar tendon rehab.',diff:'Intermediate',duration:'',premium:false,custom:false},
+       {id:'p45',title:'Short Arc Quad',muscle:'physio',sub:'Knee Rehab',desc:'Sit with roll under knee. Extend from 45 degrees to full extension. Hold 5 seconds. Classic post-surgical quad activation.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p46',title:'Lateral Step-Up',muscle:'physio',sub:'Knee Rehab',desc:'Step sideways onto low box. Drive through heel to stand. Controls valgus collapse. Excellent VMO activation.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p47',title:'Isometric Wall Squat',muscle:'physio',sub:'Knee Rehab',desc:'Back against wall, lower to pain-free angle. Hold 30-60 seconds. Safe isometric quad exercise for early rehab.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p48',title:'McGill Curl-Up',muscle:'physio',sub:'Lower Back Rehab',desc:'One knee bent, hands under lumbar. Lift only head and shoulders. Spine-safe ab exercise for lower back patients.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p49',title:'Side Bridge',muscle:'physio',sub:'Lower Back Rehab',desc:'Side plank from knees or feet. Hold neutral spine. Part of McGill Big Three. Trains quadratus lumborum.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p50',title:'Prone Press-Up',muscle:'physio',sub:'Lower Back Rehab',desc:'Lie prone, hands under shoulders. Press up leaving hips on floor. McKenzie Method exercise for disc centralisation.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p51',title:'Lumbar Rotation Stretch',muscle:'physio',sub:'Lower Back Rehab',desc:'Supine, knees bent. Let knees fall gently side to side. Keep shoulders flat. Gentle rotational mobility for lumbar spine.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p52',title:'Hip Hinge Pattern',muscle:'physio',sub:'Lower Back Rehab',desc:'Stand with dowel on back. Hinge forward keeping 3 points of contact. Teaches proper movement pattern to protect lumbar spine.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p53',title:'Supine Hip Flexor Stretch',muscle:'physio',sub:'Hip Rehab',desc:'Lie on table edge, bring one knee to chest, let other leg hang. Hip flexor stretch without spinal compensation.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p54',title:'Fire Hydrant',muscle:'physio',sub:'Hip Rehab',desc:'All fours. Lift bent knee out to side. Targets gluteus medius and external rotators. Progress to banded version.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p55',title:'Hip Extension Isometric',muscle:'physio',sub:'Hip Rehab',desc:'Stand at wall, press heel back into wall. Hold 10 seconds. Activates gluteus maximus without movement.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p56',title:'Lateral Band Walk',muscle:'physio',sub:'Hip Rehab',desc:'Band around ankles or knees. Step sideways maintaining squat position. Strengthens gluteus medius. Essential for hip and knee rehab.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p57',title:'Frog Stretch',muscle:'physio',sub:'Hip Rehab',desc:'All fours, knees wide as hips open. Rock hips back. Deep hip adductor and groin stretch.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p58',title:'Heel Raise Progression',muscle:'physio',sub:'Ankle Rehab',desc:'Double to single leg calf raises. Full range. Builds gastrocnemius and soleus strength post ankle sprain.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p59',title:'Ankle Dorsiflexion Mobility',muscle:'physio',sub:'Ankle Rehab',desc:'Lunge position, drive knee forward over toes keeping heel down. Improves dorsiflexion range. Critical for squat depth.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p60',title:'Wobble Board Training',muscle:'physio',sub:'Ankle Rehab',desc:'Stand on wobble board. Progress from bilateral to unilateral to eyes closed. Restores proprioceptive function after ankle sprain.',diff:'Intermediate',duration:'',premium:false,custom:false},
+       {id:'p61',title:'Neck Isometrics',muscle:'physio',sub:'Neck Rehab',desc:'Press head into hand in all directions. Hold 5-10 seconds. Builds neck stability without movement. Safe for most neck conditions.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p62',title:'Thoracic Extension Stretch',muscle:'physio',sub:'Neck Rehab',desc:'Foam roller under mid back. Gently extend over it. Improves thoracic mobility which reduces neck and shoulder tension.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p63',title:'Upper Trap Stretch',muscle:'physio',sub:'Neck Rehab',desc:'Sit upright. Ear toward shoulder, hand gently on head. Hold 30 seconds. Releases upper trapezius tension.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p64',title:'Wrist Flexor Stretch',muscle:'physio',sub:'Shoulder Rehab',desc:'Arm straight, palm up. Pull fingers back with other hand. Hold 30 seconds. Essential for tennis elbow and carpal tunnel.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p65',title:'Eccentric Wrist Curl',muscle:'physio',sub:'Shoulder Rehab',desc:'Forearm on table. Curl up with both hands, lower with one. Eccentric loading for lateral epicondylitis rehabilitation.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p66',title:'Supination and Pronation',muscle:'physio',sub:'Shoulder Rehab',desc:'Hold hammer at end. Rotate forearm palm up and palm down slowly. Key exercise for elbow and forearm rehab.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p67',title:'Plantar Fascia Stretch',muscle:'physio',sub:'Ankle Rehab',desc:'Seated, cross foot over knee. Pull toes back toward shin. Hold 30 seconds. Best done first thing in the morning.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p68',title:'Toe Spread and Lift',muscle:'physio',sub:'Ankle Rehab',desc:'Seated barefoot. Spread all toes wide then lift big toe only. Strengthens intrinsic foot muscles. Improves arch support.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p69',title:'Short Foot Exercise',muscle:'physio',sub:'Ankle Rehab',desc:'Shorten the foot by pulling ball of foot toward heel without curling toes. Activates intrinsic arch muscles.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p70',title:'Ankle Pumps',muscle:'physio',sub:'Ankle Rehab',desc:'Pump ankle up and down rhythmically. Activates calf muscle pump. Critical post-surgery DVT prevention. Do every hour.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p71',title:'Quad Set',muscle:'physio',sub:'Knee Rehab',desc:'Lie supine, leg straight. Tighten quad by pressing knee into surface. Hold 10 seconds. First exercise post knee surgery.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p72',title:'Active Assisted Range of Motion',muscle:'physio',sub:'Shoulder Rehab',desc:'Use unaffected arm to move affected joint through available range. Maintains joint mobility after injury or surgery.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p73',title:'Single Leg Squat Progression',muscle:'physio',sub:'Balance',desc:'Progress from box-supported to full single leg squat. Controls knee valgus. Functional test for lower limb rehabilitation.',diff:'Intermediate',duration:'',premium:false,custom:false},
+       {id:'p74',title:'Foam Pad Standing',muscle:'physio',sub:'Balance',desc:'Stand on foam pad single leg. Progress to eyes closed. Challenges proprioception. Excellent for post-ankle or knee rehab.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p75',title:'Vestibular Exercises',muscle:'physio',sub:'Balance',desc:'Head movements side to side and up/down while focusing on a point. Trains vestibular system. Used for vertigo and concussion rehab.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p76',title:'Pursed Lip Breathing',muscle:'physio',sub:'Breathing',desc:'Inhale through nose 2 counts. Exhale through pursed lips 4 counts. Improves breathing efficiency. Used in COPD and asthma rehab.',diff:'Beginner',duration:'',premium:false,custom:false},
+       {id:'p77',title:'Segmental Breathing',muscle:'physio',sub:'Breathing',desc:'Place hands on different rib areas. Direct breath into that zone. Improves regional lung ventilation. Critical post-thoracic surgery.',diff:'Beginner',duration:'',premium:false,custom:false},
+     ];
+
+     try {
+       // Use in-memory MASTER_EXERCISES — avoids read auth check for manager
+       var existing = MASTER_EXERCISES.slice();
+       var existingIds = new Set(existing.map(function(e){ return e.id; }));
+       var toAdd    = NEW_EXERCISES.filter(function(e){ return !existingIds.has(e.id); });
+
+       if (toAdd.length === 0) {
+         showToast('All exercises already in library — nothing to add.');
+         if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-download"></i> Import 75 New Exercises'; }
+         return;
+       }
+
+       var merged = existing.concat(toAdd);
+       await window._firebase.setDoc(
+         window._firebase.doc(window._db, 'config', 'masterLibrary'),
+         { exercises: merged, updatedAt: new Date().toISOString() }
+       );
+
+       MASTER_EXERCISES = merged;
+       localStorage.setItem('repcast_master', JSON.stringify(merged));
+       renderAdminTable();
+       updateAdminStats();
+       showToast('Imported ' + toAdd.length + ' exercises! Total: ' + merged.length);
+       if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-check"></i> Imported!'; }
+
+     } catch(e) {
+       console.error('Import error:', e.code, e.message);
+       showToast('Import failed: ' + e.code + '. Check Firestore rules for config/masterLibrary.');
+       if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-download"></i> Import 75 New Exercises'; }
+     }
+   }
+
    function updateAdminStats() {
      const el = document.getElementById('stat-total-exercises');
      if (el) el.textContent = MASTER_EXERCISES.length;
@@ -2423,6 +3688,3852 @@
      if (rl) rl.textContent = sentRoutines.length;
    }
    
+
+/* ══════════════════════════════════════════════════════════
+   NUTRITION — BMR CALCULATOR + MENU SYSTEM
+══════════════════════════════════════════════════════════ */
+
+let menus        = [];
+let foods        = [];   // master food database (admin-controlled)
+let bmrResult    = null;
+let activeGoal   = 'maintain';
+let menuFilter   = 'all';
+let editingMenuId = null;
+
+/* ── Goal selector ────────────────────────────────────── */
+function setGoal(goal, btn) {
+  activeGoal = goal;
+  document.querySelectorAll('.goal-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById('cut-intensity-group').style.display  = goal === 'cut'  ? '' : 'none';
+  document.getElementById('bulk-intensity-group').style.display = goal === 'bulk' ? '' : 'none';
+}
+
+/* ── BMR Calculation (Mifflin-St Jeor) ───────────────── */
+function calculateBMR() {
+  var name     = document.getElementById('bmr-name').value.trim() || 'Client';
+  var gender   = document.getElementById('bmr-gender').value;
+  var age      = parseFloat(document.getElementById('bmr-age').value);
+  var weight   = parseFloat(document.getElementById('bmr-weight').value);
+  var height   = parseFloat(document.getElementById('bmr-height').value);
+  var activity = parseFloat(document.getElementById('bmr-activity').value);
+
+  if (!age || !weight || !height) { showToast('Please fill in age, weight and height.'); return; }
+
+  // Mifflin-St Jeor
+  var bmr = (10 * weight) + (6.25 * height) - (5 * age) + (gender === 'male' ? 5 : -161);
+  var tdee = Math.round(bmr * activity);
+
+  // Adjust for goal
+  var factor = 1;
+  if (activeGoal === 'cut')  factor = parseFloat(document.getElementById('bmr-cut-intensity').value  || 0.85);
+  if (activeGoal === 'bulk') factor = parseFloat(document.getElementById('bmr-bulk-intensity').value || 1.10);
+  var target = Math.round(tdee * factor);
+
+  // Macro split based on goal
+  var proteinG, carbsG, fatG;
+  if (activeGoal === 'cut') {
+    proteinG = Math.round(weight * 2.2);           // 2.2g per kg
+    fatG     = Math.round(weight * 0.9);           // 0.9g per kg
+    carbsG   = Math.round((target - (proteinG * 4) - (fatG * 9)) / 4);
+  } else if (activeGoal === 'bulk') {
+    proteinG = Math.round(weight * 2.0);
+    fatG     = Math.round(weight * 1.0);
+    carbsG   = Math.round((target - (proteinG * 4) - (fatG * 9)) / 4);
+  } else {
+    proteinG = Math.round(weight * 1.8);
+    fatG     = Math.round(weight * 0.9);
+    carbsG   = Math.round((target - (proteinG * 4) - (fatG * 9)) / 4);
+  }
+  carbsG = Math.max(50, carbsG); // floor
+
+  bmrResult = { name, gender, age, weight, height, bmr: Math.round(bmr), tdee, target, proteinG, carbsG, fatG, goal: activeGoal };
+
+  // Show results
+  document.getElementById('bmr-result-name').textContent = name;
+  document.getElementById('res-bmr').textContent    = Math.round(bmr).toLocaleString();
+  document.getElementById('res-tdee').textContent   = tdee.toLocaleString();
+  document.getElementById('res-target').textContent = target.toLocaleString();
+  document.getElementById('res-protein').textContent = proteinG + 'g';
+  document.getElementById('res-carbs').textContent   = carbsG + 'g';
+  document.getElementById('res-fat').textContent     = fatG + 'g';
+
+  // Macro bars
+  var total = (proteinG * 4) + (carbsG * 4) + (fatG * 9);
+  document.getElementById('bar-protein').style.width = Math.round((proteinG * 4 / total) * 100) + '%';
+  document.getElementById('bar-carbs').style.width   = Math.round((carbsG   * 4 / total) * 100) + '%';
+  document.getElementById('bar-fat').style.width     = Math.round((fatG     * 9 / total) * 100) + '%';
+
+  document.getElementById('bmr-results').style.display = '';
+  showToast('BMR calculated for ' + name);
+}
+
+/* ── Find matching menus ──────────────────────────────── */
+function findMatchingMenus() {
+  if (!bmrResult) return;
+  menuFilter = bmrResult.goal;
+  document.querySelectorAll('.lib-tab[id^="menu-tab"]').forEach(function(b){ b.classList.remove('active'); });
+  var tabEl = document.getElementById('menu-tab-' + bmrResult.goal);
+  if (tabEl) tabEl.classList.add('active');
+  renderMenuLibrary();
+  // Scroll to menu library
+  document.getElementById('menu-library-body').scrollIntoView({ behavior:'smooth' });
+  showToast('Showing ' + bmrResult.goal + ' menus closest to ' + bmrResult.target + ' kcal');
+}
+
+/* ── Load menus from Firestore ───────────────────────── */
+async function loadMenus() {
+  if (!window._firebase || !window._db) return;
+  try {
+    var snap = await window._firebase.getDocs(window._firebase.collection(window._db, col('menus')));
+    menus = [];
+    snap.forEach(function(d){ menus.push(Object.assign({ id: d.id }, d.data())); });
+    renderMenuLibrary();
+    renderAdminMenuList();
+  } catch(e) {
+    console.warn('Load menus error:', e.code, '— using local cache');
+    // If Firestore read fails (e.g. unauthenticated admin), keep existing array
+    renderMenuLibrary();
+    renderAdminMenuList();
+  }
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   FOOD PICKER — trainer picks from food database for menus
+══════════════════════════════════════════════════════════ */
+var _foodPickerMealId = null;
+var _foodPickerCat    = 'All';
+
+async function openFoodPicker(mealId) {
+  _foodPickerMealId = mealId;
+  _foodPickerCat    = 'All';
+  if (!foods.length) await loadFoods();
+
+  // Close menu modal first, keep backdrop open
+  var menuModal = document.getElementById('modal-admin-menu');
+  if (menuModal) menuModal.classList.remove('open');
+
+  renderFoodPickerCategories();
+  renderFoodPicker('');
+
+  var picker = document.getElementById('modal-food-picker');
+  if (picker) picker.classList.add('open');
+  document.getElementById('modal-backdrop').classList.add('open');
+
+  // Reset to list view
+  var lv = document.getElementById('food-picker-list-view');
+  var qv = document.getElementById('food-picker-qty-view');
+  if (lv) lv.style.display = 'block';
+  if (qv) qv.style.display = 'none';
+
+  setTimeout(function(){
+    var s = document.getElementById('food-picker-search');
+    if (s) { s.value = ''; s.focus(); }
+  }, 200);
+}
+
+function renderFoodPickerCategories() {
+  var bar = document.getElementById('food-picker-cats');
+  if (!bar) return;
+  var cats = ['All'].concat([...new Set(foods.map(function(f){ return f.category||'Other'; }))].sort());
+  bar.innerHTML = cats.map(function(c){
+    return '<button class="food-cat-pill' + (c === _foodPickerCat ? ' active' : '') + '" onclick="setFoodPickerCat(\'' + c.replace(/'/g, '') + '\')">' + c + '</button>';
+  }).join('');
+}
+
+function setFoodPickerCat(cat) {
+  _foodPickerCat = cat;
+  renderFoodPickerCategories();
+  var q = document.getElementById('food-picker-search');
+  renderFoodPicker(q ? q.value : '');
+}
+
+function filterFoodPicker(q) {
+  renderFoodPicker(q);
+}
+
+function renderFoodPicker(query) {
+  var body = document.getElementById('food-picker-body');
+  if (!body) return;
+  query = (query || '').toLowerCase().trim();
+
+  var filtered = foods.filter(function(f){
+    var matchCat = (_foodPickerCat === 'All' || (f.category||'Other') === _foodPickerCat);
+    var matchQ   = !query || (f.name||'').toLowerCase().includes(query) || (f.category||'').toLowerCase().includes(query);
+    return matchCat && matchQ;
+  });
+
+  if (!filtered.length) {
+    body.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--muted)">' +
+      '<i class="ti ti-apple" style="font-size:36px;opacity:0.3;display:block;margin-bottom:10px"></i>' +
+      (foods.length ? 'No foods match' : 'Food database is empty. Admin needs to add foods.') +
+    '</div>';
+    return;
+  }
+
+  // Group by category (only when showing All)
+  var html = '';
+  if (_foodPickerCat === 'All') {
+    var byCat = {};
+    filtered.forEach(function(f){ (byCat[f.category||'Other'] = byCat[f.category||'Other'] || []).push(f); });
+    Object.keys(byCat).sort().forEach(function(cat){
+      html += '<div class="food-picker-cat"><div class="food-picker-cat-title">' + cat + '</div>';
+      byCat[cat].forEach(function(f){ html += foodPickerItemHTML(f); });
+      html += '</div>';
+    });
+  } else {
+    filtered.forEach(function(f){ html += foodPickerItemHTML(f); });
+  }
+  body.innerHTML = html;
+}
+
+function foodPickerItemHTML(f) {
+  var fEnc = encodeURIComponent(JSON.stringify(f));
+  return '<div class="food-picker-item" onclick="selectFoodFromPicker(\'' + fEnc + '\')">' +
+    '<div style="flex:1">' +
+      '<div class="food-picker-name">' + f.name + '</div>' +
+      '<div class="food-picker-macros">Per ' + (f.serving||100) + (f.unit||'g') + ': ' + (f.calories||0) + ' kcal · P' + (f.protein||0) + ' C' + (f.carbs||0) + ' F' + (f.fat||0) + '</div>' +
+    '</div>' +
+    '<i class="ti ti-plus" style="color:var(--accent)"></i>' +
+  '</div>';
+}
+
+var _selectedFood = null;
+
+function selectFoodFromPicker(fEnc) {
+  _selectedFood = JSON.parse(decodeURIComponent(fEnc));
+  // Show quantity step
+  document.getElementById('food-qty-name').textContent = _selectedFood.name;
+  document.getElementById('food-qty-base').textContent =
+    'Per ' + (_selectedFood.serving||100) + (_selectedFood.unit||'g') + ': ' +
+    (_selectedFood.calories||0) + ' kcal · P' + (_selectedFood.protein||0) + ' C' + (_selectedFood.carbs||0) + ' F' + (_selectedFood.fat||0);
+  var qtyInput = document.getElementById('food-qty-input');
+  qtyInput.value = _selectedFood.serving || 100;
+  document.getElementById('food-qty-unit').textContent = _selectedFood.unit || 'g';
+  updateFoodQtyPreview();
+  document.getElementById('food-picker-list-view').style.display = 'none';
+  document.getElementById('food-picker-qty-view').style.display = 'block';
+  setTimeout(function(){ qtyInput.focus(); qtyInput.select(); }, 100);
+}
+
+function updateFoodQtyPreview() {
+  if (!_selectedFood) return;
+  var qty  = parseFloat(document.getElementById('food-qty-input').value) || 0;
+  var base = _selectedFood.serving || 100;
+  var mult = qty / base;
+  var cal = Math.round((_selectedFood.calories||0) * mult);
+  var pro = Math.round((_selectedFood.protein||0) * mult);
+  var car = Math.round((_selectedFood.carbs||0) * mult);
+  var fat = Math.round((_selectedFood.fat||0) * mult);
+  document.getElementById('food-qty-preview').innerHTML =
+    '<span style="font-size:22px;font-weight:800">' + cal + '</span> kcal &nbsp;·&nbsp; ' +
+    '<span style="color:#60A5FA">P' + pro + 'g</span> ' +
+    '<span style="color:#FBBF24">C' + car + 'g</span> ' +
+    '<span style="color:#F472B6">F' + fat + 'g</span>';
+}
+
+function confirmFoodQty() {
+  if (!_selectedFood || !_foodPickerMealId) return;
+  var qty  = parseFloat(document.getElementById('food-qty-input').value) || 0;
+  if (qty <= 0) { showToast('Enter a quantity'); return; }
+  var base = _selectedFood.serving || 100;
+  var mult = qty / base;
+
+  var item = {
+    name:     _selectedFood.name,
+    qty:      String(qty),
+    unit:     _selectedFood.unit || 'g',
+    calories: Math.round((_selectedFood.calories||0) * mult),
+    protein:  Math.round((_selectedFood.protein||0) * mult),
+    carbs:    Math.round((_selectedFood.carbs||0) * mult),
+    fat:      Math.round((_selectedFood.fat||0) * mult)
+  };
+
+  // Add to the meal
+  var container = document.getElementById('items-' + _foodPickerMealId);
+  if (container) {
+    var div = document.createElement('div');
+    div.innerHTML = foodItemHTML(_foodPickerMealId, item);
+    container.appendChild(div.firstChild);
+    updateAdminMenuPreview();
+  }
+
+  // Reset and go back to list for adding more
+  _selectedFood = null;
+  document.getElementById('food-picker-qty-view').style.display = 'none';
+  document.getElementById('food-picker-list-view').style.display = 'block';
+  showToast('✓ ' + item.name + ' added');
+}
+
+function backToFoodList() {
+  _selectedFood = null;
+  var qv = document.getElementById('food-picker-qty-view');
+  var lv = document.getElementById('food-picker-list-view');
+  if (qv) qv.style.display = 'none';
+  if (lv) lv.style.display = 'block';
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   FOOD DATABASE — master collection, admin-controlled
+══════════════════════════════════════════════════════════ */
+async function loadFoods() {
+  if (!window._firebase || !window._db) return;
+  try {
+    var snap = await window._firebase.getDocs(window._firebase.collection(window._db, col('foods')));
+    foods = [];
+    snap.forEach(function(d){ foods.push(Object.assign({ id: d.id }, d.data())); });
+    foods.sort(function(a,b){ return (a.category||'').localeCompare(b.category||'') || (a.name||'').localeCompare(b.name||''); });
+    if (state.isManager) renderAdminFoodList();
+  } catch(e) { console.warn('loadFoods error:', e); }
+}
+
+var editingFoodId = null;
+
+function openAdminFoodModal(id) {
+  if (id) {
+    var f = foods.find(function(x){ return x.id === id; });
+    if (!f) return;
+    editingFoodId = id;
+    document.getElementById('food-name').value     = f.name || '';
+    document.getElementById('food-category').value = f.category || '';
+    document.getElementById('food-serving').value  = f.serving || 100;
+    document.getElementById('food-unit').value     = f.unit || 'g';
+    document.getElementById('food-calories').value = f.calories || 0;
+    document.getElementById('food-protein').value  = f.protein || 0;
+    document.getElementById('food-carbs').value    = f.carbs || 0;
+    document.getElementById('food-fat').value      = f.fat || 0;
+    document.getElementById('food-modal-title').innerHTML = '<i class="ti ti-edit"></i> Edit Food';
+  } else {
+    editingFoodId = null;
+    ['food-name','food-category','food-calories','food-protein','food-carbs','food-fat'].forEach(function(fid){
+      var el = document.getElementById(fid); if (el) el.value = '';
+    });
+    document.getElementById('food-serving').value = 100;
+    document.getElementById('food-unit').value    = 'g';
+    document.getElementById('food-modal-title').innerHTML = '<i class="ti ti-plus"></i> Add Food';
+  }
+  openModal('admin-food');
+}
+
+async function saveAdminFood() {
+  var name = document.getElementById('food-name').value.trim();
+  var cat  = document.getElementById('food-category').value.trim();
+  if (!name) { showToast('Enter a food name'); return; }
+  if (!cat)  { showToast('Choose a category'); return; }
+
+  var foodData = {
+    name:     name,
+    category: cat,
+    serving:  parseFloat(document.getElementById('food-serving').value) || 100,
+    unit:     document.getElementById('food-unit').value || 'g',
+    calories: parseFloat(document.getElementById('food-calories').value) || 0,
+    protein:  parseFloat(document.getElementById('food-protein').value) || 0,
+    carbs:    parseFloat(document.getElementById('food-carbs').value) || 0,
+    fat:      parseFloat(document.getElementById('food-fat').value) || 0,
+    updatedAt: new Date().toISOString()
+  };
+
+  try {
+    var foodColName = (_adminLang && _adminLang['foods'] === 'he') ? 'foods_he' : 'foods';
+    if (editingFoodId) {
+      await window._firebase.setDoc(window._firebase.doc(window._db, foodColName, editingFoodId), foodData, { merge: true });
+      showToast(_adminLang && _adminLang['foods'] === 'he' ? 'נשמר!' : 'Food updated');
+    } else {
+      await window._firebase.addDoc(window._firebase.collection(window._db, foodColName), foodData);
+      showToast(_adminLang && _adminLang['foods'] === 'he' ? 'נשמר!' : 'Food added');
+    }
+    closeAllModals();
+    await loadFoods();
+  } catch(e) { showToast('Error: ' + e.message); }
+}
+
+async function deleteFood(id) {
+  if (!state.isManager) { showToast('Only admin can delete foods'); return; }
+  if (!confirm('Delete this food from the database?')) return;
+  try {
+    await window._firebase.deleteDoc(window._firebase.doc(window._db, col('foods'), id));
+    foods = foods.filter(function(f){ return f.id !== id; });
+    renderAdminFoodList();
+    showToast('Food deleted');
+  } catch(e) { showToast('Error: ' + e.message); }
+}
+
+function renderAdminFoodList() {
+  // Render to active language container
+  var adminFoodLang = _adminLang && _adminLang['foods'] ? _adminLang['foods'] : 'en';
+  var el = document.getElementById(adminFoodLang === 'he' ? 'admin-food-list-he' : 'admin-food-list');
+  if (!el) return;
+  if (!foods.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="ti ti-apple"></i></div><h3>No foods yet</h3><p>Add foods or bulk import to build your database.</p></div>';
+    return;
+  }
+  // Group by category
+  var byCat = {};
+  foods.forEach(function(f){ (byCat[f.category||'Other'] = byCat[f.category||'Other'] || []).push(f); });
+
+  var html = '';
+  Object.keys(byCat).sort().forEach(function(cat){
+    html += '<div style="margin-bottom:14px">' +
+      '<div style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;padding:0 4px">' + cat + ' (' + byCat[cat].length + ')</div>';
+    byCat[cat].forEach(function(f){
+      html += '<div class="admin-menu-row">' +
+        '<div style="flex:1"><strong>' + f.name + '</strong>' +
+          '<div style="font-size:12px;color:var(--muted);margin-top:3px">Per ' + (f.serving||100) + (f.unit||'g') + ': ' + (f.calories||0) + ' kcal · P' + (f.protein||0) + ' C' + (f.carbs||0) + ' F' + (f.fat||0) + '</div>' +
+        '</div>' +
+        '<div class="admin-actions">' +
+          '<button class="admin-action-btn edit" onclick="openAdminFoodModal(\'' + f.id + '\')"><i class="ti ti-edit"></i></button>' +
+          '<button class="admin-action-btn delete" onclick="deleteFood(\'' + f.id + '\')"><i class="ti ti-trash"></i></button>' +
+        '</div>' +
+      '</div>';
+    });
+    html += '</div>';
+  });
+  el.innerHTML = html;
+}
+
+
+
+// Auto-load menus when trainer opens nutrition tab (even without BMR)
+var _origSetView = typeof setView === 'function' ? setView : null;
+
+function filterMenus(goal, btn) {
+  menuFilter = goal;
+  document.querySelectorAll('.lib-tab[id^="menu-tab"]').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  renderMenuLibrary();
+}
+
+/* ── Render menu library (trainer view) ──────────────── */
+function renderMenuLibrary() {
+  var myUid = state.user ? state.user.uid : null;
+  var pool = (menuFilter === 'all' ? menus : menus.filter(function(m){ return m.goal === menuFilter; }))
+    .filter(function(m){ return m.isPublic !== false || m.createdBy === myUid; })
+;  // col() already queries the right collection
+
+  // Sort by closest calories to bmrResult if available
+  if (bmrResult && menuFilter !== 'all') {
+    pool = pool.slice().sort(function(a, b){
+      return Math.abs((a.calories||0) - bmrResult.target) - Math.abs((b.calories||0) - bmrResult.target);
+    });
+  }
+
+  var body = document.getElementById('menu-library-body');
+  if (!pool.length) {
+    var msg = menuFilter === 'all' ? 'No menus in the library yet. Ask your manager to add some.' : 'No ' + menuFilter + ' menus yet.';
+    body.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="ti ti-salad"></i></div><h3>No menus found</h3><p>' + msg + '</p></div>';
+    return;
+  }
+
+  var goalColors = { cut:'#F472B6', maintain:'#60A5FA', bulk:'#7EE8A2' };
+  body.innerHTML = '<div class="menu-grid">' + pool.map(function(m) {
+    var totals = calcMenuTotals(m);
+    var diff   = bmrResult ? (Math.abs(totals.calories - bmrResult.target)) : null;
+    var match  = diff !== null ? (diff < 100 ? '🎯 Best match' : diff < 200 ? '✓ Good match' : '') : '';
+    var canEdit = canEditItem(m);
+    return '<div class="menu-card' + (!m.isPublic && m.createdBy === myUid ? ' menu-card-private' : '') + '" onclick="openMenuDetail(\'' + m.id + '\')">' +
+      '<div class="menu-card-header" style="border-left:4px solid ' + (goalColors[m.goal]||'var(--accent)') + '">' +
+        '<div>' +
+          '<div class="menu-card-name">' + m.name + '</div>' +
+          '<div class="menu-card-meta">' +
+            '<span class="tag" style="background:rgba(126,232,162,0.1);color:var(--accent);font-size:10px">' + (m.goal||'').toUpperCase() + '</span>' +
+            (match ? '<span style="font-size:11px;color:var(--accent)">' + match + '</span>' : '') +
+          '</div>' +
+        '</div>' +
+        '<div class="menu-card-cal">' + (totals.calories||m.calories||0) + '<span>kcal</span></div>' +
+      '</div>' +
+      '<div class="menu-card-chart">' + macroChartHTML(totals.protein, totals.carbs, totals.fat, totals.calories, 120) + '</div>' +
+      '<div class="menu-card-desc">' + (m.desc||'') + '</div>' +
+      (canEdit ? '<div class="menu-card-actions">' +
+        '<span class="tag" style="background:' + (!m.isPublic?'rgba(251,191,36,0.1)':'rgba(126,232,162,0.1)') + ';color:' + (!m.isPublic?'#FBBF24':'var(--accent)') + '">' + (!m.isPublic?'🔒 Private':'🌐 Public') + '</span>' +
+        '<div style="display:flex;gap:6px">' +
+          '<button class="btn btn-ghost btn-sm" style="padding:4px 8px" onclick="event.stopPropagation();openTrainerMenuModal(\'' + m.id + '\')" ><i class="ti ti-edit"></i></button>' +
+          '<button class="btn btn-ghost btn-sm" style="padding:4px 8px;color:var(--danger)" onclick="event.stopPropagation();deleteTrainerMenu(\'' + m.id + '\')"><i class="ti ti-trash"></i></button>' +
+        '</div>' +
+      '</div>' : '') +
+    '</div>';
+  }).join('') + '</div>';
+}
+
+/* ── Calculate menu totals from meals ────────────────── */
+function calcMenuTotals(menu) {
+  var cal = 0, prot = 0, carb = 0, fat = 0;
+  (menu.meals || []).forEach(function(meal) {
+    (meal.items || []).forEach(function(item) {
+      cal  += (item.calories || 0);
+      prot += (item.protein  || 0);
+      carb += (item.carbs    || 0);
+      fat  += (item.fat      || 0);
+    });
+  });
+  return { calories: Math.round(cal), protein: Math.round(prot), carbs: Math.round(carb), fat: Math.round(fat) };
+}
+
+/* ── Open menu detail modal ──────────────────────────── */
+function openMenuDetail(id) {
+  var menu = menus.find(function(m){ return m.id === id; });
+  if (!menu) return;
+  document.getElementById('menu-detail-title').innerHTML = '<i class="ti ti-salad"></i> ' + menu.name;
+  var assignBtn = document.getElementById('menu-assign-btn');
+  if (assignBtn) assignBtn.setAttribute('data-menu-id', id);
+
+  var totals = calcMenuTotals(menu);
+  var html =
+    '<div class="menu-detail-header">' +
+      macroChartHTML(totals.protein, totals.carbs, totals.fat, totals.calories, 180) +
+      (menu.desc ? '<p class="menu-detail-desc">' + menu.desc + '</p>' : '') +
+    '</div>';
+
+  var grandTot = { cal:0, p:0, c:0, f:0 };
+
+  (menu.meals || []).forEach(function(meal) {
+    var mealTot = { cal:0, p:0, c:0, f:0 };
+    (meal.items||[]).forEach(function(item){
+      mealTot.cal += item.calories||0;
+      mealTot.p   += item.protein||0;
+      mealTot.c   += item.carbs||0;
+      mealTot.f   += item.fat||0;
+    });
+    grandTot.cal += mealTot.cal;
+    grandTot.p   += mealTot.p;
+    grandTot.c   += mealTot.c;
+    grandTot.f   += mealTot.f;
+
+    html += '<div class="meal-section">' +
+      '<div class="meal-header">' +
+        '<span class="meal-name">' + meal.name + '</span>' +
+        '<span class="meal-total">' + Math.round(mealTot.cal) + ' kcal</span>' +
+      '</div>' +
+      '<table class="food-table">' +
+        '<thead><tr>' +
+          '<th style="text-align:left">Food</th>' +
+          '<th>Qty</th>' +
+          '<th>Cal</th>' +
+          '<th style="color:#60A5FA">Protein</th>' +
+          '<th style="color:#FBBF24">Carbs</th>' +
+          '<th style="color:#F472B6">Fat</th>' +
+        '</tr></thead>' +
+        '<tbody>' +
+        (meal.items||[]).map(function(item) {
+          return '<tr>' +
+            '<td style="font-weight:500">' + (item.name||'') + '</td>' +
+            '<td style="color:var(--muted)">' + (item.qty||'') + ' ' + (item.unit||'') + '</td>' +
+            '<td>' + (item.calories||0) + '</td>' +
+            '<td style="color:#60A5FA">' + (item.protein||0) + 'g</td>' +
+            '<td style="color:#FBBF24">' + (item.carbs||0) + 'g</td>' +
+            '<td style="color:#F472B6">' + (item.fat||0) + 'g</td>' +
+          '</tr>';
+        }).join('') +
+        '</tbody>' +
+        '<tfoot>' +
+          '<tr class="food-table-subtotal">' +
+            '<td colspan="2"><strong>Meal Total</strong></td>' +
+            '<td><strong>' + Math.round(mealTot.cal) + '</strong></td>' +
+            '<td><strong>' + Math.round(mealTot.p) + 'g</strong></td>' +
+            '<td><strong>' + Math.round(mealTot.c) + 'g</strong></td>' +
+            '<td><strong>' + Math.round(mealTot.f) + 'g</strong></td>' +
+          '</tr>' +
+        '</tfoot>' +
+      '</table></div>';
+  });
+
+  // Grand total row
+  html +=
+    '<div class="menu-grand-total">' +
+      '<div class="menu-grand-item">' +
+        '<span class="menu-grand-label">Daily Total</span>' +
+      '</div>' +
+      '<div class="menu-grand-macros">' +
+        '<div class="menu-grand-macro"><span class="menu-grand-val">' + Math.round(grandTot.cal) + '</span><em>Calories</em></div>' +
+        '<div class="menu-grand-macro" style="color:#60A5FA"><span class="menu-grand-val">' + Math.round(grandTot.p) + 'g</span><em>Protein</em></div>' +
+        '<div class="menu-grand-macro" style="color:#FBBF24"><span class="menu-grand-val">' + Math.round(grandTot.c) + 'g</span><em>Carbs</em></div>' +
+        '<div class="menu-grand-macro" style="color:#F472B6"><span class="menu-grand-val">' + Math.round(grandTot.f) + 'g</span><em>Fat</em></div>' +
+      '</div>' +
+    '</div>';
+
+  document.getElementById('menu-detail-body').innerHTML = html;
+  openModal('menu-detail');
+}
+
+/* ── Assign menu to client (share link) ──────────────── */
+async function assignMenuToClient() {
+  var menuId   = document.getElementById('menu-assign-btn').getAttribute('data-menu-id');
+  var menu     = menus.find(function(m){ return m.id === menuId; });
+  if (!menu || !state.user) return;
+
+  var clientName = prompt('Client name:', bmrResult ? bmrResult.name : '');
+  if (!clientName) return;
+
+  var token = 'mn_' + Math.random().toString(36).substr(2, 8);
+  var shareData = {
+    type:        'menu',
+    token:       token,
+    menuId:      menuId,
+    menuName:    menu.name,
+    clientName:  clientName,
+    trainerName: state.user.fullName,
+    bmrData:     bmrResult || null,
+    createdAt:   new Date().toISOString(),
+  };
+
+  try {
+    await window._firebase.setDoc(
+      window._firebase.doc(window._db, 'sharedMenus', token),
+      shareData
+    );
+    var url = window.location.origin + '?menu=' + token;
+    navigator.clipboard.writeText(url).catch(function(){});
+    closeAllModals();
+    showToast('Menu link copied! Share with ' + clientName);
+  } catch(e) {
+    showToast('Could not create share link: ' + e.code);
+  }
+}
+
+/* ── ADMIN: Render menu list ──────────────────────────── */
+function renderAdminMenuList() {
+  var adminMenuLang = _adminLang && _adminLang['menus'] ? _adminLang['menus'] : 'en';
+  var el = document.getElementById(adminMenuLang === 'he' ? 'admin-menu-list-he' : 'admin-menu-list');
+  if (!el) return;
+  var countEl = document.getElementById('admin-menu-count');
+  if (countEl) countEl.textContent = menus.length + ' menus';
+
+  if (!menus.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="ti ti-salad"></i></div><h3>No menus yet</h3><p>Click "Add Menu" to create your first nutrition plan.</p></div>';
+    return;
+  }
+  var goalColors = { cut:'rgba(244,114,182,0.1)', maintain:'rgba(96,165,250,0.1)', bulk:'rgba(126,232,162,0.1)' };
+  el.innerHTML = menus.map(function(m) {
+    var totals = calcMenuTotals(m);
+    return '<div class="admin-menu-row" style="background:' + (goalColors[m.goal]||'var(--surface)') + '">' +
+      '<div style="flex:1"><strong>' + m.name + '</strong>' +
+      '<div style="font-size:12px;color:var(--muted);margin-top:3px">' +
+        (m.goal||'').toUpperCase() + ' · ' + totals.calories + ' kcal · P:' + totals.protein + 'g C:' + totals.carbs + 'g F:' + totals.fat + 'g' +
+      '</div></div>' +
+      '<div class="admin-actions">' +
+        '<button class="admin-action-btn edit" onclick="openAdminMenuModal(\'' + m.id + '\')"><i class="ti ti-edit"></i> Edit</button>' +
+        '<button class="admin-action-btn delete" onclick="deleteMenu(\'' + m.id + '\')"><i class="ti ti-trash"></i></button>' +
+      '</div></div>';
+  }).join('');
+}
+
+/* ── ADMIN: Open menu editor ──────────────────────────── */
+function openAdminMenuModal(id) {
+  if (id) {
+    var m = menus.find(function(x){ return x.id === id; });
+    if (!canEditItem(m)) { showToast('You can only edit your own menus.'); return; }
+  }
+  editingMenuId = id || null;
+  var titleEl = document.getElementById('admin-menu-modal-title');
+
+  // Reset
+  document.getElementById('admin-menu-edit-id').value = id || '';
+  document.getElementById('admin-menu-name').value     = '';
+  document.getElementById('admin-menu-goal').value     = 'cut';
+  document.getElementById('admin-menu-calories').value = '';
+  document.getElementById('admin-menu-desc').value     = '';
+  document.getElementById('admin-menu-meals').innerHTML = '';
+
+  if (id) {
+    var menu = menus.find(function(m){ return m.id === id; });
+    if (!menu) return;
+    titleEl.innerHTML = '<i class="ti ti-edit"></i> Edit Menu';
+    document.getElementById('admin-menu-name').value     = menu.name || '';
+    document.getElementById('admin-menu-goal').value     = menu.goal || 'cut';
+    document.getElementById('admin-menu-calories').value = menu.calories || '';
+    document.getElementById('admin-menu-desc').value     = menu.desc || '';
+    (menu.meals || []).forEach(function(meal){ renderMealEditor(meal); });
+  } else {
+    titleEl.innerHTML = '<i class="ti ti-plus"></i> Add Menu Plan';
+    // Start with 4 default meals
+    ['Breakfast','Lunch','Dinner','Snacks'].forEach(function(name){ renderMealEditor({ name:name, items:[] }); });
+  }
+
+  openModal('admin-menu');
+}
+
+function renderMealEditor(meal) {
+  var container = document.getElementById('admin-menu-meals');
+  var mealId    = 'meal-' + Date.now() + Math.random().toString(36).substr(2,4);
+  var div = document.createElement('div');
+  div.className = 'meal-editor';
+  div.id = mealId;
+  div.innerHTML =
+    '<div class="meal-editor-header">' +
+      '<input class="form-input meal-name-input" value="' + (meal.name||'Meal') + '" placeholder="Meal name (e.g. Breakfast)" style="flex:1">' +
+      '<button class="admin-action-btn delete" onclick="this.closest(\'.meal-editor\').remove()"><i class="ti ti-trash"></i></button>' +
+    '</div>' +
+    '<div class="food-table-header">' +
+      '<span style="flex:2">Food Name</span>' +
+      '<span style="width:60px">Qty</span>' +
+      '<span style="width:60px">Unit</span>' +
+      '<span style="width:65px">Calories</span>' +
+      '<span style="width:55px">Protein</span>' +
+      '<span style="width:55px">Carbs</span>' +
+      '<span style="width:55px">Fat</span>' +
+      '<span style="width:32px"></span>' +
+    '</div>' +
+    '<div class="food-items-container" id="items-' + mealId + '">' +
+      (meal.items||[]).map(function(item){ return foodItemHTML(mealId, item); }).join('') +
+    '</div>' +
+    '<div style="display:flex;gap:6px;margin-top:6px">' +
+      '<button class="btn btn-primary btn-sm" data-mid="' + mealId + '" onclick="openFoodPicker(this.dataset.mid)">' +
+        '<i class="ti ti-search"></i> Pick from Database' +
+      '</button>' +
+      '<button class="btn btn-ghost btn-sm" data-mid="' + mealId + '" onclick="addFoodItem(this.dataset.mid)">' +
+        '<i class="ti ti-plus"></i> Add Manually' +
+      '</button>' +
+    '</div>';
+  container.appendChild(div);
+}
+
+function foodItemHTML(mealId, item) {
+  item = item || {};
+  return '<div class="food-item-row">' +
+    '<input class="form-input food-name" placeholder="e.g. Chicken breast" value="' + (item.name||'') + '" style="flex:2">' +
+    '<input class="form-input food-qty"  placeholder="150"  value="' + (item.qty||'') + '" style="width:60px">' +
+    '<input class="form-input food-unit" placeholder="g"    value="' + (item.unit||'g') + '" style="width:60px">' +
+    '<input class="form-input food-cal"  type="number" placeholder="0" value="' + (item.calories||'') + '" style="width:65px">' +
+    '<input class="form-input food-pro"  type="number" placeholder="0" value="' + (item.protein||'') + '" style="width:55px">' +
+    '<input class="form-input food-car"  type="number" placeholder="0" value="' + (item.carbs||'') + '" style="width:55px">' +
+    '<input class="form-input food-fat"  type="number" placeholder="0" value="' + (item.fat||'') + '" style="width:55px">' +
+    '<button class="admin-action-btn delete" onclick="this.parentElement.remove()" style="padding:6px 8px"><i class="ti ti-x"></i></button>' +
+  '</div>';
+}
+
+function addFoodItem(mealId) {
+  var container = document.getElementById('items-' + mealId);
+  if (!container) return;
+  var div = document.createElement('div');
+  div.innerHTML = foodItemHTML(mealId, {});
+  container.appendChild(div.firstChild);
+}
+
+function addMealToEditor() {
+  renderMealEditor({ name: 'New Meal', items: [] });
+}
+
+/* ── Live macro preview + totals in admin menu editor ─── */
+function updateAdminMenuPreview() {
+  var cal=0, pro=0, car=0, fat=0;
+  document.querySelectorAll('#modal-admin-menu .food-cal').forEach(function(i){ cal += parseFloat(i.value)||0; });
+  document.querySelectorAll('#modal-admin-menu .food-pro').forEach(function(i){ pro += parseFloat(i.value)||0; });
+  document.querySelectorAll('#modal-admin-menu .food-car').forEach(function(i){ car += parseFloat(i.value)||0; });
+  document.querySelectorAll('#modal-admin-menu .food-fat').forEach(function(i){ fat += parseFloat(i.value)||0; });
+  var el = document.getElementById('admin-menu-preview-chart');
+  if (el) el.innerHTML =
+    macroChartHTML(Math.round(pro), Math.round(car), Math.round(fat), Math.round(cal), 140) +
+    '<div class="menu-grand-total" style="margin-top:12px">' +
+      '<div class="menu-grand-macros">' +
+        '<div class="menu-grand-macro"><span class="menu-grand-val">' + Math.round(cal) + '</span><em>Calories</em></div>' +
+        '<div class="menu-grand-macro" style="color:#60A5FA"><span class="menu-grand-val">' + Math.round(pro) + 'g</span><em>Protein</em></div>' +
+        '<div class="menu-grand-macro" style="color:#FBBF24"><span class="menu-grand-val">' + Math.round(car) + 'g</span><em>Carbs</em></div>' +
+        '<div class="menu-grand-macro" style="color:#F472B6"><span class="menu-grand-val">' + Math.round(fat) + 'g</span><em>Fat</em></div>' +
+      '</div>' +
+    '</div>';
+  var calEl = document.getElementById('admin-menu-calories');
+  if (calEl) calEl.placeholder = cal > 0 ? 'Auto: ' + Math.round(cal) : '1800';
+}
+
+/* ── ADMIN: Save menu to Firestore ───────────────────── */
+async function saveAdminMenu() {
+  var name = document.getElementById('admin-menu-name').value.trim();
+  var goal = document.getElementById('admin-menu-goal').value;
+  var desc = document.getElementById('admin-menu-desc').value.trim();
+  if (!name) { showToast('Please enter a menu name.'); return; }
+
+  // Collect meals from editor
+  var meals = [];
+  document.querySelectorAll('.meal-editor').forEach(function(mealEl) {
+    var mealName = mealEl.querySelector('.meal-name-input').value.trim();
+    var items = [];
+    mealEl.querySelectorAll('.food-item-row').forEach(function(row) {
+      var foodName = row.querySelector('.food-name').value.trim();
+      if (!foodName) return;
+      items.push({
+        name:     foodName,
+        qty:      row.querySelector('.food-qty').value.trim(),
+        unit:     row.querySelector('.food-unit').value.trim(),
+        calories: parseFloat(row.querySelector('.food-cal').value) || 0,
+        protein:  parseFloat(row.querySelector('.food-pro').value) || 0,
+        carbs:    parseFloat(row.querySelector('.food-car').value) || 0,
+        fat:      parseFloat(row.querySelector('.food-fat').value) || 0,
+      });
+    });
+    if (mealName) meals.push({ name: mealName, items: items });
+  });
+
+  var langEl = document.getElementById('admin-menu-lang');
+  var menuData = {
+    name:      name,
+    name_he:   (document.getElementById('admin-menu-name-he')||{}).value || '',
+    goal:      goal,
+    desc:      desc,
+    meals:     meals,
+    lang:      langEl ? langEl.value : 'en',
+    updatedAt: new Date().toISOString(),
+  };
+
+  // Always set createdBy for trainers; respect override if present
+  var override = window._trainerMenuOverride;
+  if (override) {
+    menuData.createdBy   = override.createdBy;
+    menuData.trainerName = override.trainerName;
+    menuData.isPublic    = override.isPublic;
+    window._trainerMenuOverride = null;
+  } else if (state.isManager) {
+    menuData.isPublic  = true; // admin menus always public
+    menuData.createdBy = state.user ? state.user.uid : null;
+  } else if (state.user && state.user.uid) {
+    // Trainer saving — always attach ownership
+    if (!editingMenuId) {  // new menu
+      menuData.createdBy   = state.user.uid;
+      menuData.trainerName = state.user.fullName || '';
+      // Read public toggle if it exists, default to true
+      var pubToggle = document.getElementById('menu-is-public');
+      menuData.isPublic = pubToggle ? pubToggle.checked : true;
+    }
+  }
+
+  var menuColName = (_adminLang && _adminLang['menus'] === 'he') ? 'menus_he' : 'menus';
+  try {
+    var editId = document.getElementById('admin-menu-edit-id').value;
+    if (editId) {
+      await window._firebase.setDoc(
+        window._firebase.doc(window._db, menuColName, editId),
+        menuData, { merge: true }
+      );
+      showToast(_adminLang && _adminLang['menus']==='he' ? 'עודכן!' : 'Menu updated!');
+    } else {
+      await window._firebase.addDoc(
+        window._firebase.collection(window._db, menuColName),
+        menuData
+      );
+      showToast(_adminLang && _adminLang['menus']==='he' ? 'נשמר!' : 'Menu saved!');
+    }
+    closeAllModals();
+    await loadMenus();
+    renderAdminMenuList();
+    if (menuColName === 'menus') renderMenuLibrary();
+  } catch(e) {
+    console.error('Save menu error:', e);
+    showToast('Save failed: ' + (e.code || e.message));
+  }
+}
+
+async function deleteMenu(id) {
+  var m = menus.find(function(x){ return x.id === id; });
+  if (!canEditItem(m)) { showToast('You can only delete your own menus.'); return; }
+  if (!confirm('Delete this menu? This cannot be undone.')) return;
+  try {
+    await window._firebase.deleteDoc(window._firebase.doc(window._db, col('menus'), id));
+    menus = menus.filter(function(m){ return m.id !== id; });
+    renderAdminMenuList();
+    renderMenuLibrary();
+    showToast('Menu deleted.');
+  } catch(e) { showToast('Delete failed: ' + e.code); }
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   PROGRAMS
+══════════════════════════════════════════════════════════ */
+var programs = [];
+
+async function loadPrograms() {
+  if (!window._firebase || !window._db) return;
+  try {
+    var snap = await window._firebase.getDocs(window._firebase.collection(window._db, col('programs')));
+    programs = [];
+    snap.forEach(function(d){ programs.push(Object.assign({ id: d.id }, d.data())); });
+    renderProgramsView();
+    renderAdminProgramsList();
+  } catch(e) {
+    console.warn('loadPrograms:', e.code, '— keeping local data');
+    renderProgramsView();
+    renderAdminProgramsList();
+  }
+}
+
+function renderProgramsView() {
+  var body = document.getElementById('programs-body');
+  if (!body) return;
+  var myPrograms = JSON.parse(localStorage.getItem('repcast_my_programs') || '[]');
+  // Show: public programs from library + trainer's own programs
+  var myUid = state.user ? state.user.uid : null;
+  var libProgs = programs.filter(function(p){ return p.isPublic !== false || p.createdBy === myUid; })
+;  // col() already queries the right collection
+  var allPrograms = libProgs.concat(myPrograms);
+  if (!allPrograms.length) {
+    var isNative = document.documentElement.classList.contains('is-native');
+    body.innerHTML = '<div style="text-align:center;padding:40px 20px"><div class="empty-icon"><i class="ti ti-calendar"></i></div><h3>No programs yet</h3><p style="color:var(--muted);margin-bottom:20px">Training programs will appear here.</p>' +
+      (isNative ? '' : '<button class="btn btn-primary" onclick="openCreateOwnProgram()"><i class="ti ti-plus"></i> Create My Own Program</button>') +
+    '</div>';
+    return;
+  }
+  var gc = { strength:'#F472B6', hypertrophy:'#A78BFA', 'fat-loss':'#7EE8A2', endurance:'#60A5FA', rehab:'#FBBF24' };
+  body.innerHTML =
+    (document.documentElement.classList.contains('is-native') ? '' : '<div style="display:flex;justify-content:flex-end;padding:0 24px 12px"><button class="btn btn-ghost" onclick="openCreateOwnProgram()"><i class="ti ti-plus"></i> Create My Own Program</button></div>') +
+    '<div class="resource-grid" style="padding:0 24px">' +
+    allPrograms.map(function(p) {
+      var col = gc[p.goal] || '#7EE8A2';
+      var splits = (p.trainingDays||[]).map(function(d){ return (d.day||'').split('\u2014')[0].split('—')[0].trim(); });
+      return '<div class="resource-card" onclick="openProgramDetail(\'' + p.id + '\')">' +
+        '<div class="resource-card-header" style="background:linear-gradient(135deg,' + col + '22,' + col + '08)">' +
+          '<i class="ti ti-calendar resource-card-icon" style="color:' + col + '"></i>' +
+          '<div style="flex:1"><div class="resource-card-name">' + p.name + '</div>' +
+          '<div class="resource-card-meta">' + (p.weeks||'?') + ' weeks &middot; ' + (p.days||p.trainingDays&&p.trainingDays.length||'?') + 'x/week &middot; ' + (p.level||'') + '</div></div>' +
+        '</div>' +
+        (splits.length ? '<div class="program-splits">' + splits.slice(0,5).map(function(s){ return '<span class="split-pill">' + s + '</span>'; }).join('') + '</div>' : '') +
+        '<div class="resource-card-body">' + (p.desc||'').slice(0,100) + (p.desc&&p.desc.length>100?'...':'') + '</div>' +
+        '<div class="resource-card-tags">' +
+          '<span class="tag" style="background:' + col + '22;color:' + col + '">' + (p.goal||'').replace(/-/g,' ').toUpperCase() + '</span>' +
+          (p._isPersonal ? '<span class="tag" style="background:rgba(96,165,250,0.1);color:#60A5FA">MY PROGRAM</span>' : '') +
+        ((myUid && p.createdBy === myUid) ? '<span class="tag" style="background:rgba(255,107,107,0.1);color:var(--danger);cursor:pointer" onclick="event.stopPropagation();deleteTrainerProgram(\'' + p.id + '\')"><i class="ti ti-trash" style="font-size:10px"></i> Delete</span>' : '') +
+        '</div>' +
+      '</div>';
+    }).join('') + '</div>';
+}
+
+function openProgramDetail(id) {
+  var p = programs.find(function(x){ return x.id === id; });
+  if (!p) return;
+  document.getElementById('program-detail-title').innerHTML = '<i class="ti ti-calendar"></i> ' + p.name;
+  var el = document.getElementById('program-detail-body');
+  el.setAttribute('data-id', id);
+  var days = p.trainingDays || [];
+  el.innerHTML =
+    '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px">' +
+      '<div class="bmr-stat"><div class="bmr-stat-val">' + (p.weeks||'?') + '</div><div class="bmr-stat-label">Weeks</div></div>' +
+      '<div class="bmr-stat"><div class="bmr-stat-val">' + (days.length||p.days||'?') + '</div><div class="bmr-stat-label">Days/week</div></div>' +
+      '<div class="bmr-stat accent"><div class="bmr-stat-val">' + (p.goal||'').replace('-',' ') + '</div><div class="bmr-stat-label">Goal</div></div>' +
+      '<div class="bmr-stat"><div class="bmr-stat-val">' + (p.level||'?') + '</div><div class="bmr-stat-label">Level</div></div>' +
+    '</div>' +
+    '<p style="color:var(--muted);margin-bottom:20px">' + (p.desc||'') + '</p>' +
+    (days.length ? days.map(function(day) {
+      return '<div class="meal-section">' +
+        '<div class="meal-header"><span class="meal-name">' + (day.name||'Day') + '</span>' +
+        '<span class="meal-total" style="color:var(--muted2)">' + (day.muscleGroup||'') + '</span></div>' +
+        (day.exercises && day.exercises.length ?
+          '<table class="food-table"><thead><tr><th>Exercise</th><th>Muscle</th><th>Sets</th><th>Reps</th><th>Rest</th><th>Notes</th></tr></thead><tbody>' +
+          day.exercises.map(function(ex){
+            return '<tr><td><strong>' + (ex.name||'') + '</strong></td><td>' + (ex.muscle||'') + '</td><td>' + (ex.sets||'') + '</td><td>' + (ex.reps||'') + '</td><td>' + (ex.rest||'') + '</td><td style="color:var(--muted);font-size:12px">' + (ex.notes||'') + '</td></tr>';
+          }).join('') + '</tbody></table>' : '') +
+      '</div>';
+    }).join('') : (p.schedule ? '<h4>Schedule</h4><div class="schedule-grid">' + p.schedule.split('\n').filter(Boolean).map(function(d){ return '<div class="schedule-day">' + d + '</div>'; }).join('') + '</div>' : '')) +
+    (p.notes ? '<div style="margin-top:16px;padding:14px;background:var(--surface2);border-radius:8px;font-size:13px;color:var(--muted)"><i class="ti ti-info-circle" style="color:var(--accent)"></i> ' + p.notes + '</div>' : '');
+  openModal('program-detail');
+}
+
+async function assignProgram() {
+  var id   = document.getElementById('program-detail-body').getAttribute('data-id');
+  var prog = programs.find(function(p){ return p.id === id; }) ||
+             JSON.parse(localStorage.getItem('repcast_my_programs')||'[]').find(function(p){ return p.id === id; });
+  if (!prog) return;
+
+  if (!clientsList.length) {
+    showToast('No clients yet. Add a client first.');
+    return;
+  }
+
+  // Build client picker
+  var existing = document.getElementById('modal-prog-assign');
+  if (existing) existing.remove();
+  var modal = document.createElement('div');
+  modal.id = 'modal-prog-assign';
+  modal.className = 'modal';
+  modal.style.cssText = 'max-width:400px';
+  modal.innerHTML =
+    '<div class="modal-header"><h3><i class="ti ti-user-check"></i> Assign to Client</h3>' +
+    '<button class="modal-close" onclick="this.closest(\'.modal\').remove()"><i class="ti ti-x"></i></button></div>' +
+    '<div class="modal-body">' +
+      '<p style="color:var(--muted);font-size:13px;margin-bottom:14px">Assign <strong>' + prog.name + '</strong> to:</p>' +
+      clientsList.map(function(c) {
+        var hasIt = (c.assignedPrograms||[]).some(function(p){ return p.id === id; });
+        return '<div class="assign-row' + (hasIt?' assigned':'') + '" onclick="assignProgToClient(\'' + id + '\',\'' + c.id + '\')">' +
+          '<div class="assign-check"><i class="ti ' + (hasIt?'ti-check':'ti-plus') + '"></i></div>' +
+          '<div><div class="assign-name">' + c.name + '</div>' +
+          '<div class="assign-meta">' + (c.email||'') + '</div></div>' +
+        '</div>';
+      }).join('') +
+    '</div>';
+  document.body.appendChild(modal);
+  modal.style.display = 'flex';
+  setTimeout(function(){ modal.classList.add('modal-open'); }, 10);
+}
+
+async function assignProgToClient(progId, clientId) {
+  var prog   = programs.find(function(p){ return p.id === progId; }) ||
+               JSON.parse(localStorage.getItem('repcast_my_programs')||'[]').find(function(p){ return p.id === progId; });
+  var client = clientsList.find(function(c){ return c.id === clientId; });
+  if (!prog || !client) return;
+
+  var arr    = client.assignedPrograms || [];
+  var exists = arr.findIndex(function(p){ return p.id === progId; });
+
+  if (exists > -1) {
+    arr.splice(exists, 1);
+    showToast('Program removed from ' + client.name);
+  } else {
+    arr.push(prog);
+    showToast('Program assigned to ' + client.name + '!');
+  }
+  client.assignedPrograms = arr;
+
+  await _saveClientProfile(clientId, client);
+  renderClientsList();
+
+  // Close picker and refresh assign modal
+  var picker = document.getElementById('modal-prog-assign');
+  if (picker) picker.remove();
+  assignProgram(); // re-open to show updated state
+}
+
+/* ── Program Day Editor ──────────────────────────────── */
+function addProgramDay(dayData) {
+  var container = document.getElementById('prog-days-editor');
+  var dayId = 'pd_' + Date.now() + '_' + Math.random().toString(36).substr(2,4);
+  var div = document.createElement('div');
+  div.className = 'meal-editor';
+  div.id = dayId;
+  var exHTML = dayData && dayData.exercises ? dayData.exercises.map(function(ex){ return programExerciseHTML(ex); }).join('') : '';
+  div.innerHTML =
+    '<div class="meal-editor-header">' +
+      '<input class="form-input prog-day-name" value="' + (dayData&&dayData.name||'Day 1') + '" placeholder="Day name e.g. Monday — Chest" style="flex:2">' +
+      '<input class="form-input prog-day-muscle" value="' + (dayData&&dayData.muscleGroup||'') + '" placeholder="Muscle group" style="flex:1">' +
+      '<button class="admin-action-btn delete" onclick="this.closest(\'.meal-editor\').remove()"><i class="ti ti-trash"></i></button>' +
+    '</div>' +
+    '<div class="prog-ex-header"><span style="flex:2;min-width:230px">Exercise</span><span style="width:52px">Sets</span><span style="width:60px">Reps</span><span style="width:60px">Rest</span><span style="flex:1">Notes</span><span style="width:32px"></span></div>' +
+    '<div class="prog-ex-container" id="pex-' + dayId + '">' + exHTML + '</div>' +
+    '<button class="btn btn-ghost btn-sm" data-dayid="' + dayId + '" onclick="addProgramExercise(this.dataset.dayid)" style="margin-top:6px"><i class="ti ti-plus"></i> Add Exercise</button>';
+  container.appendChild(div);
+}
+
+function programExerciseHTML(ex) {
+  ex = ex || {};
+  return '<div class="prog-ex-row">' +
+    '<input class="form-input" placeholder="Exercise name" value="' + (ex.name||'') + '">' +
+    '<input class="form-input" placeholder="Chest" value="' + (ex.muscle||'') + '" style="width:90px">' +
+    '<input class="form-input" type="number" placeholder="4" value="' + (ex.sets||'') + '" style="width:60px">' +
+    '<input class="form-input" placeholder="8-12" value="' + (ex.reps||'') + '" style="width:70px">' +
+    '<input class="form-input" placeholder="90s" value="' + (ex.rest||'') + '" style="width:65px">' +
+    '<input class="form-input" placeholder="Notes..." value="' + (ex.notes||'') + '">' +
+    '<button class="admin-action-btn delete" onclick="this.parentElement.remove()" style="padding:5px 8px"><i class="ti ti-x"></i></button>' +
+  '</div>';
+}
+
+function addProgramExercise(dayId) {
+  var container = document.getElementById('pex-' + dayId);
+  if (!container) return;
+  var div = document.createElement('div');
+  div.innerHTML = programExerciseHTML({});
+  container.appendChild(div.firstChild);
+}
+
+function openAdminProgramModal(id) {
+  document.getElementById('admin-program-id').value = id || '';
+  ['prog-name','prog-weeks','prog-days','prog-desc','prog-schedule','prog-notes'].forEach(function(x){ document.getElementById(x).value=''; });
+  document.getElementById('prog-goal').value  = 'strength';
+  document.getElementById('prog-level').value = 'Intermediate';
+  document.getElementById('prog-exercises-container').innerHTML = '';
+  document.getElementById('admin-program-title').innerHTML = id ? '<i class="ti ti-edit"></i> Edit Program' : '<i class="ti ti-plus"></i> Add Program';
+  if (id) {
+    var allP = programs.concat(JSON.parse(localStorage.getItem('repcast_my_programs')||'[]'));
+    var p = allP.find(function(x){ return x.id === id; });
+    if (p) {
+      document.getElementById('prog-name').value     = p.name     || '';
+      document.getElementById('prog-weeks').value    = p.weeks    || '';
+      document.getElementById('prog-days').value     = p.days     || '';
+      document.getElementById('prog-goal').value     = p.goal     || 'strength';
+      document.getElementById('prog-level').value    = p.level    || 'Intermediate';
+      document.getElementById('prog-desc').value     = p.desc     || '';
+      document.getElementById('prog-schedule').value = p.schedule || '';
+      document.getElementById('prog-notes').value    = p.notes    || '';
+      (p.trainingDays || []).forEach(function(day){ addProgExercise(day); });
+    }
+  } else {
+    addProgExercise({ day: 'Workout A — Chest, Shoulders & Triceps', exercises: [] });
+    addProgExercise({ day: 'Workout B — Back & Biceps',               exercises: [] });
+    addProgExercise({ day: 'Workout C — Legs & Core',                 exercises: [] });
+  }
+  openModal('admin-program');
+}
+
+async function saveAdminProgram() {
+  var name = document.getElementById('prog-name').value.trim();
+  if (!name) { showToast('Please enter a program name.'); return; }
+  // Collect training days
+  var trainingDays = [];
+  document.querySelectorAll('#prog-days-editor .meal-editor').forEach(function(dayEl) {
+    var dayName   = dayEl.querySelector('.prog-day-name').value.trim();
+    var muscle    = dayEl.querySelector('.prog-day-muscle').value.trim();
+    var exercises = [];
+    dayEl.querySelectorAll('.prog-ex-row').forEach(function(row) {
+      var inputs = row.querySelectorAll('input');
+      var exName = inputs[0].value.trim();
+      if (!exName) return;
+      exercises.push({ name:exName, muscle:inputs[1].value.trim(), sets:inputs[2].value.trim(), reps:inputs[3].value.trim(), rest:inputs[4].value.trim(), notes:inputs[5].value.trim() });
+    });
+    if (dayName) trainingDays.push({ name:dayName, muscleGroup:muscle, exercises:exercises });
+  });
+  var data = {
+    name, weeks: parseInt(document.getElementById('prog-weeks').value)||0,
+    days: trainingDays.length,
+    goal: document.getElementById('prog-goal').value,
+    level: document.getElementById('prog-level').value,
+    desc: document.getElementById('prog-desc').value.trim(),
+    notes: document.getElementById('prog-notes').value.trim(),
+    trainingDays: trainingDays,
+    updatedAt: new Date().toISOString(),
+  };
+  var editId = document.getElementById('admin-program-id').value;
+  try {
+    if (editId) { await window._firebase.setDoc(window._firebase.doc(window._db, col('programs'),editId), data, {merge:true}); }
+    else { await window._firebase.addDoc(window._firebase.collection(window._db, col('programs')), data); }
+    showToast('Program saved!'); closeAllModals(); renderAdminProgramsList(); renderProgramsView();
+  } catch(e) { showToast('Save failed: ' + e.code); }
+}
+
+function renderAdminProgramsList() {
+  var adminProgLang = _adminLang && _adminLang['programs'] ? _adminLang['programs'] : 'en';
+  var el = document.getElementById(adminProgLang === 'he' ? 'admin-programs-list-he' : 'admin-programs-list');
+  if (!el) return;
+  var cnt = document.getElementById('admin-programs-count');
+  if (cnt) cnt.textContent = programs.length + ' programs';
+  if (!programs.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="ti ti-calendar"></i></div><h3>No programs yet</h3></div>'; return; }
+  var gc = { strength:'rgba(244,114,182,0.08)', hypertrophy:'rgba(167,139,250,0.08)', 'fat-loss':'rgba(126,232,162,0.08)', endurance:'rgba(96,165,250,0.08)', rehab:'rgba(251,191,36,0.08)' };
+  el.innerHTML = programs.map(function(p) {
+    var days = (p.trainingDays||[]).length || p.days || 0;
+    var totalEx = (p.trainingDays||[]).reduce(function(s,d){ return s+(d.exercises||[]).length; },0);
+    return '<div class="admin-menu-row" style="background:' + (gc[p.goal]||'var(--surface)') + '">' +
+      '<div style="flex:1"><strong>' + p.name + '</strong>' +
+      '<div style="font-size:12px;color:var(--muted);margin-top:3px">' + (p.goal||'').replace('-',' ') + ' &middot; ' + (p.weeks||0) + ' weeks &middot; ' + days + ' days/week &middot; ' + totalEx + ' exercises &middot; ' + (p.level||'') + '</div></div>' +
+      '<div class="admin-actions">' +
+        '<button class="admin-action-btn edit" onclick="openAdminProgramModal(\'' + p.id + '\')"><i class="ti ti-edit"></i> Edit</button>' +
+        '<button class="admin-action-btn delete" onclick="deleteProgram(\'' + p.id + '\')"><i class="ti ti-trash"></i></button>' +
+      '</div></div>';
+  }).join('');
+}
+
+async function deleteTrainerProgram(id) {
+  var p = programs.find(function(x){ return x.id === id; });
+  if (!canEditItem(p)) { showToast('You can only delete your own programs.'); return; }
+  if (!confirm('Delete this program? This cannot be undone.')) return;
+  try {
+    await window._firebase.deleteDoc(window._firebase.doc(window._db, col('programs'), id));
+    programs = programs.filter(function(p){ return p.id !== id; });
+    // Also remove from localStorage personal programs
+    var my = JSON.parse(localStorage.getItem('repcast_my_programs')||'[]').filter(function(p){ return p.id !== id; });
+    localStorage.setItem('repcast_my_programs', JSON.stringify(my));
+    renderProgramsView();
+    renderAdminProgramsList();
+    showToast('Program deleted.');
+  } catch(e) { showToast('Delete failed: ' + e.code); }
+}
+
+async function deleteProgram(id) {
+  var p = programs.find(function(x){ return x.id === id; });
+  if (!canEditItem(p)) { showToast('You can only delete your own programs.'); return; }
+  if (!confirm('Delete this program?')) return;
+  await window._firebase.deleteDoc(window._firebase.doc(window._db, col('programs'),id));
+  programs = programs.filter(function(p){ return p.id !== id; });
+  renderAdminProgramsList(); renderProgramsView(); showToast('Program deleted.');
+}
+
+/* ══════════════════════════════════════════════════════════
+   RECIPES
+══════════════════════════════════════════════════════════ */
+var recipes = [];
+var recipeFilter = 'all';
+
+async function loadRecipes() {
+  if (!window._firebase || !window._db) return;
+  try {
+    var snap = await window._firebase.getDocs(window._firebase.collection(window._db, col('recipes')));
+    recipes = [];
+    snap.forEach(function(d){ recipes.push(Object.assign({ id: d.id }, d.data())); });
+    renderRecipesView(); renderAdminRecipesList();
+  } catch(e) {
+    console.warn('loadRecipes:', e.code, '— keeping local data');
+    renderRecipesView(); renderAdminRecipesList();
+  }
+}
+
+function filterRecipes(cat, btn) {
+  recipeFilter = cat;
+  document.querySelectorAll('#view-recipes .lib-tab').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  renderRecipesView();
+}
+
+function renderRecipesView() {
+  var body = document.getElementById('recipes-body');
+  if (!body) return;
+  var myUidR2 = state.user ? state.user.uid : null;
+  var pool = (recipeFilter === 'all' ? recipes : recipes.filter(function(r){ return r.category === recipeFilter; }))
+    .filter(function(r){ return r.isPublic !== false || r.createdBy === myUidR2; })
+;  // col() already queries the right collection
+  if (!pool.length) { body.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="ti ti-chef-hat"></i></div><h3>No recipes found</h3></div>'; return; }
+  var cc = { breakfast:'#FBBF24', lunch:'#60A5FA', dinner:'#A78BFA', snack:'#7EE8A2', 'post-workout':'#F472B6' };
+  body.innerHTML = '<div class="resource-grid">' + pool.map(function(r) {
+    var col = cc[r.category] || '#7EE8A2';
+    var myUidR = state.user ? state.user.uid : null;
+    var canEditR = canEditItem(r);
+    return '<div class="resource-card" onclick="openRecipeDetail(\'' + r.id + '\')">' +
+      (r.photoURL ? '<img src="' + r.photoURL + '" alt="' + r.name + '" style="width:100%;height:140px;object-fit:cover;border-radius:var(--radius-lg) var(--radius-lg) 0 0">' : '') +
+      '<div class="resource-card-header" style="background:' + (r.photoURL ? 'var(--surface)' : 'linear-gradient(135deg,' + col + '22,' + col + '08)') + '">' +
+        '<i class="ti ti-chef-hat resource-card-icon" style="color:' + col + '"></i>' +
+        '<div><div class="resource-card-name">' + r.name + '</div><div class="resource-card-meta">' + (r.prepTime||'?') + ' min &middot; ' + (r.calories||0) + ' kcal</div></div>' +
+      '</div>' +
+      '<div class="menu-card-macros"><div class="menu-macro"><span>' + (r.protein||0) + 'g</span><em>Protein</em></div><div class="menu-macro"><span>' + (r.carbs||0) + 'g</span><em>Carbs</em></div><div class="menu-macro"><span>' + (r.fat||0) + 'g</span><em>Fat</em></div></div>' +
+      '<div class="resource-card-tags">' +
+        '<span class="tag" style="background:' + col + '22;color:' + col + '">' + (r.category||'').toUpperCase() + '</span>' +
+        (!r.isPublic && canEditR ? '<span class="tag" style="background:rgba(251,191,36,0.1);color:#FBBF24">🔒 Private</span>' : '') +
+      '</div>' +
+      (canEditR ? '<div class="menu-card-actions">' +
+        '<button class="btn btn-ghost btn-sm" style="padding:4px 8px" onclick="event.stopPropagation();openTrainerRecipeModal(\'' + r.id + '\')" ><i class="ti ti-edit"></i></button>' +
+        '<button class="btn btn-ghost btn-sm" style="padding:4px 8px;color:var(--danger)" onclick="event.stopPropagation();deleteTrainerRecipe(\'' + r.id + '\')"><i class="ti ti-trash"></i></button>' +
+      '</div>' : '') +
+    '</div>';
+  }).join('') + '</div>';
+}
+
+function openRecipeDetail(id) {
+  var r = recipes.find(function(x){ return x.id === id; });
+  if (!r) return;
+  document.getElementById('recipe-detail-title').innerHTML = '<i class="ti ti-chef-hat"></i> ' + r.name;
+  var ings  = (r.ingredients ||'').split('\n').filter(Boolean);
+  var steps = (r.instructions||'').split('\n').filter(Boolean);
+  // Build photo/video section
+  var mediaHTML = '';
+  if (r.videoURL) {
+    if (isYouTubeURL(r.videoURL)) {
+      var ytId = getYouTubeID(r.videoURL);
+      mediaHTML = '<div class="recipe-media"><iframe src="https://www.youtube.com/embed/' + ytId + '" frameborder="0" allow="autoplay;fullscreen" allowfullscreen style="width:100%;height:280px;border-radius:12px;margin-bottom:16px"></iframe></div>';
+    } else {
+      mediaHTML = '<video src="' + r.videoURL + '" controls style="width:100%;border-radius:12px;margin-bottom:16px;max-height:280px"></video>';
+    }
+  } else if (r.photoURL) {
+    mediaHTML = '<img src="' + r.photoURL + '" alt="' + r.name + '" style="width:100%;border-radius:12px;margin-bottom:16px;max-height:280px;object-fit:cover">';
+  }
+
+  document.getElementById('recipe-detail-body').innerHTML =
+    mediaHTML +
+    '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px">' +
+      '<div class="bmr-stat accent"><div class="bmr-stat-val">' + (r.calories||0) + '</div><div class="bmr-stat-label">Calories</div></div>' +
+      '<div class="bmr-stat"><div class="bmr-stat-val">' + (r.protein||0) + 'g</div><div class="bmr-stat-label">Protein</div></div>' +
+      '<div class="bmr-stat"><div class="bmr-stat-val">' + (r.carbs||0) + 'g</div><div class="bmr-stat-label">Carbs</div></div>' +
+      '<div class="bmr-stat"><div class="bmr-stat-val">' + (r.fat||0) + 'g</div><div class="bmr-stat-label">Fat</div></div>' +
+      '<div class="bmr-stat"><div class="bmr-stat-val">' + (r.prepTime||'?') + '</div><div class="bmr-stat-label">Minutes</div></div>' +
+    '</div>' +
+    '<div class="recipe-two-col">' +
+      '<div><h4>Ingredients</h4><ul class="recipe-list">' + ings.map(function(i){ return '<li>' + i + '</li>'; }).join('') + '</ul></div>' +
+      '<div><h4>Instructions</h4><ol class="recipe-list">' + steps.map(function(s){ return '<li>' + s.replace(/^step\s*\d+:\s*/i,'') + '</li>'; }).join('') + '</ol></div>' +
+    '</div>' +
+    (r.tips ? '<div class="recipe-tips"><i class="ti ti-bulb"></i> ' + r.tips + '</div>' : '');
+  openModal('recipe-detail');
+}
+
+function openAdminRecipeModal(id) {
+  document.getElementById('admin-recipe-id').value = id || '';
+  ['recipe-name','recipe-time','recipe-cal','recipe-pro','recipe-car','recipe-fat','recipe-ingredients','recipe-instructions','recipe-tips'].forEach(function(x){ document.getElementById(x).value=''; });
+  document.getElementById('recipe-category').value = 'breakfast';
+  document.getElementById('admin-recipe-title').innerHTML = id ? '<i class="ti ti-edit"></i> Edit Recipe' : '<i class="ti ti-plus"></i> Add Recipe';
+  var rLangEl = document.getElementById('admin-recipe-lang');
+  if (rLangEl) rLangEl.value = (id && recipes.find(function(r){return r.id===id;})||{}).lang || 'en';
+  // Clear photo/video fields
+  var photoEl = document.getElementById('recipe-photo');
+  var videoEl = document.getElementById('recipe-video');
+  if (photoEl) photoEl.value = '';
+  if (videoEl) videoEl.value = '';
+
+  if (id) {
+    var r = recipes.find(function(x){ return x.id === id; });
+    if (r) {
+      document.getElementById('recipe-name').value         = r.name         || '';
+      document.getElementById('recipe-category').value     = r.category     || 'breakfast';
+      document.getElementById('recipe-time').value         = r.prepTime     || '';
+      document.getElementById('recipe-cal').value          = r.calories     || '';
+      document.getElementById('recipe-pro').value          = r.protein      || '';
+      document.getElementById('recipe-car').value          = r.carbs        || '';
+      document.getElementById('recipe-fat').value          = r.fat          || '';
+      document.getElementById('recipe-ingredients').value  = r.ingredients  || '';
+      document.getElementById('recipe-instructions').value = r.instructions || '';
+      document.getElementById('recipe-tips').value         = r.tips         || '';
+      if (photoEl) photoEl.value = r.photoURL || '';
+      if (videoEl) videoEl.value = r.videoURL || '';
+    }
+  }
+  openModal('admin-recipe');
+}
+
+async function saveAdminRecipe() {
+  var name = document.getElementById('recipe-name').value.trim();
+  if (!name) { showToast('Please enter a recipe name.'); return; }
+  var photoEl = document.getElementById('recipe-photo');
+  var videoEl = document.getElementById('recipe-video');
+  var pubEl   = document.getElementById('recipe-is-public');
+  var data = {
+    name,
+    category:     document.getElementById('recipe-category').value,
+    prepTime:     parseInt(document.getElementById('recipe-time').value)     || 0,
+    calories:     parseFloat(document.getElementById('recipe-cal').value)    || 0,
+    protein:      parseFloat(document.getElementById('recipe-pro').value)    || 0,
+    carbs:        parseFloat(document.getElementById('recipe-car').value)    || 0,
+    fat:          parseFloat(document.getElementById('recipe-fat').value)    || 0,
+    ingredients:  document.getElementById('recipe-ingredients').value.trim(),
+    instructions: document.getElementById('recipe-instructions').value.trim(),
+    tips:         document.getElementById('recipe-tips').value.trim(),
+    photoURL:     photoEl ? photoEl.value.trim() : '',
+    videoURL:     videoEl ? videoEl.value.trim() : '',
+    isPublic:     pubEl   ? pubEl.checked         : true,
+    createdBy:    state.user ? state.user.uid : null,
+    updatedAt:    new Date().toISOString(),
+  };
+  var editId = document.getElementById('admin-recipe-id').value;
+  try {
+    if (editId) {
+      await window._firebase.setDoc(window._firebase.doc(window._db, col('recipes'),editId),data,{merge:true});
+      var idx = recipes.findIndex(function(r){ return r.id === editId; });
+      if (idx > -1) recipes[idx] = Object.assign({}, recipes[idx], data);
+      else recipes.push(Object.assign({ id: editId }, data));
+    } else {
+      var recCol = (_adminLang && _adminLang['recipes'] === 'he') ? 'recipes_he' : col('recipes');
+      var ref = await window._firebase.addDoc(window._firebase.collection(window._db, recCol),data);
+      recipes.push(Object.assign({ id: ref.id }, data));
+    }
+    showToast('Recipe saved!'); closeAllModals(); renderAdminRecipesList(); renderRecipesView();
+  } catch(e) { showToast('Save failed: '+e.code); }
+}
+
+function renderAdminRecipesList() {
+  var adminRecLang = _adminLang && _adminLang['recipes'] ? _adminLang['recipes'] : 'en';
+  var el = document.getElementById(adminRecLang === 'he' ? 'admin-recipes-list-he' : 'admin-recipes-list');
+  if (!el) return;
+  var cnt = document.getElementById('admin-recipes-count');
+  if (cnt) cnt.textContent = recipes.length + ' recipes';
+  if (!recipes.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="ti ti-chef-hat"></i></div><h3>No recipes yet</h3></div>'; return; }
+  el.innerHTML = recipes.map(function(r) {
+    return '<div class="admin-menu-row"><div style="flex:1"><strong>' + r.name + '</strong><div style="font-size:12px;color:var(--muted);margin-top:3px">' + (r.category||'') + ' &middot; ' + (r.calories||0) + ' kcal</div></div>' +
+      '<div class="admin-actions"><button class="admin-action-btn edit" onclick="openAdminRecipeModal(\'' + r.id + '\')"><i class="ti ti-edit"></i></button><button class="admin-action-btn delete" onclick="deleteRecipe(\'' + r.id + '\')"><i class="ti ti-trash"></i></button></div></div>';
+  }).join('');
+}
+
+async function deleteRecipe(id) {
+  var r = recipes.find(function(x){ return x.id === id; });
+  if (!canEditItem(r)) { showToast('You can only delete your own recipes.'); return; }
+  if (!confirm('Delete this recipe?')) return;
+  await window._firebase.deleteDoc(window._firebase.doc(window._db, col('recipes'),id));
+  recipes = recipes.filter(function(r){ return r.id !== id; });
+  renderAdminRecipesList(); renderRecipesView(); showToast('Recipe deleted.');
+}
+
+/* ══════════════════════════════════════════════════════════
+   RESEARCH
+══════════════════════════════════════════════════════════ */
+var researches = [];
+var researchQuery = '';
+
+async function loadResearch() {
+  if (!window._firebase || !window._db) return;
+  try {
+    var snap = await window._firebase.getDocs(window._firebase.collection(window._db, 'research'));
+    researches = [];
+    snap.forEach(function(d){ researches.push(Object.assign({ id: d.id }, d.data())); });
+    renderResearchView(); renderAdminResearchList();
+  } catch(e) {
+    console.warn('loadResearch:', e.code, '— keeping local data');
+    renderResearchView(); renderAdminResearchList();
+  }
+}
+
+function filterResearch(q) {
+  researchQuery = (q||'').toLowerCase();
+  renderResearchView();
+}
+
+function renderResearchView() {
+  var body = document.getElementById('research-body');
+  if (!body) return;
+  var pool = researches.filter(function(r){ var rl = r.lang || 'both'; return rl === _lang || rl === 'both'; });
+  if (researchQuery) pool = pool.filter(function(r){ return (r.title||'').toLowerCase().includes(researchQuery)||(r.summary||'').toLowerCase().includes(researchQuery); });
+  if (!pool.length) { body.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="ti ti-microscope"></i></div><h3>No studies found</h3></div>'; return; }
+  var cc = { strength:'#F472B6', hypertrophy:'#A78BFA', nutrition:'#7EE8A2', recovery:'#60A5FA', injury:'#FBBF24', cardio:'#3ECFCF', physio:'#FB923C', psychology:'#EC4899' };
+  body.innerHTML = '<div class="research-list">' + pool.map(function(r) {
+    var col = cc[r.category] || 'var(--accent)';
+    return '<div class="research-card">' +
+      '<div class="research-card-header">' +
+        '<div style="flex:1"><div class="research-title">' + (r.title||'') + '</div>' +
+        '<div class="research-meta">' + [r.authors,r.journal,r.year].filter(Boolean).join(' &middot; ') + '</div></div>' +
+        '<span class="tag" style="background:' + col + '22;color:' + col + ';flex-shrink:0">' + (r.category||'').toUpperCase() + '</span>' +
+      '</div>' +
+      '<div class="research-summary">' + (r.summary||'').slice(0,220) + '...</div>' +
+      '<div class="research-footer">' +
+        (r.url ? '<a href="' + r.url + '" target="_blank" class="btn btn-ghost btn-sm"><i class="ti ti-external-link"></i> Read Paper</a>' : '') +
+        (r.application ? '<div class="research-application"><i class="ti ti-bulb"></i> ' + r.application.slice(0,120) + '...</div>' : '') +
+        ((state.user && r.createdBy === state.user.uid) ? '<div style="display:flex;gap:6px;margin-left:auto">' +
+          (!r.isPublic ? '<span class="tag" style="background:rgba(251,191,36,0.1);color:#FBBF24;font-size:10px">🔒 Private</span>' : '') +
+          '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openTrainerResearchModal(\'' + r.id + '\')"><i class="ti ti-edit"></i></button>' +
+          '<button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="event.stopPropagation();deleteTrainerResearch(\'' + r.id + '\')"><i class="ti ti-trash"></i></button>' +
+        '</div>' : '') +
+      '</div></div>';
+  }).join('') + '</div>';
+}
+
+function openAdminResearchModal(id) {
+  document.getElementById('admin-research-id').value = id || '';
+  ['research-title-input','research-authors','research-year','research-journal','research-summary','research-url','research-application'].forEach(function(x){ document.getElementById(x).value=''; });
+  document.getElementById('research-cat').value = 'strength';
+  document.getElementById('admin-research-title').innerHTML = id ? '<i class="ti ti-edit"></i> Edit Study' : '<i class="ti ti-plus"></i> Add Study';
+  if (id) {
+    var r = researches.find(function(x){ return x.id === id; });
+    if (r) { document.getElementById('research-title-input').value=r.title||'';
+      var heResTitle = document.getElementById('research-title-he');
+      if (heResTitle) heResTitle.value = r.title_he || ''; document.getElementById('research-authors').value=r.authors||''; document.getElementById('research-year').value=r.year||''; document.getElementById('research-journal').value=r.journal||''; document.getElementById('research-cat').value=r.category||'strength'; document.getElementById('research-summary').value=r.summary||''; document.getElementById('research-url').value=r.url||''; document.getElementById('research-application').value=r.application||''; }
+  }
+  openModal('admin-research');
+}
+
+async function saveAdminResearch() {
+  var title = document.getElementById('research-title-input').value.trim();
+  if (!title) { showToast('Please enter a study title.'); return; }
+  var resLangEl = document.getElementById('admin-research-lang');
+  var resHeTitleEl = document.getElementById('research-title-he');
+  var data = { lang: resLangEl ? resLangEl.value : 'en', title, title_he: resHeTitleEl ? resHeTitleEl.value : '', authors: document.getElementById('research-authors').value.trim(), year: parseInt(document.getElementById('research-year').value)||null, journal: document.getElementById('research-journal').value.trim(), category: document.getElementById('research-cat').value, summary: document.getElementById('research-summary').value.trim(), url: document.getElementById('research-url').value.trim(), application: document.getElementById('research-application').value.trim(), updatedAt: new Date().toISOString() };
+  var editId = document.getElementById('admin-research-id').value;
+  try {
+    if (editId) { await window._firebase.setDoc(window._firebase.doc(window._db,'research',editId),data,{merge:true}); }
+    else { await window._firebase.addDoc(window._firebase.collection(window._db,'research'),data); }
+    showToast('Study saved!'); closeAllModals(); renderAdminResearchList(); renderResearchView();
+  } catch(e) { showToast('Save failed: '+e.code); }
+}
+
+function renderAdminResearchList() {
+  var el = document.getElementById('admin-research-list');
+  if (!el) return;
+  var cnt = document.getElementById('admin-research-count');
+  if (cnt) cnt.textContent = researches.length + ' studies';
+  if (!researches.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="ti ti-microscope"></i></div><h3>No studies yet</h3></div>'; return; }
+  el.innerHTML = researches.map(function(r) {
+    return '<div class="admin-menu-row"><div style="flex:1"><strong>' + r.title + '</strong><div style="font-size:12px;color:var(--muted);margin-top:3px">' + [r.authors,r.journal,r.year].filter(Boolean).join(' &middot; ') + '</div></div>' +
+      '<div class="admin-actions"><button class="admin-action-btn edit" onclick="openAdminResearchModal(\'' + r.id + '\')"><i class="ti ti-edit"></i></button><button class="admin-action-btn delete" onclick="deleteResearch(\'' + r.id + '\')"><i class="ti ti-trash"></i></button></div></div>';
+  }).join('');
+}
+
+async function deleteResearch(id) {
+  var r = researches.find(function(x){ return x.id === id; });
+  if (!canEditItem(r)) { showToast('You can only delete your own studies.'); return; }
+  if (!confirm('Delete this study?')) return;
+  await window._firebase.deleteDoc(window._firebase.doc(window._db,'research',id));
+  researches = researches.filter(function(r){ return r.id !== id; });
+  renderAdminResearchList(); renderResearchView(); showToast('Study deleted.');
+}
+
+
+/* ── Program exercise day editor ─────────────────────── */
+function addProgExercise(dayData) {
+  var container = document.getElementById('prog-exercises-container');
+  var dayId = 'progday-' + Date.now();
+  dayData = dayData || {};
+  var div = document.createElement('div');
+  div.className = 'meal-editor';
+  div.id = dayId;
+  div.innerHTML =
+    '<div class="meal-editor-header">' +
+      '<input class="form-input meal-name-input" value="' + (dayData.day||'Day 1') + '" placeholder="e.g. Monday — Chest & Triceps" style="flex:1">' +
+      '<button class="admin-action-btn delete" onclick="this.closest(\'.meal-editor\').remove()"><i class="ti ti-trash"></i></button>' +
+    '</div>' +
+    '<div class="prog-ex-header"><span>Exercise</span><span>Muscle</span><span>Sets</span><span>Reps</span><span>Rest</span><span>Notes</span><span></span></div>' +
+    '<div id="exrows-' + dayId + '">' +
+      ((dayData.exercises||[]).map(function(ex){ return progExRowHTML(dayId, ex); }).join('')) +
+    '</div>' +
+    '<button class="btn btn-ghost btn-sm" data-day="' + dayId + '" onclick="addProgExRow(this.dataset.day)" style="margin-top:6px">' +
+      '<i class="ti ti-plus"></i> Add Exercise' +
+    '</button>';
+  container.appendChild(div);
+}
+
+function progExRowHTML(dayId, ex) {
+  ex = ex || {};
+  var exId = ex.exerciseId || ex.id || '';
+  var muscleOpts = ['','chest','back','legs','shoulders','arms','core','fullbody','physio'];
+  return '<div class="prog-ex-row" data-exid="' + exId + '">' +
+    '<div class="prog-ex-pick">' +
+      '<select class="form-input prog-ex-muscle-filter" onchange="filterProgExSearch(this.closest(\'.prog-ex-row\').querySelector(\'.prog-ex-name\'))" style="width:110px;flex-shrink:0">' +
+        muscleOpts.map(function(m){ return '<option value="' + m + '">' + (m||'All muscles') + '</option>'; }).join('') +
+      '</select>' +
+      '<input class="form-input prog-ex-name" placeholder="Search exercise..." value="' + (ex.title||ex.name||'') + '" ' +
+        'oninput="filterProgExSearch(this)" onfocus="showProgExDropdown(this)" style="flex:1;min-width:120px">' +
+      '<input type="hidden" class="prog-ex-id"    value="' + exId + '">' +
+      '<input type="hidden" class="prog-ex-url"   value="' + (ex.videoURL||'') + '">' +
+      '<input type="hidden" class="prog-ex-muscle" value="' + (ex.muscle||'') + '">' +
+      '<div class="prog-ex-dropdown" style="display:none"></div>' +
+    '</div>' +
+    '<input class="form-input" placeholder="Sets"  value="' + (ex.sets||'')  + '" style="width:52px">' +
+    '<input class="form-input" placeholder="Reps"  value="' + (ex.reps||'')  + '" style="width:60px">' +
+    '<input class="form-input" placeholder="Rest"  value="' + (ex.rest||'')  + '" style="width:60px">' +
+    '<input class="form-input" placeholder="Notes" value="' + (ex.notes||'') + '" style="flex:1;min-width:70px">' +
+    '<button class="admin-action-btn delete" onclick="this.closest(\'.prog-ex-row\').remove()" style="padding:6px 8px"><i class="ti ti-x"></i></button>' +
+  '</div>';
+}
+
+/* ── Exercise search dropdown for program editor ──────── */
+function filterProgExSearch(input) {
+  var q      = input.value.toLowerCase().trim();
+  var row    = input.closest('.prog-ex-row');
+  var dd     = row.querySelector('.prog-ex-dropdown');
+  var muscle = (row.querySelector('.prog-ex-muscle-filter') || {}).value || '';
+
+  if (!q && !muscle) { dd.style.display = 'none'; return; }
+  // Don't show dropdown if exercise already selected (exId set) and input unchanged
+  var exId = (row.querySelector('.prog-ex-id') || {}).value || '';
+  if (exId && row.querySelector('.prog-ex-name').value.toLowerCase().trim() === q && dd.innerHTML === '') {
+    return; // already selected, dropdown was cleared
+  }
+
+  var all  = MASTER_EXERCISES.concat(customExercises || []);
+  var hits = all.filter(function(e) {
+    var matchQ = !q || (e.title||'').toLowerCase().includes(q) || (e.sub||'').toLowerCase().includes(q);
+    var matchM = !muscle || (e.muscle||'').toLowerCase() === muscle.toLowerCase();
+    return matchQ && matchM;
+  }).slice(0, 10);
+
+  if (!hits.length) {
+    dd.innerHTML = '<div style="padding:12px;color:var(--muted);font-size:13px;text-align:center">No exercises found</div>';
+    dd.style.display = 'block';
+    return;
+  }
+
+  dd.innerHTML = hits.map(function(e) {
+    var thumb = e.videoURL && isYouTubeURL(e.videoURL) ? getYouTubeThumbnail(e.videoURL) : '';
+    var hasDirect = e.videoURL && !isYouTubeURL(e.videoURL);
+    return '<div class="prog-ex-drop-item" data-exid="' + e.id + '" data-title="' + (e.title||'').replace(/"/g,'&#34;') + '" data-muscle="' + (e.muscle||'') + '" data-url="' + (e.videoURL||'').replace(/"/g,'&#34;') + '" onclick="pickProgEx(this)">' +
+      (thumb ? '<img src="' + thumb + '" style="width:40px;height:30px;object-fit:cover;border-radius:4px;flex-shrink:0">' :
+       hasDirect ? '<div style="width:40px;height:30px;background:var(--surface3);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center"><i class="ti ti-player-play" style="font-size:12px;color:var(--accent)"></i></div>' :
+       '<div style="width:40px;height:30px;background:var(--surface3);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center"><i class="ti ti-barbell" style="font-size:12px;color:var(--muted2)"></i></div>') +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-size:13px;font-weight:600">' + (e.title||'') + '</div>' +
+        '<div style="font-size:11px;color:var(--muted)">' + (e.muscle||'') + (e.sub ? ' · ' + e.sub : '') + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  dd.style.display = 'block';
+}
+
+function pickProgEx(el) {
+  var exId   = el.getAttribute('data-exid')   || '';
+  var title  = el.getAttribute('data-title')  || '';
+  var muscle = el.getAttribute('data-muscle') || '';
+  var url    = el.getAttribute('data-url')    || '';
+  selectProgEx(el, exId, title, muscle, url);
+}
+
+function showProgExDropdown(input) {
+  if (input.value.trim()) filterProgExSearch(input);
+}
+
+function selectProgEx(item, exId, title, muscle, videoURL) {
+  var row = item.closest('.prog-ex-row');
+  if (!row) return;
+  row.querySelector('.prog-ex-name').value   = title;
+  row.querySelector('.prog-ex-id').value     = exId;
+  row.querySelector('.prog-ex-url').value    = videoURL;
+  row.querySelector('.prog-ex-muscle').value = muscle;
+  var muscleTag = row.querySelector('.prog-ex-muscle-tag');
+  if (muscleTag) muscleTag.textContent = muscle;
+
+  // CRITICAL: hide dropdown immediately and prevent it showing again
+  var dd = row.querySelector('.prog-ex-dropdown');
+  if (dd) {
+    dd.style.display = 'none';
+    dd.innerHTML = ''; // clear so it can't reappear
+  }
+  row.setAttribute('data-exid', exId);
+
+  // Blur the search input so keyboard stays up but dropdown gone
+  var nameInput = row.querySelector('.prog-ex-name');
+  if (nameInput) nameInput.blur();
+
+  // Focus Sets input after short delay
+  var setsInput = row.querySelector('input[placeholder="Sets"]');
+  if (setsInput) {
+    setTimeout(function(){
+      setsInput.focus();
+      setsInput.select();
+    }, 150);
+  }
+}
+
+// Close dropdowns on outside click
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.prog-ex-pick')) {
+    document.querySelectorAll('.prog-ex-dropdown').forEach(function(d){ d.style.display='none'; });
+  }
+});
+
+function addProgExRow(dayId) {
+  var container = document.getElementById('exrows-' + dayId);
+  if (!container) return;
+  var div = document.createElement('div');
+  div.innerHTML = progExRowHTML(dayId, {});
+  container.appendChild(div.firstChild);
+}
+
+/* ── Override saveAdminProgram to include exercise days ── */
+async function saveAdminProgram() {
+  var name = (document.getElementById('prog-name').value||'').trim() || 'My Program';
+
+  var days = [];
+  document.querySelectorAll('#prog-exercises-container .meal-editor').forEach(function(dayEl) {
+    var dayName = dayEl.querySelector('.meal-name-input').value.trim();
+    var exercises = [];
+    dayEl.querySelectorAll('.prog-ex-row').forEach(function(row) {
+      var nameEl = row.querySelector('.prog-ex-name');
+      if (!nameEl || !nameEl.value.trim()) return;
+      exercises.push({
+        exerciseId: (row.querySelector('.prog-ex-id')     || {}).value || '',
+        title:      nameEl.value.trim(),
+        muscle:     (row.querySelector('.prog-ex-muscle') || {}).value || '',
+        videoURL:   (row.querySelector('.prog-ex-url')    || {}).value || '',
+        sets:  (row.querySelector('input[placeholder="Sets"]')  || {}).value || '',
+        reps:  (row.querySelector('input[placeholder="Reps"]')  || {}).value || '',
+        rest:  (row.querySelector('input[placeholder="Rest"]')  || {}).value || '',
+        notes: (row.querySelector('input[placeholder="Notes"]') || {}).value || '',
+      });
+    });
+    days.push({ day: dayName || 'Workout', exercises: exercises });
+  });
+
+  var pubEl = document.getElementById('prog-is-public');
+  // Support both checkbox (.checked) and hidden input (.value)
+  var isPublic = pubEl ? (pubEl.type === 'checkbox' ? Boolean(pubEl.checked) : pubEl.value !== 'false') : true;
+
+  var data = {
+    name, isPublic,
+    weeks:        parseInt(document.getElementById('prog-weeks').value) || 0,
+    days:         parseInt(document.getElementById('prog-days').value)  || 0,
+    goal:         document.getElementById('prog-goal').value,
+    level:        document.getElementById('prog-level').value,
+    desc:         document.getElementById('prog-desc').value.trim(),
+    notes:        document.getElementById('prog-notes').value.trim(),
+    trainingDays: days,
+    createdBy:    state.user ? state.user.uid : null,
+    trainerName:  state.user ? state.user.fullName : null,
+    updatedAt:    new Date().toISOString(),
+  };
+
+  var editId = document.getElementById('admin-program-id').value;
+  try {
+    var savedId;
+    if (editId) {
+      await window._firebase.setDoc(window._firebase.doc(window._db, col('programs'),editId),data,{merge:true});
+      savedId = editId;
+      var idx = programs.findIndex(function(p){ return p.id === editId; });
+      if (idx > -1) programs[idx] = Object.assign({}, programs[idx], data);
+      else programs.push(Object.assign({ id: editId }, data));
+    } else {
+      var ref = await window._firebase.addDoc(window._firebase.collection(window._db, col('programs')),data);
+      savedId = ref.id;
+      programs.push(Object.assign({ id: savedId }, data));
+    }
+    showToast('Program saved!');
+    closeAllModals();
+    renderAdminProgramsList();
+    renderProgramsView();
+  } catch(e) { showToast('Save failed: ' + e.code); }
+}
+
+/* ── Override openAdminProgramModal to load days ─────── */
+function openAdminProgramModal(id) {
+  document.getElementById('admin-program-id').value = id || '';
+  ['prog-name','prog-weeks','prog-days','prog-desc','prog-schedule','prog-notes'].forEach(function(x){ document.getElementById(x).value=''; });
+  document.getElementById('prog-goal').value  = 'strength';
+  document.getElementById('prog-level').value = 'Intermediate';
+  document.getElementById('prog-exercises-container').innerHTML = '';
+  document.getElementById('admin-program-title').innerHTML = id ? '<i class="ti ti-edit"></i> Edit Program' : '<i class="ti ti-plus"></i> Add Program';
+
+  if (id) {
+    var p = programs.find(function(x){ return x.id === id; });
+    if (p) {
+      document.getElementById('prog-name').value     = p.name     || '';
+      document.getElementById('prog-weeks').value    = p.weeks    || '';
+      document.getElementById('prog-days').value     = p.days     || '';
+      document.getElementById('prog-goal').value     = p.goal     || 'strength';
+      document.getElementById('prog-level').value    = p.level    || 'Intermediate';
+      document.getElementById('prog-desc').value     = p.desc     || '';
+      document.getElementById('prog-schedule').value = p.schedule || '';
+      document.getElementById('prog-notes').value    = p.notes    || '';
+      (p.trainingDays || []).forEach(function(day){ addProgExercise(day); });
+    }
+  } else {
+    // Default: one empty day
+    addProgExercise({ day: 'Day 1 — Chest & Triceps', exercises: [] });
+  }
+  openModal('admin-program');
+}
+
+function openProgramDetail(id) {
+  var allP = programs.concat(JSON.parse(localStorage.getItem('repcast_my_programs')||'[]'));
+  var p    = allP.find(function(x){ return x.id === id; });
+  // Also check client assigned programs (for client portal)
+  if (!p && state.user && state.user.tier === 'client') {
+    p = allP.find(function(x){ return x.id === id; }) ||
+        (window._clientAssignedPrograms || []).find(function(x){ return x.id === id; });
+  }
+  if (!p) {
+    // Last resort: search by id in all known program arrays
+    var allKnown = programs.concat(
+      JSON.parse(localStorage.getItem('repcast_my_programs')||'[]'),
+      window._clientAssignedPrograms || []
+    );
+    p = allKnown.find(function(x){ return x.id === id; });
+  }
+  if (!p) { showToast('Program not found'); return; }
+
+  document.getElementById('program-detail-title').innerHTML = '<i class="ti ti-calendar"></i> ' + p.name;
+  var el = document.getElementById('program-detail-body');
+  el.setAttribute('data-id', id);
+
+  // Header stats
+  var goalFull = (p.goal||'?').replace(/-/g,' ');
+  goalFull = goalFull.charAt(0).toUpperCase() + goalFull.slice(1);
+  var html =
+    '<div style="display:flex;gap:8px;flex-wrap:nowrap;margin-bottom:16px;overflow-x:auto">' +
+      '<div class="bmr-stat" style="min-width:56px;text-align:center"><div class="bmr-stat-val">' + (p.weeks||'?') + '</div><div class="bmr-stat-label">Weeks</div></div>' +
+      '<div class="bmr-stat" style="min-width:56px;text-align:center"><div class="bmr-stat-val">' + (p.trainingDays&&p.trainingDays.length||p.days||'?') + '</div><div class="bmr-stat-label">Days</div></div>' +
+      '<div class="bmr-stat accent" style="flex:1;text-align:center"><div class="bmr-stat-val" style="font-size:13px">' + goalFull + '</div><div class="bmr-stat-label">Goal</div></div>' +
+      '<div class="bmr-stat" style="flex:1;text-align:center"><div class="bmr-stat-val" style="font-size:13px">' + (p.level||'?') + '</div><div class="bmr-stat-label">Level</div></div>' +
+    '</div>' +
+    (p.desc ? '<p style="color:var(--muted);font-size:13px;margin-bottom:16px;line-height:1.5">' + p.desc + '</p>' : '');
+
+  // Day tab pills
+  var days = p.trainingDays || [];
+  if (days.length > 1) {
+    html += '<div class="prog-day-tabs" id="prog-day-tabs">' +
+      days.map(function(day, i) {
+        var label = (day.day||'Day '+(i+1)).split('—')[0].split('—')[0].trim();
+        return '<button class="prog-day-tab' + (i===0?' active':'') + '" onclick="switchProgDay(' + i + ',this)">' + label + '</button>';
+      }).join('') +
+    '</div>';
+  }
+
+  // Day panels
+  html += days.map(function(day, i) {
+    var exercises = day.exercises || [];
+    return '<div class="prog-day-panel' + (i===0?' active':'') + '" id="prog-panel-' + i + '">' +
+      '<h4 style="font-size:15px;font-weight:700;margin-bottom:12px;color:var(--text)">' + (day.day||'Day '+(i+1)) + '</h4>' +
+
+      // Exercise table
+      '<table class="prog-ex-table">' +
+        '<thead><tr>' +
+          '<th style="width:36px"></th>' +
+          '<th>Exercise</th><th>Sets</th><th>Reps</th><th>Rest</th><th>Notes</th>' +
+        '</tr></thead>' +
+        '<tbody>' +
+        exercises.map(function(ex, ei) {
+          var hasVideo = !!(ex.videoURL);
+          var thumb    = hasVideo && isYouTubeURL(ex.videoURL) ? getYouTubeThumbnail(ex.videoURL) : '';
+          var thumbHTML = thumb
+            ? '<img src="' + thumb + '" style="width:32px;height:26px;object-fit:cover;border-radius:4px">'
+            : (hasVideo ? '<div style="width:32px;height:26px;background:var(--surface3);border-radius:4px;display:flex;align-items:center;justify-content:center"><i class="ti ti-player-play" style="font-size:11px;color:var(--accent)"></i></div>'
+                        : '<div style="width:32px;height:26px;background:var(--surface3);border-radius:4px;display:flex;align-items:center;justify-content:center"><i class="ti ti-barbell" style="font-size:11px;color:var(--muted2)"></i></div>');
+          // Resolve videoURL — fall back to master library if not stored
+          var resolvedVideo = ex.videoURL || '';
+          var _masterPool = (typeof MASTER_EXERCISES !== 'undefined' ? MASTER_EXERCISES : []);
+          if (!resolvedVideo && ex.exerciseId) {
+            var masterEx = _masterPool.find(function(m){ return m.id === ex.exerciseId; });
+            if (masterEx) resolvedVideo = masterEx.videoURL || masterEx.video_url || masterEx.video || masterEx.youtube || '';
+          }
+          if (!resolvedVideo && ex.title) {
+            var byTitle = _masterPool.find(function(m){
+              return (m.title||'').toLowerCase() === (ex.title||'').toLowerCase();
+            });
+            if (byTitle) resolvedVideo = byTitle.videoURL || byTitle.video_url || byTitle.video || byTitle.youtube || '';
+          }
+          var hasV = !!resolvedVideo;
+          var thumb2 = hasV && isYouTubeURL(resolvedVideo) ? getYouTubeThumbnail(resolvedVideo) : '';
+          var thumbHTML2 = thumb2
+            ? '<img src="' + thumb2 + '" style="width:40px;height:32px;object-fit:cover;border-radius:5px">'
+            : (hasV ? '<div style="width:40px;height:32px;background:rgba(126,232,162,0.12);border-radius:5px;display:flex;align-items:center;justify-content:center"><i class="ti ti-player-play" style="font-size:14px;color:var(--accent)"></i></div>'
+                    : '<div style="width:40px;height:32px;background:var(--surface3);border-radius:5px;display:flex;align-items:center;justify-content:center"><i class="ti ti-barbell" style="font-size:12px;color:var(--muted2)"></i></div>');
+          var clickAttr = hasV ? ' onclick="openVideoPopup(decodeURIComponent(\'' + encodeURIComponent(resolvedVideo) + '\'))" style="cursor:pointer"' : '';
+          return '<tr class="prog-ex-table-row"' + clickAttr + '>' +
+            '<td>' + thumbHTML2 + '</td>' +
+            '<td><strong>' + (ex.title||ex.name||'-') + '</strong>' +
+              (ex.muscle ? '<div style="font-size:11px;color:var(--muted)">' + ex.muscle + '</div>' : '') +
+              (hasV ? '<div style="font-size:10px;color:var(--accent)"><i class="ti ti-player-play"></i> Tap to watch</div>' : '') +
+            '</td>' +
+            '<td>' + (ex.sets||'-') + '</td>' +
+            '<td>' + (ex.reps||'-') + '</td>' +
+            '<td>' + (ex.rest||'-') + '</td>' +
+            '<td style="color:var(--muted);font-size:12px">' + (ex.notes||'') + '</td>' +
+          '</tr>';
+        }).join('') +
+        '</tbody>' +
+      '</table>' +
+    '</div>';
+  }).join('');
+
+  if (p.notes) html += '<div class="recipe-tips" style="margin-top:16px"><i class="ti ti-bulb"></i> ' + p.notes + '</div>';
+  el.innerHTML = html;
+  openModal('program-detail');
+}
+
+function switchProgDay(idx, btn) {
+  // Scope to the parent tabs container only
+  var tabsContainer = btn.closest('.prog-day-tabs') || document.getElementById('prog-day-tabs');
+  if (tabsContainer) {
+    tabsContainer.querySelectorAll('.prog-day-tab').forEach(function(b){ b.classList.remove('active'); });
+  }
+  // Hide all panels in same modal
+  var modal = btn.closest('.modal-body') || document.getElementById('program-detail-body');
+  if (modal) {
+    modal.querySelectorAll('.prog-day-panel').forEach(function(p){ p.classList.remove('active'); });
+  }
+  btn.classList.add('active');
+  var panel = document.getElementById('prog-panel-' + idx);
+  if (panel) {
+    panel.classList.add('active');
+    // Scroll panel into view smoothly
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function toggleProgExCard(rowEl) {
+  var key          = rowEl.getAttribute('data-key');
+  var exDataEncoded = rowEl.getAttribute('data-ex');
+  // Find card row — try by ID first, then by sibling
+  var cardRow = document.getElementById('prog-ex-card-' + key);
+  if (!cardRow) {
+    // Fallback: next sibling row
+    cardRow = rowEl.nextElementSibling;
+    if (!cardRow || !cardRow.classList.contains('prog-ex-card-row')) cardRow = null;
+  }
+  if (!cardRow) return;
+
+  // Toggle: if visible hide it, if hidden show it
+  if (cardRow.style.display !== 'none') {
+    cardRow.style.display = 'none';
+    return;
+  }
+
+  var ex = JSON.parse(decodeURIComponent(exDataEncoded));
+  var hasVideo = !!(ex.videoURL);
+  var isYT     = hasVideo && isYouTubeURL(ex.videoURL);
+  var thumb    = isYT ? getYouTubeThumbnail(ex.videoURL) : '';
+
+  var videoHTML = '';
+  if (hasVideo) {
+    if (isYT) {
+      var ytId = getYouTubeID(ex.videoURL);
+      videoHTML = '<div style="position:relative;padding-top:56.25%;border-radius:10px;overflow:hidden;cursor:pointer" onclick="playVideo(null,\'' + ex.videoURL + '\')">' +
+        '<img src="' + thumb + '" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">' +
+        '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3)">' +
+          '<div class="shared-play-btn"><i class="ti ti-player-play"></i></div>' +
+        '</div></div>';
+    } else {
+      videoHTML = '<video src="' + ex.videoURL + '" controls style="width:100%;border-radius:10px;max-height:220px;background:#000"></video>';
+    }
+  }
+
+  var html =
+    '<div class="prog-ex-expanded">' +
+      (videoHTML ? '<div style="margin-bottom:12px">' + videoHTML + '</div>' : '') +
+      '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
+        (ex.sets  ? '<div class="prog-ex-stat"><span>' + ex.sets  + '</span><em>Sets</em></div>' : '') +
+        (ex.reps  ? '<div class="prog-ex-stat"><span>' + ex.reps  + '</span><em>Reps</em></div>' : '') +
+        (ex.rest  ? '<div class="prog-ex-stat"><span>' + ex.rest  + '</span><em>Rest</em></div>' : '') +
+      '</div>' +
+      (ex.notes ? '<p style="font-size:13px;color:var(--muted);margin-top:10px">' + ex.notes + '</p>' : '') +
+    '</div>';
+
+  cardRow.querySelector('td').innerHTML = html;
+  cardRow.style.display = '';
+  // Scroll expanded card into view — works in both modal and client portal
+  setTimeout(function() {
+    // Find scrollable container
+    var scrollParent = cardRow.closest('.modal-body') ||
+                       cardRow.closest('.view') ||
+                       cardRow.closest('#screen-client-portal');
+    if (scrollParent) {
+      var cardTop = cardRow.offsetTop;
+      var parentTop = scrollParent.scrollTop;
+      var parentHeight = scrollParent.clientHeight;
+      // Only scroll if card is below visible area
+      if (cardTop > parentTop + parentHeight * 0.6) {
+        scrollParent.scrollTo({ top: cardTop - 80, behavior: 'smooth' });
+      }
+    } else {
+      cardRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, 100);
+}
+
+/* ── Trainer: Create own routine/program ─────────────── */
+function openCreateOwnProgram() {
+  document.getElementById('admin-program-id').value = '';  // empty = save to Firestore
+  ['prog-name','prog-weeks','prog-days','prog-desc','prog-schedule','prog-notes'].forEach(function(x){ document.getElementById(x).value=''; });
+  document.getElementById('prog-goal').value  = 'hypertrophy';
+  document.getElementById('prog-level').value = 'Intermediate';
+  document.getElementById('prog-exercises-container').innerHTML = '';
+  document.getElementById('admin-program-title').innerHTML = '<i class="ti ti-plus"></i> Create My Program';
+  // Start with one empty day — trainer names it themselves
+  addProgExercise({ day: '', exercises: [] });
+  openModal('admin-program');
+}
+
+/* override saveAdminProgram to handle personal programs */
+var _origSaveAdminProgram = saveAdminProgram;
+saveAdminProgram = async function() {
+  var editId = document.getElementById('admin-program-id').value;
+  var isPersonal = editId && editId.startsWith('personal_');
+
+  if (!isPersonal) { return _origSaveAdminProgram(); }
+
+  var name = document.getElementById('prog-name').value.trim();
+  if (!name) { showToast('Please enter a program name.'); return; }
+
+  var days = [];
+  document.querySelectorAll('#prog-exercises-container .meal-editor').forEach(function(dayEl) {
+    var dayName = dayEl.querySelector('.meal-name-input').value.trim();
+    var exercises = [];
+    dayEl.querySelectorAll('.prog-ex-row').forEach(function(row) {
+      var inputs = row.querySelectorAll('input');
+      var exName = inputs[0].value.trim();
+      if (!exName) return;
+      exercises.push({ name:exName, muscle:inputs[1].value.trim(), sets:inputs[2].value.trim(), reps:inputs[3].value.trim(), rest:inputs[4].value.trim(), notes:inputs[5].value.trim() });
+    });
+    if (dayName) days.push({ day: dayName, exercises: exercises });
+  });
+
+  var prog = {
+    id:      editId,
+    name,
+    weeks:   parseInt(document.getElementById('prog-weeks').value)||0,
+    days:    parseInt(document.getElementById('prog-days').value)||0,
+    goal:    document.getElementById('prog-goal').value,
+    level:   document.getElementById('prog-level').value,
+    desc:    document.getElementById('prog-desc').value.trim(),
+    notes:   document.getElementById('prog-notes').value.trim(),
+    trainingDays: days,
+    _isPersonal: true,
+    createdAt: new Date().toISOString(),
+  };
+
+  var saved = JSON.parse(localStorage.getItem('repcast_my_programs') || '[]');
+  var idx = saved.findIndex(function(p){ return p.id === editId; });
+  if (idx > -1) saved[idx] = prog; else saved.push(prog);
+  localStorage.setItem('repcast_my_programs', JSON.stringify(saved));
+
+  showToast('Your program saved!');
+  closeAllModals();
+  renderProgramsView();
+};
+
+
+/* ══════════════════════════════════════════════════════════
+   MACRO DONUT CHART  (pure SVG, no library)
+══════════════════════════════════════════════════════════ */
+
+/**
+ * Returns an SVG donut chart string showing protein / carbs / fat %
+ * @param {number} protein - grams
+ * @param {number} carbs   - grams
+ * @param {number} fat     - grams
+ * @param {number} calories
+ * @param {number} size    - pixel size (default 160)
+ */
+function macroDonutSVG(protein, carbs, fat, calories, size) {
+  size = size || 160;
+  var r   = size * 0.38;   // ring radius
+  var cx  = size / 2;
+  var cy  = size / 2;
+  var sw  = size * 0.13;   // stroke width
+
+  // Calorie contributions
+  var pCal = (protein || 0) * 4;
+  var cCal = (carbs   || 0) * 4;
+  var fCal = (fat     || 0) * 9;
+  var total = pCal + cCal + fCal || 1;
+
+  var pPct = pCal / total;
+  var cPct = cCal / total;
+  var fPct = fCal / total;
+
+  // Build arc segments
+  function arcPath(startAngle, endAngle, radius, cx, cy, sw) {
+    var gap = 0.03; // radians gap between segments
+    startAngle += gap;
+    endAngle   -= gap;
+    if (endAngle <= startAngle) return '';
+
+    var x1 = cx + radius * Math.cos(startAngle);
+    var y1 = cy + radius * Math.sin(startAngle);
+    var x2 = cx + radius * Math.cos(endAngle);
+    var y2 = cy + radius * Math.sin(endAngle);
+    var large = (endAngle - startAngle) > Math.PI ? 1 : 0;
+
+    return 'M ' + x1 + ' ' + y1 + ' A ' + radius + ' ' + radius + ' 0 ' + large + ' 1 ' + x2 + ' ' + y2;
+  }
+
+  var start = -Math.PI / 2; // top
+  var pEnd  = start + pPct * 2 * Math.PI;
+  var cEnd  = pEnd  + cPct * 2 * Math.PI;
+  var fEnd  = cEnd  + fPct * 2 * Math.PI;
+
+  var pPath = arcPath(start, pEnd,  r, cx, cy, sw);
+  var cPath = arcPath(pEnd,  cEnd,  r, cx, cy, sw);
+  var fPath = arcPath(cEnd,  fEnd,  r, cx, cy, sw);
+
+  var fontSize = size * 0.13;
+  var subSize  = size * 0.085;
+
+  return '<svg viewBox="0 0 ' + size + ' ' + size + '" width="' + size + '" height="' + size + '" xmlns="http://www.w3.org/2000/svg" aria-label="Macro breakdown chart" role="img">' +
+    '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="' + sw + '"/>' +
+
+    (pPath ? '<path d="' + pPath + '" fill="none" stroke="#60A5FA" stroke-width="' + sw + '" stroke-linecap="round"/>' : '') +
+    (cPath ? '<path d="' + cPath + '" fill="none" stroke="#FBBF24" stroke-width="' + sw + '" stroke-linecap="round"/>' : '') +
+    (fPath ? '<path d="' + fPath + '" fill="none" stroke="#F472B6" stroke-width="' + sw + '" stroke-linecap="round"/>' : '') +
+
+    // Centre text
+    '<text x="' + cx + '" y="' + (cy - fontSize*0.3) + '" text-anchor="middle" fill="#f0f2f5" font-size="' + fontSize + '" font-weight="800" font-family="Syne,sans-serif">' + (calories || 0) + '</text>' +
+    '<text x="' + cx + '" y="' + (cy + subSize * 1.1) + '" text-anchor="middle" fill="#8a9bb0" font-size="' + subSize + '" font-family="Inter,sans-serif">kcal</text>' +
+  '</svg>';
+}
+
+/**
+ * Renders a full macro chart block (donut + legend)
+ */
+function macroChartHTML(protein, carbs, fat, calories, size) {
+  var pCal  = (protein||0)*4, cCal = (carbs||0)*4, fCal = (fat||0)*9;
+  var total = pCal + cCal + fCal || 1;
+  var pPct  = Math.round(pCal/total*100);
+  var cPct  = Math.round(cCal/total*100);
+  var fPct  = Math.round(fCal/total*100);
+
+  return '<div class="macro-chart-wrap">' +
+    '<div class="macro-donut">' + macroDonutSVG(protein, carbs, fat, calories, size||160) + '</div>' +
+    '<div class="macro-legend">' +
+      '<div class="macro-legend-item">' +
+        '<span class="macro-legend-dot" style="background:#60A5FA"></span>' +
+        '<span class="macro-legend-label">Protein</span>' +
+        '<span class="macro-legend-val">' + (protein||0) + 'g</span>' +
+        '<span class="macro-legend-pct">' + pPct + '%</span>' +
+      '</div>' +
+      '<div class="macro-legend-item">' +
+        '<span class="macro-legend-dot" style="background:#FBBF24"></span>' +
+        '<span class="macro-legend-label">Carbs</span>' +
+        '<span class="macro-legend-val">' + (carbs||0) + 'g</span>' +
+        '<span class="macro-legend-pct">' + cPct + '%</span>' +
+      '</div>' +
+      '<div class="macro-legend-item">' +
+        '<span class="macro-legend-dot" style="background:#F472B6"></span>' +
+        '<span class="macro-legend-label">Fat</span>' +
+        '<span class="macro-legend-val">' + (fat||0) + 'g</span>' +
+        '<span class="macro-legend-pct">' + fPct + '%</span>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+
+/* ── Video popup — works on both web and native ─────────── */
+function openVideoPopup(videoURL) {
+  // Remove any existing popup
+  var existing = document.getElementById('native-video-popup');
+  if (existing) existing.remove();
+
+  var isYT  = isYouTubeURL(videoURL);
+  var ytId  = isYT ? getYouTubeID(videoURL) : '';
+  var inner = isYT
+    ? '<iframe src="https://www.youtube.com/embed/' + ytId + '?autoplay=1&playsinline=1" ' +
+        'style="width:100%;height:100%;border:none" allow="autoplay;fullscreen" allowfullscreen></iframe>'
+    : '<video src="' + videoURL + '" controls autoplay playsinline ' +
+        'style="width:100%;height:100%;background:#000"></video>';
+
+  var popup = document.createElement('div');
+  popup.id = 'native-video-popup';
+  popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.96);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px';
+  popup.onclick = function(ev) { if (ev.target === popup) closeVideoPopup(); };
+  popup.innerHTML =
+    '<button onclick="closeVideoPopup()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.18);border:none;color:white;width:42px;height:42px;border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center">' +
+      '<i class="ti ti-x"></i></button>' +
+    '<div style="width:100%;max-width:800px;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000">' + inner + '</div>';
+  document.body.appendChild(popup);
+  document.body.style.overflow = 'hidden';
+}
+
+function closeVideoPopup() {
+  var el = document.getElementById('native-video-popup');
+  if (el) el.remove();
+  document.body.style.overflow = '';
+}
+
+/* ── Open URL in system browser from native app ─────────── */
+
+
+/* ══════════════════════════════════════════════════════════
+   ADMIN LANGUAGE TABS — switch between EN and HE collections
+══════════════════════════════════════════════════════════ */
+
+// Track which lang each admin section is viewing
+var _adminLang = {
+  exercises: 'en', menus: 'en', programs: 'en', recipes: 'en', foods: 'en'
+};
+
+// Config for each section
+var _adminSectionConfig = {
+  exercises: {
+    listEn: 'exercises-en-wrap', listHe: 'exercises-he-wrap',
+    topbarFn: function(lang) { updateAdminExercisesTopbar(lang); }
+  },
+  menus: {
+    listEn: 'admin-menu-list', listHe: 'admin-menu-list-he',
+    topbarFn: function(lang) { updateAdminMenusTopbar(lang); },
+    loadHe: function() { return loadAdminHeCollection('menus'); }
+  },
+  programs: {
+    listEn: 'admin-programs-list', listHe: 'admin-programs-list-he',
+    topbarFn: function(lang) { updateAdminProgramsTopbar(lang); },
+    loadHe: function() { return loadAdminHeCollection('programs'); }
+  },
+  recipes: {
+    listEn: 'admin-recipes-list', listHe: 'admin-recipes-list-he',
+    topbarFn: function(lang) { updateAdminRecipesTopbar(lang); },
+    loadHe: function() { return loadAdminHeCollection('recipes'); }
+  },
+  foods: {
+    listEn: 'admin-food-list', listHe: 'admin-food-list-he',
+    topbarFn: function(lang) { updateAdminFoodsTopbar(lang); },
+    loadHe: function() { return loadAdminHeCollection('foods'); }
+  }
+};
+
+// Hebrew data caches (separate from main EN arrays)
+var _heMenus = [], _hePrograms = [], _heRecipes = [], _heFoods = [];
+
+async function loadAdminHeCollection(type) {
+  try {
+    var snap = await window._firebase.getDocs(
+      window._firebase.collection(window._db, type + '_he')
+    );
+    var items = [];
+    snap.forEach(function(d){ items.push(Object.assign({ id: d.id }, d.data())); });
+    if (type === 'menus')    _heMenus    = items;
+    if (type === 'programs') _hePrograms = items;
+    if (type === 'recipes')  _heRecipes  = items;
+    if (type === 'foods')    _heFoods    = items;
+    return items;
+  } catch(e) { console.warn('loadAdminHeCollection error:', e); return []; }
+}
+
+async function setAdminLang(section, lang) {
+  _adminLang[section] = lang;
+  var cfg = _adminSectionConfig[section];
+  if (!cfg) return;
+
+  // Update tab styles
+  var enTab = document.getElementById('admin-tab-' + section + '-en');
+  var heTab = document.getElementById('admin-tab-' + section + '-he');
+  if (enTab) {
+    enTab.style.background = lang === 'en' ? 'var(--surface2)' : 'transparent';
+    enTab.style.color      = lang === 'en' ? 'var(--text)'     : 'var(--muted)';
+  }
+  if (heTab) {
+    heTab.style.background = lang === 'he' ? 'var(--surface2)' : 'transparent';
+    heTab.style.color      = lang === 'he' ? 'var(--text)'     : 'var(--muted)';
+  }
+
+  // Show/hide list containers
+  var listEn = document.getElementById(cfg.listEn);
+  var listHe = cfg.listHe ? document.getElementById(cfg.listHe) : null;
+  if (listEn) listEn.style.display = lang === 'en' ? '' : 'none';
+  if (listHe) listHe.style.display = lang === 'he' ? '' : 'none';
+
+  // Update topbar buttons (Add / Bulk Import)
+  if (cfg.topbarFn) cfg.topbarFn(lang);
+
+  // Load Hebrew data if switching to Hebrew
+  if (lang === 'he' && cfg.loadHe) {
+    await cfg.loadHe();
+    renderAdminHeList(section);
+  }
+}
+
+function renderAdminHeList(section) {
+  var items = section === 'menus'    ? _heMenus    :
+              section === 'programs' ? _hePrograms :
+              section === 'recipes'  ? _heRecipes  :
+              section === 'foods'    ? _heFoods    : [];
+  var listId = section + (section === 'foods' ? '-food-list-he' : 
+               section === 'menus' ? '-menu-list-he' :
+               'admin-' + section + '-list-he');
+
+  // Map section to correct list ID
+  var listIdMap = {
+    menus: 'admin-menu-list-he', programs: 'admin-programs-list-he',
+    recipes: 'admin-recipes-list-he', foods: 'admin-food-list-he'
+  };
+  var el = document.getElementById(listIdMap[section]);
+  if (!el) return;
+
+  if (!items.length) {
+    el.innerHTML = '<div class="empty-state" style="padding:30px"><div class="empty-icon"><i class="ti ti-language"></i></div><h3>No Hebrew content yet</h3><p>Add items or use Bulk Import to add Hebrew content.</p></div>';
+    return;
+  }
+
+  if (section === 'menus') {
+    el.innerHTML = items.map(function(m) {
+      return '<div class="admin-menu-row"><div style="flex:1"><strong>' + m.name + '</strong>' +
+        '<div style="font-size:12px;color:var(--muted);margin-top:3px">' + (m.goal||'') + '</div></div>' +
+        '<div class="admin-actions">' +
+          '<button class="admin-action-btn edit" onclick="openAdminMenuModalHe(\'' + m.id + '\')"><i class="ti ti-edit"></i> ערוך</button>' +
+          '<button class="admin-action-btn delete" onclick="deleteHeItem(\'' + m.id + '\',\'menus\')"><i class="ti ti-trash"></i></button>' +
+        '</div></div>';
+    }).join('');
+  } else if (section === 'programs') {
+    el.innerHTML = items.map(function(p) {
+      return '<div class="admin-menu-row"><div style="flex:1"><strong>' + p.name + '</strong>' +
+        '<div style="font-size:12px;color:var(--muted);margin-top:3px">' + (p.goal||'') + ' · ' + (p.weeks||'?') + ' שבועות</div></div>' +
+        '<div class="admin-actions">' +
+          '<button class="admin-action-btn edit" onclick="openAdminProgramModalHe(\'' + p.id + '\')"><i class="ti ti-edit"></i> ערוך</button>' +
+          '<button class="admin-action-btn delete" onclick="deleteHeItem(\'' + p.id + '\',\'programs\')"><i class="ti ti-trash"></i></button>' +
+        '</div></div>';
+    }).join('');
+  } else if (section === 'recipes') {
+    el.innerHTML = items.map(function(r) {
+      return '<div class="admin-menu-row"><div style="flex:1"><strong>' + r.name + '</strong>' +
+        '<div style="font-size:12px;color:var(--muted);margin-top:3px">' + (r.category||'') + ' · ' + (r.calories||0) + ' קל׳</div></div>' +
+        '<div class="admin-actions">' +
+          '<button class="admin-action-btn edit" onclick="openAdminRecipeModalHe(\'' + r.id + '\')"><i class="ti ti-edit"></i> ערוך</button>' +
+          '<button class="admin-action-btn delete" onclick="deleteHeItem(\'' + r.id + '\',\'recipes\')"><i class="ti ti-trash"></i></button>' +
+        '</div></div>';
+    }).join('');
+  } else if (section === 'foods') {
+    var byCat = {};
+    items.forEach(function(f){ (byCat[f.category||'אחר'] = byCat[f.category||'אחר'] || []).push(f); });
+    var html = '';
+    Object.keys(byCat).sort().forEach(function(cat){
+      html += '<div style="margin-bottom:14px"><div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px">' + cat + '</div>';
+      byCat[cat].forEach(function(f){
+        html += '<div class="admin-menu-row"><div style="flex:1"><strong>' + f.name + '</strong>' +
+          '<div style="font-size:12px;color:var(--muted)">' + (f.calories||0) + ' קל׳ · חלבון ' + (f.protein||0) + 'g</div></div>' +
+          '<div class="admin-actions">' +
+            '<button class="admin-action-btn edit" onclick="openAdminFoodModalHe(\'' + f.id + '\')"><i class="ti ti-edit"></i></button>' +
+            '<button class="admin-action-btn delete" onclick="deleteHeItem(\'' + f.id + '\',\'foods\')"><i class="ti ti-trash"></i></button>' +
+          '</div></div>';
+      });
+      html += '</div>';
+    });
+    el.innerHTML = html;
+  }
+}
+
+async function deleteHeItem(id, type) {
+  if (!confirm('מחק פריט זה?')) return;
+  try {
+    var colName = type === 'exercises' ? 'masterLibrary_he' : type + '_he';
+    await window._firebase.deleteDoc(window._firebase.doc(window._db, colName, id));
+    showToast('נמחק!');
+    if (type === 'exercises') { await loadHeExercises(); renderHeExercisesList(); }
+    else { await loadAdminHeCollection(type); renderAdminHeList(type); }
+  } catch(e) { showToast('שגיאה: ' + e.message); }
+}
+
+// Topbar button updaters — switch Add/Bulk buttons between EN and HE
+function updateAdminMenusTopbar(lang) {
+  var addBtn  = document.querySelector('#admin-view-nutrition .btn-primary');
+  var bulkBtn = document.querySelector('#admin-view-nutrition .btn-ghost');
+  if (lang === 'he') {
+    if (addBtn)  { addBtn.onclick  = function(){ openAdminMenuModalHe(); }; addBtn.innerHTML  = '<i class="ti ti-plus"></i> הוסף תפריט'; }
+    if (bulkBtn) { bulkBtn.onclick = function(){ openModal('bulk-menus-he'); }; bulkBtn.innerHTML = '<i class="ti ti-file-import"></i> ייבוא עברית'; }
+  } else {
+    if (addBtn)  { addBtn.onclick  = function(){ openAdminMenuModal(); }; addBtn.innerHTML  = '<i class="ti ti-plus"></i> Add Menu'; }
+    if (bulkBtn) { bulkBtn.onclick = function(){ openModal('bulk-menus'); }; bulkBtn.innerHTML = '<i class="ti ti-file-import"></i> Bulk Import'; }
+  }
+}
+function updateAdminProgramsTopbar(lang) {
+  var addBtn = document.querySelector('#admin-view-programs .btn-primary');
+  if (lang === 'he') {
+    if (addBtn) { addBtn.onclick = function(){ openAdminProgramModalHe(); }; addBtn.innerHTML = '<i class="ti ti-plus"></i> הוסף תוכנית'; }
+  } else {
+    if (addBtn) { addBtn.onclick = function(){ openAdminProgramModal(); }; addBtn.innerHTML = '<i class="ti ti-plus"></i> Add Program'; }
+  }
+}
+function updateAdminRecipesTopbar(lang) {
+  var addBtn = document.querySelector('#admin-view-recipes .btn-primary');
+  if (lang === 'he') {
+    if (addBtn) { addBtn.onclick = function(){ openAdminRecipeModalHe(); }; addBtn.innerHTML = '<i class="ti ti-plus"></i> הוסף מתכון'; }
+  } else {
+    if (addBtn) { addBtn.onclick = function(){ openAdminRecipeModal(); }; addBtn.innerHTML = '<i class="ti ti-plus"></i> Add Recipe'; }
+  }
+}
+function updateAdminFoodsTopbar(lang) {
+  var addBtn  = document.querySelector('#admin-view-foods .btn-primary');
+  var bulkBtn = document.querySelector('#admin-view-foods .btn-ghost');
+  if (lang === 'he') {
+    if (addBtn)  { addBtn.onclick  = function(){ openAdminFoodModalHe(); }; addBtn.innerHTML  = '<i class="ti ti-plus"></i> הוסף מזון'; }
+    if (bulkBtn) { bulkBtn.onclick = function(){ openModal('bulk-foods-he'); }; bulkBtn.innerHTML = '<i class="ti ti-file-import"></i> ייבוא עברית'; }
+  } else {
+    if (addBtn)  { addBtn.onclick  = function(){ openAdminFoodModal(); }; addBtn.innerHTML  = '<i class="ti ti-plus"></i> Add Food'; }
+    if (bulkBtn) { bulkBtn.onclick = function(){ openModal('bulk-foods'); }; bulkBtn.innerHTML = '<i class="ti ti-file-import"></i> Bulk Import'; }
+  }
+}
+var _heExercises = [];
+
+async function loadHeExercises() {
+  try {
+    var snap = await window._firebase.getDocs(
+      window._firebase.collection(window._db, 'masterLibrary_he')
+    );
+    _heExercises = [];
+    snap.forEach(function(d){ _heExercises.push(Object.assign({id:d.id},d.data())); });
+    return _heExercises;
+  } catch(e) { console.warn('loadHeExercises:', e); return []; }
+}
+
+function renderHeExercisesList() {
+  var el = document.getElementById('admin-exercises-he-list');
+  if (!el) return;
+  if (!_heExercises.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="ti ti-language"></i></div><h3>No Hebrew exercises yet</h3><p>Add exercises or bulk import.</p></div>';
+    return;
+  }
+  el.innerHTML = _heExercises.map(function(ex) {
+    return '<div class="admin-menu-row"><div style="flex:1"><strong>' + (ex.title||ex.name||'') + '</strong>' +
+      '<div style="font-size:12px;color:var(--muted);margin-top:3px">' + (ex.muscle||'') + (ex.sub ? ' · ' + ex.sub : '') + '</div></div>' +
+      '<div class="admin-actions">' +
+        '<button class="admin-action-btn edit" onclick="openAdminModal(\'edit\',\''+ex.id+'\')" title="Edit"><i class="ti ti-edit"></i></button>' +
+        '<button class="admin-action-btn delete" onclick="deleteHeItem(\''+ex.id+'\',\'exercises\')" title="Delete"><i class="ti ti-trash"></i></button>' +
+      '</div></div>';
+  }).join('');
+}
+
+async function updateAdminExercisesTopbar(lang) {
+  var enWrap = document.getElementById('exercises-en-wrap');
+  var heWrap = document.getElementById('exercises-he-wrap');
+  var addBtn  = document.querySelector('#admin-view-exercises .btn-primary');
+  var bulkBtn = document.querySelector('#admin-view-exercises .btn-ghost');
+  if (lang === 'he') {
+    if (enWrap) enWrap.style.display = 'none';
+    if (heWrap) heWrap.style.display = '';
+    if (addBtn) { addBtn.innerHTML = '<i class="ti ti-plus"></i> הוסף תרגיל'; addBtn.onclick = function(){ window._addExToHe=true; openAdminModal('add'); }; }
+    if (bulkBtn) { bulkBtn.innerHTML = '<i class="ti ti-file-import"></i> ייבוא עברית'; bulkBtn.onclick = function(){ openModal('bulk-import-he-exercises'); }; }
+    await loadHeExercises();
+    renderHeExercisesList();
+  } else {
+    if (enWrap) enWrap.style.display = '';
+    if (heWrap) heWrap.style.display = 'none';
+    if (addBtn) { addBtn.innerHTML = '<i class="ti ti-plus"></i> Add Exercise'; addBtn.onclick = function(){ window._addExToHe=false; openAdminModal('add'); }; }
+    if (bulkBtn) { bulkBtn.innerHTML = '<i class="ti ti-file-import"></i> Bulk Import'; bulkBtn.onclick = function(){ openModal('bulk-import'); }; }
+  }
+}
+
+/* ── Hebrew modal openers (reuse existing modals, just change save target) ── */
+var _editingHeId   = null;
+var _editingHeType = null;
+
+function openAdminMenuModalHe(id) {
+  _editingHeId = id || null; _editingHeType = 'menus';
+  if (id) {
+    var m = _heMenus.find(function(x){ return x.id===id; });
+    if (m) {
+      editingMenuId = id;
+      document.getElementById('admin-menu-name').value = m.name || '';
+      var g = document.getElementById('admin-menu-goal'); if (g) g.value = m.goal||'cut';
+      var d = document.getElementById('admin-menu-desc'); if (d) d.value = m.desc||'';
+    }
+  } else {
+    editingMenuId = null;
+    ['admin-menu-name','admin-menu-desc'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=''; });
+  }
+  // Override save to use Hebrew collection
+  window._saveMenuToHe = true;
+  openModal('admin-menu');
+}
+
+function openAdminProgramModalHe(id) {
+  _editingHeId = id || null; _editingHeType = 'programs';
+  window._saveProgramToHe = true;
+  if (id) {
+    var p = _hePrograms.find(function(x){ return x.id===id; });
+    if (p) {
+      document.getElementById('prog-name').value  = p.name  || '';
+      document.getElementById('prog-weeks').value = p.weeks || 12;
+      var g = document.getElementById('prog-goal');  if (g) g.value = p.goal||'';
+      var l = document.getElementById('prog-level'); if (l) l.value = p.level||'Beginner';
+    }
+  }
+  openModal('admin-program');
+}
+
+function openAdminRecipeModalHe(id) {
+  _editingHeId = id || null; _editingHeType = 'recipes';
+  window._saveRecipeToHe = true;
+  if (id) {
+    var r = _heRecipes.find(function(x){ return x.id===id; });
+    if (r) {
+      document.getElementById('recipe-name').value = r.name || '';
+      var c = document.getElementById('recipe-category'); if (c) c.value = r.category||'';
+      var cal = document.getElementById('recipe-calories'); if (cal) cal.value = r.calories||0;
+      var i = document.getElementById('recipe-ingredients'); if (i) i.value = r.ingredients||'';
+      var ins = document.getElementById('recipe-instructions'); if (ins) ins.value = r.instructions||'';
+    }
+  }
+  openModal('admin-recipe');
+}
+
+function openAdminFoodModalHe(id) {
+  _editingHeId = id || null; _editingHeType = 'foods';
+  window._saveFoodToHe = true;
+  if (id) {
+    var f = _heFoods.find(function(x){ return x.id===id; });
+    if (f) {
+      document.getElementById('food-name').value     = f.name     || '';
+      document.getElementById('food-category').value = f.category || '';
+      document.getElementById('food-serving').value  = f.serving  || 100;
+      document.getElementById('food-unit').value     = f.unit     || 'g';
+      document.getElementById('food-calories').value = f.calories || 0;
+      document.getElementById('food-protein').value  = f.protein  || 0;
+      document.getElementById('food-carbs').value    = f.carbs    || 0;
+      document.getElementById('food-fat').value      = f.fat      || 0;
+      document.getElementById('food-modal-title').innerHTML = '<i class="ti ti-edit"></i> ערוך מזון';
+    }
+  } else {
+    ['food-name','food-category'].forEach(function(fid){ var e=document.getElementById(fid); if(e) e.value=''; });
+    document.getElementById('food-serving').value = 100;
+    document.getElementById('food-unit').value    = 'g';
+    ['food-calories','food-protein','food-carbs','food-fat'].forEach(function(fid){ var e=document.getElementById(fid); if(e) e.value=0; });
+    document.getElementById('food-modal-title').innerHTML = '<i class="ti ti-plus"></i> הוסף מזון';
+  }
+  openModal('admin-food');
+}
+
+/* ── Patch save functions to check Hebrew flag ── */
+var _origSaveAdminMenu, _origSaveAdminFood;
+
+function patchHeSaves() {
+  // Patch saveAdminMenu
+  var origSaveMenu = window.saveAdminMenu;
+  window.saveAdminMenu = async function() {
+    if (window._saveMenuToHe) {
+      window._saveMenuToHe = false;
+      var name = document.getElementById('admin-menu-name').value.trim();
+      if (!name) { showToast('Enter menu name'); return; }
+      var menuData = {
+        name: name,
+        goal: (document.getElementById('admin-menu-goal')||{}).value || 'cut',
+        desc: (document.getElementById('admin-menu-desc')||{}).value || '',
+        meals: [],
+        isPublic: true,
+        createdBy: state.user ? state.user.uid : null,
+        updatedAt: new Date().toISOString()
+      };
+      try {
+        if (_editingHeId) {
+          await window._firebase.setDoc(window._firebase.doc(window._db,'menus_he',_editingHeId), menuData, {merge:true});
+        } else {
+          await window._firebase.addDoc(window._firebase.collection(window._db,'menus_he'), menuData);
+        }
+        _editingHeId = null;
+        showToast('נשמר!');
+        closeAllModals();
+        await loadAdminHeCollection('menus');
+        renderAdminHeList('menus');
+      } catch(e) { showToast('שגיאה: ' + e.message); }
+      return;
+    }
+    if (origSaveMenu) origSaveMenu.apply(this, arguments);
+  };
+
+  // Patch saveAdminFood
+  var origSaveFood = window.saveAdminFood;
+  window.saveAdminFood = async function() {
+    if (window._saveFoodToHe) {
+      window._saveFoodToHe = false;
+      var name = document.getElementById('food-name').value.trim();
+      var cat  = document.getElementById('food-category').value.trim();
+      if (!name) { showToast('הכנס שם מזון'); return; }
+      var foodData = {
+        name: name, category: cat,
+        serving:  parseFloat(document.getElementById('food-serving').value)  || 100,
+        unit:     document.getElementById('food-unit').value || 'g',
+        calories: parseFloat(document.getElementById('food-calories').value) || 0,
+        protein:  parseFloat(document.getElementById('food-protein').value)  || 0,
+        carbs:    parseFloat(document.getElementById('food-carbs').value)    || 0,
+        fat:      parseFloat(document.getElementById('food-fat').value)      || 0,
+        updatedAt: new Date().toISOString()
+      };
+      try {
+        if (_editingHeId) {
+          await window._firebase.setDoc(window._firebase.doc(window._db,'foods_he',_editingHeId), foodData, {merge:true});
+        } else {
+          await window._firebase.addDoc(window._firebase.collection(window._db,'foods_he'), foodData);
+        }
+        _editingHeId = null;
+        showToast('נשמר!');
+        closeAllModals();
+        await loadAdminHeCollection('foods');
+        renderAdminHeList('foods');
+      } catch(e) { showToast('שגיאה: ' + e.message); }
+      return;
+    }
+    if (origSaveFood) origSaveFood.apply(this, arguments);
+  };
+}
+
+// Wire bulk import for Hebrew collections
+var _sectionRequiredHe = {
+  'menus-he':    ['name', 'meals'],
+  'programs-he': ['name', 'trainingDays'],
+  'recipes-he':  ['name', 'category', 'calories', 'ingredients', 'instructions'],
+  'foods-he':    ['name', 'category', 'calories']
+};
+
+var _heColMap = {
+  'menus-he': 'menus_he', 'programs-he': 'programs_he',
+  'recipes-he': 'recipes_he', 'foods-he': 'foods_he'
+};
+
+
+/* ══════════════════════════════════════════════════════════
+   BULK IMPORT — separate per section, no conflicts
+══════════════════════════════════════════════════════════ */
+
+/* ── File loader (shared) ── */
+function loadBulkFile(input, textareaId) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var ta = document.getElementById(textareaId);
+    if (ta) ta.value = e.target.result;
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+/* ── Template download (shared) ── */
+var _bulkTemplates = {
+  foods: [
+    { "name": "Chicken Breast", "category": "Proteins", "serving": 100, "unit": "g", "calories": 165, "protein": 31, "carbs": 0, "fat": 4 },
+    { "name": "Greek Yogurt 0%", "category": "Dairy", "serving": 100, "unit": "g", "calories": 59, "protein": 10, "carbs": 4, "fat": 0 },
+    { "name": "Brown Rice (cooked)", "category": "Carbohydrates", "serving": 100, "unit": "g", "calories": 130, "protein": 3, "carbs": 28, "fat": 1 },
+    { "name": "Almonds", "category": "Fats & Nuts", "serving": 100, "unit": "g", "calories": 579, "protein": 21, "carbs": 22, "fat": 50 },
+    { "name": "Banana", "category": "Fruits", "serving": 100, "unit": "g", "calories": 89, "protein": 1, "carbs": 23, "fat": 0 }
+  ],
+  menus: [{"name":"High Protein Cut","goal":"cut","desc":"A balanced cut menu high in protein.","isPublic":true,"meals":[{"name":"Breakfast","items":[{"name":"Oats","qty":80,"unit":"g","calories":300,"protein":10,"carbs":55,"fat":5},{"name":"Whey Protein","qty":30,"unit":"g","calories":120,"protein":24,"carbs":3,"fat":2}]},{"name":"Lunch","items":[{"name":"Chicken Breast","qty":200,"unit":"g","calories":220,"protein":46,"carbs":0,"fat":5},{"name":"Brown Rice","qty":100,"unit":"g","calories":130,"protein":3,"carbs":28,"fat":1}]},{"name":"Dinner","items":[{"name":"Salmon","qty":180,"unit":"g","calories":350,"protein":40,"carbs":0,"fat":20},{"name":"Broccoli","qty":200,"unit":"g","calories":68,"protein":6,"carbs":13,"fat":1}]}]}],
+  programs: [{"name":"12-Week Hypertrophy","goal":"hypertrophy","level":"Intermediate","weeks":12,"days":4,"desc":"Science-based hypertrophy program.","notes":"Increase weight when you hit top of rep range.","isPublic":true,"trainingDays":[{"day":"Day 1 - Chest & Shoulders","exercises":[{"title":"Incline Dumbbell Press","muscle":"chest","sets":"4","reps":"10","rest":"90","notes":"Slow eccentric"},{"title":"Overhead Press","muscle":"shoulders","sets":"4","reps":"8","rest":"120","notes":""}]},{"day":"Day 2 - Back & Biceps","exercises":[{"title":"Barbell Row","muscle":"back","sets":"4","reps":"10","rest":"90","notes":""},{"title":"Pull-Up","muscle":"back","sets":"3","reps":"8","rest":"90","notes":""}]}]}],
+  recipes: [{"name":"Protein Pancakes","category":"breakfast","prepTime":15,"calories":380,"protein":35,"carbs":40,"fat":8,"ingredients":"2 scoops whey protein\n2 eggs\n1 banana\n50ml almond milk","instructions":"Blend all ingredients. Cook on medium heat 3 min each side.","tips":"Add blueberries for extra antioxidants.","photoURL":"","videoURL":"","isPublic":true}],
+  research: [{"title":"Effect of Protein Timing on Muscle Synthesis","authors":"Phillips SM, Van Loon LJC","year":2023,"journal":"Journal of Sports Science","category":"Nutrition","summary":"Consuming protein within 30-60 minutes post-workout significantly increases muscle protein synthesis.","url":"https://pubmed.ncbi.nlm.nih.gov/","application":"Aim for 30-40g protein within 30 minutes after training."}]
+};
+
+function downloadBulkTemplate(type) {
+  var template = _bulkTemplates[type] || [];
+  var blob = new Blob([JSON.stringify(template, null, 2)], { type: 'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'repcast-' + type + '-template.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ── Validate section JSON ── */
+var _sectionRequired = {
+  foods:           ['name', 'category', 'calories'],
+  menus:           ['name', 'meals'],
+  programs:        ['name', 'trainingDays'],
+  recipes:         ['name', 'category', 'calories', 'ingredients', 'instructions'],
+  research:        ['title', 'summary', 'category'],
+  'menus-he':      ['name', 'meals'],
+  'programs-he':   ['name', 'trainingDays'],
+  'recipes-he':    ['name', 'category', 'calories', 'ingredients', 'instructions'],
+  'foods-he':      ['name', 'category', 'calories']
+};
+
+function validateSectionBulk(type) {
+  var ta     = document.getElementById(type + '-textarea');
+  var result = document.getElementById('bulk-' + type + '-result');
+  if (!ta || !result) return null;
+
+  var raw = ta.value.trim();
+  if (!raw) { showToast('Paste some JSON first'); return null; }
+
+  try {
+    var data = JSON.parse(raw);
+    if (!Array.isArray(data)) throw new Error('Must be a JSON array: [ ... ]');
+    if (!data.length)         throw new Error('Array is empty');
+
+    var req = _sectionRequired[type] || [];
+    data.forEach(function(item, i) {
+      req.forEach(function(field) {
+        if (item[field] === undefined || item[field] === null || item[field] === '')
+          throw new Error('Item ' + (i+1) + ' is missing: "' + field + '"');
+      });
+    });
+
+    result.style.display = 'block';
+    result.innerHTML = '<div style="padding:10px 14px;background:rgba(126,232,162,0.08);border:1px solid rgba(126,232,162,0.3);border-radius:8px;font-size:13px;font-weight:600;color:var(--accent)">' +
+      '<i class="ti ti-circle-check"></i> Valid JSON — ' + data.length + ' ' + type + ' ready to import</div>';
+    return data;
+  } catch(e) {
+    result.style.display = 'block';
+    result.innerHTML = '<div style="padding:10px 14px;background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.3);border-radius:8px;font-size:13px;color:var(--danger)">' +
+      '<i class="ti ti-x"></i> ' + e.message + '</div>';
+    return null;
+  }
+}
+
+/* ── Run import for a section ── */
+async function runSectionBulkImport(type) {
+  var data = validateSectionBulk(type);
+  if (!data) return;
+
+  // For Hebrew types (e.g. 'menus-he'), use 'menus_he' collection
+  var colName = type.endsWith('-he') ? type.replace('-he','_he') : type;
+  var col = colName;
+  var prog = document.getElementById('bulk-' + type + '-progress');
+  var progText = document.getElementById('bulk-' + type + '-prog-text');
+  var progBar  = document.getElementById('bulk-' + type + '-prog-bar');
+  var result   = document.getElementById('bulk-' + type + '-result');
+
+  if (prog) prog.style.display = 'block';
+
+  var total = data.length, success = 0, errors = [];
+
+  for (var i = 0; i < data.length; i++) {
+    try {
+      var item = Object.assign({}, data[i], {
+        createdBy:   state.user ? state.user.uid    : null,
+        trainerName: state.user ? state.user.fullName : null,
+        isPublic:    data[i].isPublic !== false,
+        updatedAt:   new Date().toISOString(),
+        importedAt:  new Date().toISOString()
+      });
+      await window._firebase.addDoc(window._firebase.collection(window._db, col), item);
+      success++;
+    } catch(e) {
+      errors.push('Item ' + (i+1) + ': ' + (e.code || e.message));
+    }
+    var pct = Math.round(((i+1)/total)*100);
+    if (progText) progText.textContent = (i+1) + ' / ' + total;
+    if (progBar)  progBar.style.width  = pct + '%';
+  }
+
+  // Refresh — use original load functions which also re-render
+  await reloadAfterBulkImport(type);
+
+  if (errors.length === 0) {
+    if (result) result.innerHTML = '<div style="padding:10px 14px;background:rgba(126,232,162,0.08);border:1px solid rgba(126,232,162,0.3);border-radius:8px;font-size:13px;font-weight:600;color:var(--accent)">' +
+      '<i class="ti ti-circle-check"></i> ✓ Imported ' + success + ' ' + type + ' successfully!</div>';
+    showToast('✓ ' + success + ' ' + type + ' imported!');
+    setTimeout(function(){ closeAllModals(); }, 1800);
+  } else {
+    if (result) result.innerHTML = '<div style="padding:10px 14px;background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.3);border-radius:8px;font-size:13px;color:var(--danger)">' +
+      success + ' imported. ' + errors.length + ' failed: ' + errors.join('; ') + '</div>';
+  }
+  if (prog) prog.style.display = 'none';
+}
+
+/* ── Loaders for bulk import (reload + re-render) ── */
+async function reloadAfterBulkImport(type) {
+  if (type === 'foods')        { await loadFoods();    }
+  if (type === 'menus')        { await loadMenus();    }
+  if (type === 'programs')     { await loadPrograms(); }
+  if (type === 'recipes')      { await loadRecipes();  }
+  if (type === 'research')     { await loadResearch(); }
+  // Hebrew collections — reload and re-render Hebrew list
+  if (type.endsWith('-he')) {
+    var heType = type.replace('-he','');
+    await loadAdminHeCollection(heType);
+    renderAdminHeList(heType);
+  }
+}
+
+
+/* ── Forgot Password ────────────────────────────────────── */
+function showForgotPassword() {
+  var emailInput = document.getElementById('forgot-email');
+  var loginEmail = document.getElementById('login-email') || document.getElementById('auth-email');
+  // Pre-fill with whatever they typed in the email field
+  if (emailInput && loginEmail && loginEmail.value) {
+    emailInput.value = loginEmail.value;
+  }
+  var successEl = document.getElementById('forgot-success');
+  if (successEl) successEl.style.display = 'none';
+  openModal('forgot-password');
+}
+
+async function sendPasswordReset() {
+  var emailInput = document.getElementById('forgot-email');
+  var email = emailInput ? emailInput.value.trim() : '';
+  if (!email) {
+    showToast('Please enter your email address');
+    if (emailInput) emailInput.focus();
+    return;
+  }
+  if (!email.includes('@')) {
+    showToast('Please enter a valid email address');
+    return;
+  }
+
+  var errEl = document.getElementById('forgot-error');
+  var successEl = document.getElementById('forgot-success');
+  var sendBtn = document.querySelector('#modal-forgot-password .btn-primary');
+  if (errEl) errEl.style.display = 'none';
+  if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = 'Checking...'; }
+
+  try {
+    // Check if the email is registered at all
+    var methods = await window._firebase.fetchSignInMethodsForEmail(window._auth, email);
+
+    if (!methods || methods.length === 0) {
+      // Not registered
+      if (errEl) {
+        errEl.style.display = 'block';
+        errEl.innerHTML = '<i class="ti ti-user-x"></i> No account found with this email. Please register first.';
+      }
+      return;
+    }
+
+    // Check if they signed up with Google (not password)
+    if (methods.includes('google.com') && !methods.includes('password')) {
+      if (errEl) {
+        errEl.style.display = 'block';
+        errEl.innerHTML = '<i class="ti ti-brand-google"></i> This account uses Google sign-in. ' +
+          'Use the "Continue with Google" button to log in — no password needed.';
+      }
+      return;
+    }
+
+    // All good — send reset email
+    await window._firebase.sendPasswordResetEmail(window._auth, email);
+    if (successEl) successEl.style.display = 'block';
+    var footer = document.querySelector('#modal-forgot-password .modal-footer');
+    if (footer) footer.style.display = 'none';
+    showToast('Reset link sent to ' + email);
+
+  } catch(e) {
+    var msg = e.code === 'auth/invalid-email'     ? 'Please enter a valid email address.' :
+              e.code === 'auth/too-many-requests'  ? 'Too many attempts. Please try again later.' :
+              'Something went wrong. Please try again.';
+    if (errEl) { errEl.style.display = 'block'; errEl.textContent = msg; }
+    else showToast(msg);
+  } finally {
+    if (sendBtn) { sendBtn.disabled = false; sendBtn.innerHTML = '<i class="ti ti-send"></i> Send Reset Link'; }
+  }
+}
+
+function openInBrowser(url) {
+  if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Browser) {
+    window.Capacitor.Plugins.Browser.open({ url: url });
+  } else {
+    window.open(url, '_blank');
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   CLIENT SYSTEM
+══════════════════════════════════════════════════════════ */
+var clientsList = [];
+
+/* ── Boot client portal (when logged in user has tier:'client') ── */
+async function bootClientPortal(user, profile) {
+  state.user = {
+    uid:           user.uid,
+    email:         user.email,
+    fullName:      profile.fullName     || profile.name || 'Client',
+    tier:          'client',
+    linkedTrainer: profile.linkedTrainer || null,
+  };
+  showScreen('client-portal');
+  loadClientPortal(profile.linkedTrainer, user.uid);
+}
+
+async function loadClientPortal(trainerUid, clientUid) {
+  if (!window._firebase || !window._db) return;
+  try {
+    var snap = await window._firebase.getDoc(
+      window._firebase.doc(window._db, 'clientProfiles', clientUid)
+    );
+    var data = snap.exists() ? snap.data() : {};
+
+    menus     = data.assignedMenus    || [];
+    programs  = data.assignedPrograms || [];
+    recipes   = data.assignedRecipes  || [];
+    window._clientAssignedPrograms = data.assignedPrograms || [];
+
+    // Enrich routines — fetch full data from routines collection if exercises missing
+    var rawRoutines = data.assignedRoutines || [];
+    var enriched = [];
+    for (var ri = 0; ri < rawRoutines.length; ri++) {
+      var r = rawRoutines[ri];
+      if (r.exercises && r.exercises.length > 0) {
+        enriched.push(r); // already has exercises
+      } else if (r.shareToken || r.id) {
+        // Fetch from Firestore
+        try {
+          var rSnap = await window._firebase.getDoc(
+            window._firebase.doc(window._db, 'routines', r.shareToken || r.id)
+          );
+          if (rSnap.exists()) {
+            enriched.push(Object.assign({}, r, rSnap.data()));
+          } else {
+            enriched.push(r);
+          }
+        } catch(e) { enriched.push(r); }
+      } else {
+        enriched.push(r);
+      }
+    }
+    data.assignedRoutines = enriched;
+
+    renderClientPortal(data);
+  } catch(e) {
+    console.warn('loadClientPortal error:', e.code);
+    renderClientPortal({});
+  }
+}
+
+function renderClientPortal(data) {
+  // Render each section of the client portal
+  var name = state.user.fullName;
+  var el = document.getElementById('client-portal-name');
+  if (el) el.textContent = 'Welcome, ' + name.split(' ')[0] + '!';
+
+  renderClientSection('client-routines-body',  data.assignedRoutines  || [], 'routines');
+  renderClientSection('client-menu-body',       data.assignedMenus     || [], 'menus');
+  renderClientSection('client-program-body',    data.assignedPrograms  || [], 'programs');
+  renderClientSection('client-recipes-body',    data.assignedRecipes   || [], 'recipes');
+
+  // BMR stats — full explained breakdown for client
+  var bmrEl = document.getElementById('client-bmr-stats');
+  if (bmrEl) {
+    if (data.bmrData) {
+      var b = data.bmrData;
+      var actLabel = b.activityLabel || 'Moderately Active';
+      var goalLabel = b.goal === 'cut' ? 'Weight Loss' : b.goal === 'bulk' ? 'Muscle Gain' : 'Maintenance';
+      var goalIcon  = b.goal === 'cut' ? 'ti-trending-down' : b.goal === 'bulk' ? 'ti-trending-up' : 'ti-minus';
+      var goalColor = b.goal === 'cut' ? '#F472B6' : b.goal === 'bulk' ? '#7EE8A2' : '#60A5FA';
+
+      bmrEl.innerHTML =
+        '<div class="client-bmr-card">' +
+
+          // Header
+          '<div class="client-bmr-header">' +
+            '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">' +
+              '<h3 style="margin:0;font-size:16px">Your Daily Nutrition Plan</h3>' +
+              '<div style="display:flex;align-items:center;gap:6px;background:' + goalColor + '15;padding:5px 10px;border-radius:20px;border:1px solid ' + goalColor + '40">' +
+                '<i class="ti ' + goalIcon + '" style="color:' + goalColor + '"></i>' +
+                '<span style="font-size:13px;font-weight:700;color:' + goalColor + '">' + goalLabel + '</span>' +
+              '</div>' +
+            '</div>' +
+            '<p style="font-size:13px;color:var(--muted);margin:8px 0 0">' +
+              '<i class="ti ti-run" style="color:var(--accent)"></i>&nbsp;' + actLabel +
+            '</p>' +
+          '</div>' +
+
+          // Explained stats row
+          '<div class="client-bmr-stats-row">' +
+
+            '<div class="client-bmr-stat">' +
+              '<div class="client-bmr-stat-val">' + b.bmr + '</div>' +
+              '<div class="client-bmr-stat-label">BMR</div>' +
+              '<div class="client-bmr-stat-explain">Calories your body burns at rest — just to keep your heart beating, breathing, and organs working. This is your baseline even if you stayed in bed all day.</div>' +
+            '</div>' +
+
+            '<div class="client-bmr-stat">' +
+              '<div class="client-bmr-stat-val">' + b.tdee + '</div>' +
+              '<div class="client-bmr-stat-label">TDEE</div>' +
+              '<div class="client-bmr-stat-explain">Total Daily Energy Expenditure — your BMR (' + b.bmr + ') multiplied by your activity level (' + actLabel + '). This is what you actually burn in a full day including exercise and movement.</div>' +
+            '</div>' +
+
+            '<div class="client-bmr-stat accent">' +
+              '<div class="client-bmr-stat-val">' + b.target + '</div>' +
+              '<div class="client-bmr-stat-label">Daily Target</div>' +
+              '<div class="client-bmr-stat-explain">Your TDEE (' + b.tdee + ') adjusted for your goal (' + goalLabel + '). ' +
+                (b.goal === 'cut' ? 'Eating ' + b.target + ' kcal creates a calorie deficit to help you lose fat while preserving muscle.' :
+                 b.goal === 'bulk' ? 'Eating ' + b.target + ' kcal gives your body the extra energy needed to build muscle.' :
+                 'Eating ' + b.target + ' kcal keeps your weight stable while supporting your training.') +
+              '</div>' +
+            '</div>' +
+
+          '</div>' +
+
+          // Macro targets
+          '<div class="client-bmr-macros">' +
+            '<h4 style="margin-bottom:12px;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">Daily Macro Targets</h4>' +
+            '<div class="client-macro-row">' +
+              '<div class="client-macro-icon" style="background:rgba(96,165,250,0.12);color:#60A5FA"><i class="ti ti-fish"></i></div>' +
+              '<div class="client-macro-info">' +
+                '<div class="client-macro-name">Protein <strong>' + b.proteinG + 'g</strong></div>' +
+                '<div class="client-macro-explain">Builds and repairs muscle. Aim for ' + b.proteinG + 'g (' + Math.round(b.proteinG*4) + ' kcal) spread across your meals — prioritise after training.</div>' +
+              '</div>' +
+              '<div class="macro-bar-track" style="width:60px"><div class="macro-bar protein" style="width:100%"></div></div>' +
+            '</div>' +
+            '<div class="client-macro-row">' +
+              '<div class="client-macro-icon" style="background:rgba(251,191,36,0.12);color:#FBBF24"><i class="ti ti-grain"></i></div>' +
+              '<div class="client-macro-info">' +
+                '<div class="client-macro-name">Carbohydrates <strong>' + b.carbsG + 'g</strong></div>' +
+                '<div class="client-macro-explain">Your main energy source for training. ' + b.carbsG + 'g (' + Math.round(b.carbsG*4) + ' kcal) — eat more on training days, less on rest days.</div>' +
+              '</div>' +
+              '<div class="macro-bar-track" style="width:60px"><div class="macro-bar carbs" style="width:100%"></div></div>' +
+            '</div>' +
+            '<div class="client-macro-row">' +
+              '<div class="client-macro-icon" style="background:rgba(244,114,182,0.12);color:#F472B6"><i class="ti ti-droplet"></i></div>' +
+              '<div class="client-macro-info">' +
+                '<div class="client-macro-name">Fat <strong>' + b.fatG + 'g</strong></div>' +
+                '<div class="client-macro-explain">Essential for hormones and vitamin absorption. ' + b.fatG + 'g (' + Math.round(b.fatG*9) + ' kcal) — focus on healthy sources like olive oil, nuts, and avocado.</div>' +
+              '</div>' +
+              '<div class="macro-bar-track" style="width:60px"><div class="macro-bar fat" style="width:100%"></div></div>' +
+            '</div>' +
+          '</div>' +
+
+        '</div>';
+    } else {
+      bmrEl.innerHTML =
+        '<div class="client-bmr-empty">' +
+          '<i class="ti ti-calculator" style="font-size:32px;color:var(--muted2);margin-bottom:12px"></i>' +
+          '<p style="color:var(--muted)">Your trainer has not set your nutrition targets yet.</p>' +
+        '</div>';
+    }
+  }
+}
+
+function renderClientSection(elId, items, type) {
+  var el = document.getElementById(elId);
+  if (!el || !items.length) {
+    if (el) el.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:12px 0">Nothing assigned yet.</p>';
+    return;
+  }
+  if (type === 'menus') {
+    el.innerHTML = items.map(function(m) {
+      var t = calcMenuTotals(m);
+      return '<div class="client-item-card" onclick="openMenuDetail(\'' + m.id + '\' )">' +
+        '<div class="client-item-icon"><i class="ti ti-salad"></i></div>' +
+        '<div><div class="client-item-name">' + m.name + '</div>' +
+        '<div class="client-item-meta">' + t.calories + ' kcal · P:' + t.protein + 'g C:' + t.carbs + 'g F:' + t.fat + 'g</div></div>' +
+      '</div>';
+    }).join('');
+  } else if (type === 'programs') {
+    el.innerHTML = items.map(function(p) {
+      return '<div class="client-item-card" onclick="openProgramDetail(\'' + p.id + '\')">' +
+        '<div class="client-item-icon"><i class="ti ti-calendar"></i></div>' +
+        '<div><div class="client-item-name">' + p.name + '</div>' +
+        '<div class="client-item-meta">' + (p.weeks||'?') + ' weeks · ' + (p.goal||'') + ' · ' + (p.level||'') + '</div></div>' +
+      '</div>';
+    }).join('');
+  } else if (type === 'recipes') {
+    el.innerHTML = items.map(function(r) {
+      return '<div class="client-item-card" onclick="openRecipeDetail(\'' + r.id + '\')">' +
+        (r.photoURL ? '<img src="' + r.photoURL + '" style="width:48px;height:48px;object-fit:cover;border-radius:8px;flex-shrink:0">' :
+          '<div class="client-item-icon"><i class="ti ti-chef-hat"></i></div>') +
+        '<div><div class="client-item-name">' + r.name + '</div>' +
+        '<div class="client-item-meta">' + (r.calories||0) + ' kcal · ' + (r.prepTime||'?') + ' min</div></div>' +
+      '</div>';
+    }).join('');
+  } else if (type === 'routines') {
+    el.innerHTML = items.map(function(r, idx) {
+      var exCount = (r.exercises||[]).length;
+      return '<div class="client-item-card" onclick="toggleClientRoutine(' + idx + ',this)">' +
+        '<div class="client-item-icon"><i class="ti ti-list-check"></i></div>' +
+        '<div style="flex:1">' +
+          '<div class="client-item-name">' + (r.name || 'Routine') + '</div>' +
+          '<div class="client-item-meta">' + exCount + ' exercise' + (exCount!==1?'s':'') + (r.trainerName?' · '+r.trainerName:'') + '</div>' +
+        '</div>' +
+        '<i class="ti ti-chevron-down" style="color:var(--muted);font-size:14px"></i>' +
+      '</div>' +
+      '<div id="client-routine-' + idx + '" style="display:none;padding:8px 14px 14px;border-bottom:1px solid var(--border)">' +
+        (r.exercises||[]).map(function(ex) {
+          var hasV = !!(ex.videoURL);
+          return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)"' +
+            (hasV ? ' onclick="event.stopPropagation();openVideoPopup(decodeURIComponent(\'' + encodeURIComponent(ex.videoURL) + '\'))" style="cursor:pointer"' : '') + '>' +
+            '<div style="width:36px;height:36px;border-radius:8px;background:' + (hasV?'rgba(126,232,162,0.1)':'var(--surface3)') + ';display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+              '<i class="ti ' + (hasV?'ti-player-play':'ti-barbell') + '" style="color:' + (hasV?'var(--accent)':'var(--muted2)') + ';font-size:14px"></i>' +
+            '</div>' +
+            '<div style="flex:1">' +
+              '<div style="font-size:13px;font-weight:600">' + (ex.title||ex.name||'Exercise') + '</div>' +
+              '<div style="font-size:11px;color:var(--muted)">' +
+                [ex.sets?ex.sets+' sets':'', ex.reps?ex.reps+' reps':'', ex.muscle||''].filter(Boolean).join(' · ') +
+              '</div>' +
+            '</div>' +
+            (hasV ? '<i class="ti ti-player-play" style="color:var(--accent);font-size:12px"></i>' : '') +
+          '</div>';
+        }).join('') +
+      '</div>';
+    }).join('');
+  }
+} // end of renderClientSection
+
+/* ── Global: toggle client routine exercises panel ──────── */
+function toggleClientRoutine(idx, headerRow) {
+  var panel = document.getElementById('client-routine-' + idx);
+  var icon  = document.getElementById('routine-icon-' + idx);
+  if (!panel) return;
+  if (panel.style.display === 'none') {
+    panel.style.display = 'block';
+    if (icon) { icon.classList.remove('ti-chevron-down'); icon.classList.add('ti-chevron-up'); }
+  } else {
+    panel.style.display = 'none';
+    if (icon) { icon.classList.remove('ti-chevron-up'); icon.classList.add('ti-chevron-down'); }
+  }
+}
+
+/* ── Trainer: Load clients ──────────────────────────── */
+async function loadClients() {
+  if (!state.user || !window._firebase || !window._db) return;
+  try {
+    var snap = await window._firebase.getDocs(
+      window._firebase.collection(window._db, 'clientProfiles')
+    );
+    clientsList = [];
+    snap.forEach(function(d){
+      var data = d.data();
+      if (data.linkedTrainer === state.user.uid) {
+        clientsList.push(Object.assign({ id: d.id }, data));
+      }
+    });
+    renderClientsList();
+  } catch(e) { console.warn('loadClients:', e.code); }
+}
+
+function renderClientsList() {
+  var el = document.getElementById('clients-list-body');
+  if (!el) return;
+  var cnt = document.getElementById('clients-count');
+  if (cnt) cnt.textContent = clientsList.length + ' clients';
+
+  if (!clientsList.length) {
+    el.innerHTML =
+      '<div style="text-align:center;padding:48px 20px">' +
+        '<div class="empty-icon"><i class="ti ti-users"></i></div>' +
+        '<h3>No clients yet</h3>' +
+        '<p style="color:var(--muted);margin-bottom:20px">Add your first client to get started.</p>' +
+        '<button class="btn btn-primary" onclick="openAddClientModal()"><i class="ti ti-user-plus"></i> Add Client</button>' +
+      '</div>';
+    return;
+  }
+
+  el.innerHTML = clientsList.map(function(c) {
+    var goalColors = { cut:'#F472B6', maintain:'#60A5FA', bulk:'#7EE8A2' };
+    var goalColor  = goalColors[c.goal] || 'var(--accent)';
+    var assigned   = ((c.assignedMenus||[]).length + (c.assignedPrograms||[]).length + (c.assignedRoutines||[]).length + (c.assignedRecipes||[]).length);
+    return '<div class="client-row" onclick="openClientProfile(\'' + c.id + '\')">' +
+      '<div class="client-avatar">' + ((c.name||'?')[0]).toUpperCase() + '</div>' +
+      '<div class="client-info">' +
+        '<div class="client-name">' + c.name + '</div>' +
+        '<div class="client-meta">' + (c.email||'') + (c.goal ? ' · <span style="color:' + goalColor + '">' + c.goal + '</span>' : '') + '</div>' +
+      '</div>' +
+      '<div class="client-stats">' +
+        '<span class="tag">' + assigned + ' items assigned</span>' +
+      '</div>' +
+      '<div class="client-actions">' +
+        '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openClientProfile(\'' + c.id + '\')"><i class="ti ti-eye"></i> View</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+/* ── Add client modal ───────────────────────────────── */
+function openAddClientModal() {
+  ['client-name','client-email','client-phone','client-age','client-weight','client-height','client-notes'].forEach(function(x){
+    var el = document.getElementById(x);
+    if (el) el.value = '';
+  });
+  var g = document.getElementById('client-goal');
+  if (g) g.value = 'maintain';
+  openModal('add-client');
+}
+
+async function saveNewClient() {
+  var name   = (document.getElementById('client-name')   ||{}).value || '';
+  var email  = (document.getElementById('client-email')  ||{}).value || '';
+  var phone  = (document.getElementById('client-phone')  ||{}).value || '';
+  var goal   = (document.getElementById('client-goal')   ||{}).value || 'maintain';
+  var gender       = (document.getElementById('client-gender')        ||{}).value || 'male';
+  var age          = parseFloat((document.getElementById('client-age')         ||{}).value) || 0;
+  var weight       = parseFloat((document.getElementById('client-weight')      ||{}).value) || 0;
+  var height       = parseFloat((document.getElementById('client-height')      ||{}).value) || 0;
+  var activity     = parseFloat((document.getElementById('client-activity')    ||{}).value) || 1.55;
+  var cutFactor    = parseFloat((document.getElementById('client-cut-intensity')||{}).value) || 0.85;
+  var bulkFactor   = parseFloat((document.getElementById('client-bulk-intensity')||{}).value) || 1.10;
+  var notes        = (document.getElementById('client-notes') ||{}).value || '';
+
+  if (!name.trim()) { showToast('Please enter the client name.'); return; }
+  if (!email.trim()) { showToast('Email is required to create a client login.'); return; }
+
+  // Calculate BMR with activity level
+  var bmrData = null;
+  if (age && weight && height) {
+    var bmr    = (10 * weight) + (6.25 * height) - (5 * age) + (gender === 'male' ? 5 : -161);
+    var tdee   = Math.round(bmr * activity);
+    var factor = goal === 'cut' ? cutFactor : goal === 'bulk' ? bulkFactor : 1;
+    var target = Math.round(tdee * factor);
+    var proteinG = Math.round(weight * (goal==='cut'?2.2:goal==='bulk'?2.0:1.8));
+    var fatG     = Math.round(weight * 0.9);
+    var carbsG   = Math.max(50, Math.round((target - proteinG*4 - fatG*9)/4));
+    var activityLabels = {
+      '1.2':'Sedentary','1.375':'Lightly Active','1.55':'Moderately Active',
+      '1.725':'Very Active','1.9':'Athlete'
+    };
+    bmrData = {
+      bmr: Math.round(bmr), tdee, target, proteinG, carbsG, fatG,
+      goal, gender, activity, activityLabel: activityLabels[String(activity)] || 'Moderately Active',
+      cutFactor, bulkFactor
+    };
+  }
+
+  var btn = document.querySelector('#modal-add-client .btn-primary');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Creating...'; }
+
+  try {
+    // Call Cloud Function — it creates Firebase Auth + Firestore
+    var fn       = window._firebase.httpsCallable(window._functions, 'createClientAccount');
+    var result   = await fn({ name, email, phone, goal, gender, age, weight, height, notes, activity, bmrData });
+    var data     = result.data;
+
+    // Add to local list
+    var clientData = {
+      id:               data.clientUid,
+      name, email, phone, goal, gender, age, weight, height, notes, bmrData,
+      linkedTrainer:    state.user.uid,
+      trainerName:      state.user.fullName,
+      assignedMenus:    [],
+      assignedPrograms: [],
+      assignedRoutines: [],
+      assignedRecipes:  [],
+      tempPassword:     data.tempPassword,
+    };
+    clientsList.push(clientData);
+    renderClientsList();
+    closeAllModals();
+
+    // Refresh all client dropdowns immediately so trainer can assign right away
+    var opts2 = '<option value="">— Choose client —</option>';
+    clientsList.forEach(function(c) {
+      opts2 += '<option value="' + c.id + '">' + (c.name || c.email || c.id) + '</option>';
+    });
+    document.querySelectorAll('[id*="client-select"], [id*="checkout-client"]').forEach(function(sel){
+      if (sel) sel.innerHTML = opts2;
+    });
+
+    // Show credentials to trainer
+    showClientCredentials(name, email);
+
+  } catch(e) {
+    console.error('saveNewClient error:', e);
+    var msg = (e.message || e.code || 'Unknown error');
+    if (msg.includes('already-exists')) msg = 'A user with this email already exists.';
+    showToast('Failed: ' + msg);
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-user-plus"></i> Add Client'; }
+  }
+}
+
+var _lastCredsText = '';
+function copyClientCreds() {
+  copyToClipboard(_lastCredsText);
+  var btn = document.querySelector('#modal-client-creds .btn-primary');
+  if (btn) btn.innerHTML = '<i class="ti ti-check"></i> Copied!';
+}
+
+function closeCredsModal() {
+  var el = document.getElementById('modal-client-creds');
+  if (el) el.remove();
+}
+
+function showClientCredentials(name, email) {
+  var existing = document.getElementById('modal-client-creds');
+  if (existing) existing.remove();
+  // Find the newly created client
+  var newClient = clientsList.find(function(c){ return c.email === email; });
+  var newClientId = newClient ? newClient.id : null;
+
+  _lastCredsText = 'Site: repcast.co.il\nEmail: ' + email + '\n(Client sets password via email link)';
+
+  var modal = document.createElement('div');
+  modal.id = 'modal-client-creds';
+  modal.className = 'modal';
+  modal.style.cssText = 'max-width:440px';
+  modal.innerHTML =
+    '<div class="modal-header">' +
+      '<h3><i class="ti ti-circle-check" style="color:var(--accent)"></i> Client Account Created!</h3>' +
+      '<button class="modal-close" onclick="closeCredsModal()"><i class="ti ti-x"></i></button>' +
+    '</div>' +
+    '<div class="modal-body">' +
+      '<div style="text-align:center;padding:8px 0 20px">' +
+        '<div style="width:56px;height:56px;background:rgba(126,232,162,0.12);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px">' +
+          '<i class="ti ti-mail" style="font-size:24px;color:var(--accent)"></i>' +
+        '</div>' +
+        '<p style="font-size:15px;font-weight:600;margin-bottom:6px">' + name + '</p>' +
+        '<p style="color:var(--muted);font-size:14px">A password setup email has been sent to <strong>' + email + '</strong></p>' +
+      '</div>' +
+      '<div class="creds-box">' +
+        '<div class="cred-row"><span class="cred-label">Site</span><span class="cred-val">repcast.co.il</span></div>' +
+        '<div class="cred-row"><span class="cred-label">Email</span><span class="cred-val">' + email + '</span></div>' +
+        '<div class="cred-row"><span class="cred-label">Password</span><span class="cred-val" style="color:var(--muted)">Client sets via email link</span></div>' +
+      '</div>' +
+      '<div class="recipe-tips" style="margin-top:14px">' +
+        '<i class="ti ti-info-circle"></i>' +
+        '<span>Tell your client to check their inbox and click the link to set their password. The email comes from Firebase.</span>' +
+      '</div>' +
+    '</div>' +
+    '<div class="modal-footer">' +
+      '<button class="btn btn-ghost" onclick="closeCredsModal()">Close</button>' +
+      (newClientId ? '<button class="btn btn-ghost" onclick="closeCredsModal();openClientProfile(\'' + newClientId + '\')"><i class="ti ti-user-plus"></i> Assign Content Now</button>' : '') +
+      '<button class="btn btn-primary" onclick="copyClientCreds()"><i class="ti ti-copy"></i> Copy Login Details</button>' +
+    '</div>';
+
+  document.body.appendChild(modal);
+  modal.style.display = 'flex';
+  setTimeout(function(){ modal.classList.add('modal-open'); }, 10);
+}
+
+/* ── Client profile / assignment ───────────────────── */
+function openClientProfile(clientId) {
+  var client = clientsList.find(function(c){ return c.id === clientId; });
+  if (!client) return;
+
+  var el = document.getElementById('client-profile-body');
+  var title = document.getElementById('client-profile-title');
+  if (title) title.innerHTML = '<i class="ti ti-user"></i> ' + client.name;
+
+  // Build BMR summary
+  var bmrHTML = '';
+  if (client.bmrData) {
+    var b = client.bmrData;
+    bmrHTML = '<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;margin-bottom:20px">' +
+      macroChartHTML(b.proteinG, b.carbsG, b.fatG, b.target, 130) +
+      '<div style="flex:1">' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">' +
+          '<h4 style="margin:0">Nutrition Targets</h4>' +
+          '<button class="btn btn-ghost btn-sm" onclick="openEditClientBMR(\'' + clientId + '\')" style="padding:4px 8px;font-size:11px">' +
+            '<i class="ti ti-edit"></i> Edit BMR' +
+          '</button>' +
+        '</div>' +
+        '<p style="font-size:13px;color:var(--muted)">BMR: ' + b.bmr + ' · TDEE: ' + b.tdee + ' · Target: ' + b.target + ' kcal</p>' +
+        '<p style="font-size:12px;color:var(--muted2);margin-top:3px">Goal: ' + (b.goal||'') + (b.activityLabel ? ' · ' + b.activityLabel : '') + '</p>' +
+        (client.notes ? '<div class="recipe-tips" style="margin-top:10px"><i class="ti ti-note"></i> ' + client.notes + '</div>' : '') +
+      '</div>' +
+    '</div>';
+  } else {
+    bmrHTML = '<div style="margin-bottom:16px"><button class="btn btn-ghost btn-sm" onclick="openEditClientBMR(\'' + clientId + '\')">' +
+      '<i class="ti ti-calculator"></i> Set BMR & Nutrition Targets</button></div>';
+  }
+
+  // Assignment sections
+  var sections = [
+    { key:'assignedMenus',    icon:'ti-salad',      label:'Menus',    type:'menus'    },
+    { key:'assignedPrograms', icon:'ti-calendar',   label:'Programs', type:'programs' },
+    { key:'assignedRoutines', icon:'ti-list-check', label:'Routines', type:'routines' },
+    { key:'assignedRecipes',  icon:'ti-chef-hat',   label:'Recipes',  type:'recipes'  },
+  ];
+
+  var sectHTML = sections.map(function(s) {
+    var items = client[s.key] || [];
+    return '<div class="client-assign-section">' +
+      '<div class="client-assign-header">' +
+        '<span><i class="ti ' + s.icon + '"></i> ' + s.label + ' (' + items.length + ')</span>' +
+        '<button class="btn btn-ghost btn-sm" onclick="openAssignModal(\'' + clientId + '\',\'' + s.type + '\')">' +
+          '<i class="ti ti-plus"></i> Assign' +
+        '</button>' +
+      '</div>' +
+      (items.length
+        ? '<div class="client-assigned-list">' + items.map(function(item) {
+            return '<div class="client-assigned-item">' +
+              '<span>' + (item.name||item.title||'Item') + '</span>' +
+              '<button class="admin-action-btn delete" style="padding:3px 8px" onclick="unassignFromClient(\'' + clientId + '\',\'' + s.key + '\',\'' + (item.id||item.shareToken) + '\')"><i class="ti ti-x"></i></button>' +
+            '</div>';
+          }).join('') + '</div>'
+        : '<p style="font-size:12px;color:var(--muted2);padding:8px 0">Nothing assigned yet.</p>'
+      ) +
+    '</div>';
+  }).join('');
+
+  var shareURL = window.location.origin + '?client=' + clientId;
+  if (el) el.innerHTML = bmrHTML + sectHTML +
+    '<div style="margin-top:20px;padding:14px;background:var(--surface2);border-radius:var(--radius);border:1px solid var(--border)">' +
+      '<p style="font-size:13px;color:var(--muted);margin-bottom:8px"><i class="ti ti-link"></i> Client portal link:</p>' +
+      '<div style="display:flex;gap:8px;align-items:center">' +
+        '<code style="flex:1;font-size:12px;color:var(--accent);word-break:break-all">' + shareURL + '</code>' +
+        '<button class="btn btn-ghost btn-sm" onclick="copyToClipboard(\'' + shareURL + '\')"><i class="ti ti-copy"></i> Copy</button>' +
+      '</div>' +
+    '</div>';
+
+  // Add delete button to modal footer
+  var footer = document.querySelector('#modal-client-profile .modal-footer');
+  if (footer) {
+    footer.innerHTML =
+      '<button class="btn btn-ghost" style="color:var(--danger);border-color:rgba(255,107,107,0.3)" onclick="deleteClient(\'' + clientId + '\')">' +
+        '<i class="ti ti-trash"></i> Delete Client' +
+      '</button>' +
+      '<button class="btn btn-ghost" onclick="closeAllModals()">Close</button>';
+  }
+
+  openModal('client-profile');
+}
+
+/* ── Assign content to client ───────────────────────── */
+var _assigningClient = null;
+var _assigningType   = null;
+
+/* ── Assign content to client — with search + filter ──── */
+var _assignPool      = [];
+var _assignAlready   = [];
+var _assignType2     = '';
+
+function openAssignModal(clientId, type) {
+  _assigningClient = clientId;
+  _assigningType   = type;
+  var client = clientsList.find(function(c){ return c.id === clientId; });
+  if (!client) return;
+  _assignAlready = (client[_typeToKey(type)] || []).map(function(x){ return x.id || x.shareToken; });
+
+  _assignPool = [];
+  if (type === 'menus')    _assignPool = menus;
+  if (type === 'programs') _assignPool = programs;
+  if (type === 'recipes')  _assignPool = recipes;
+  if (type === 'routines') _assignPool = sentRoutines || [];
+  _assignType2 = type;
+
+  // Set title
+  var title = document.getElementById('assign-modal-title');
+  if (title) title.textContent = 'Assign ' + type.charAt(0).toUpperCase() + type.slice(1) + ' to ' + client.name;
+
+  // Reset search
+  var searchEl = document.getElementById('assign-search-input');
+  if (searchEl) searchEl.value = '';
+
+  // Build category filter pills
+  var pillsEl = document.getElementById('assign-filter-pills');
+  if (pillsEl) {
+    var pills = [];
+    if (type === 'menus' || type === 'programs') {
+      pills = ['All', 'Cut', 'Bulk', 'Maintain'];
+    } else if (type === 'recipes') {
+      var cats = ['All'].concat([...new Set(_assignPool.map(function(i){ return i.category||'Other'; }))].sort());
+      pills = cats;
+    }
+    if (pills.length > 1) {
+      pillsEl.style.display = 'flex';
+      pillsEl.innerHTML = pills.map(function(p, i){
+        return '<button class="assign-pill' + (i===0?' active':'') + '" onclick="setAssignFilter(this,\'' + p + '\')">' + p + '</button>';
+      }).join('');
+    } else {
+      pillsEl.style.display = 'none';
+      pillsEl.innerHTML = '';
+    }
+  }
+
+  renderAssignList('', 'All');
+  // Hide client profile modal while assigning, keep backdrop
+  var profileModal = document.getElementById('modal-client-profile');
+  if (profileModal) profileModal.classList.remove('open');
+  var pickModal = document.getElementById('modal-assign-content');
+  if (pickModal) pickModal.classList.add('open');
+  document.getElementById('modal-backdrop').classList.add('open');
+}
+
+function setAssignFilter(btn, filter) {
+  document.querySelectorAll('#assign-filter-pills .assign-pill').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  var q = document.getElementById('assign-search-input');
+  renderAssignList(q ? q.value : '', filter);
+}
+
+function filterAssignSearch(q) {
+  var activeBtn = document.querySelector('#assign-filter-pills .assign-pill.active');
+  var filter = activeBtn ? activeBtn.textContent : 'All';
+  renderAssignList(q, filter);
+}
+
+function renderAssignList(query, filter) {
+  var body = document.getElementById('assign-modal-body');
+  if (!body) return;
+
+  query  = (query  || '').toLowerCase().trim();
+  filter = (filter || 'All');
+
+  var filtered = _assignPool.filter(function(item) {
+    var label = (item.name || item.title || '').toLowerCase();
+    var matchQ = !query || label.includes(query);
+    var matchF = filter === 'All' || filter === '' ||
+      (item.goal     || '').toLowerCase() === filter.toLowerCase() ||
+      (item.category || '').toLowerCase() === filter.toLowerCase();
+    return matchQ && matchF;
+  });
+
+  if (!filtered.length) {
+    body.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted)">' +
+      '<i class="ti ti-search" style="font-size:28px;opacity:0.3;display:block;margin-bottom:8px"></i>' +
+      (_assignPool.length ? 'Nothing matches your search.' : 'No ' + _assignType2 + ' available yet.') +
+    '</div>';
+    return;
+  }
+
+  body.innerHTML = filtered.map(function(item) {
+    var id       = item.id || item.shareToken;
+    var assigned = _assignAlready.includes(id);
+    var label    = item.name || item.title || 'Item';
+    var meta     = _assignType2 === 'menus'    ? ((typeof calcMenuTotals === 'function' ? calcMenuTotals(item).calories : 0) + ' kcal · ' + (item.goal||'')) :
+                   _assignType2 === 'programs' ? ((item.weeks||'?') + ' weeks · ' + (item.goal||'') + ' · ' + (item.level||'')) :
+                   _assignType2 === 'recipes'  ? ((item.calories||0) + ' kcal · ' + (item.prepTime||'?') + ' min · ' + (item.category||'')) :
+                   _assignType2 === 'routines' ? ((item.exercises||[]).length + ' exercises') : '';
+    return '<div class="assign-row' + (assigned?' assigned':'') + '" onclick="toggleAssign(\'' + id + '\')">' +
+      '<div class="assign-check"><i class="ti ' + (assigned?'ti-check':'ti-plus') + '"></i></div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div class="assign-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + label + '</div>' +
+        (meta ? '<div class="assign-meta">' + meta + '</div>' : '') +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+
+
+/* ── Edit client BMR from client profile ─────────────── */
+// Store current client being edited
+var _bmrEditClientId = null;
+
+function openEditClientBMR(clientId) {
+  var client = clientsList.find(function(c){ return c.id === clientId; });
+  if (!client) { showToast('Client not found'); return; }
+
+  _bmrEditClientId = clientId;
+  var b = client.bmrData || {};
+
+  // Populate the static modal fields
+  var genderEl   = document.getElementById('ebmr-gender');
+  var goalEl     = document.getElementById('ebmr-goal');
+  var ageEl      = document.getElementById('ebmr-age');
+  var weightEl   = document.getElementById('ebmr-weight');
+  var heightEl   = document.getElementById('ebmr-height');
+  var actEl      = document.getElementById('ebmr-activity');
+  var cutEl      = document.getElementById('ebmr-cut');
+  var bulkEl     = document.getElementById('ebmr-bulk');
+  var titleEl    = document.getElementById('ebmr-title');
+  var previewEl  = document.getElementById('ebmr-preview');
+
+  if (titleEl)   titleEl.textContent   = 'Edit BMR — ' + client.name;
+  if (genderEl)  genderEl.value        = b.gender     || client.gender  || 'male';
+  if (goalEl)    goalEl.value          = b.goal       || client.goal    || 'maintain';
+  if (ageEl)     ageEl.value           = client.age   || b.age          || '';
+  if (weightEl)  weightEl.value        = client.weight|| b.weight       || '';
+  if (heightEl)  heightEl.value        = client.height|| b.height       || '';
+  if (actEl)     actEl.value           = String(b.activity   || 1.55);
+  if (cutEl)     cutEl.value           = String(b.cutFactor  || 0.85);
+  if (bulkEl)    bulkEl.value          = String(b.bulkFactor || 1.10);
+  if (previewEl) previewEl.innerHTML   = '';
+
+  openModal('edit-bmr');
+  // Auto-preview if data exists
+  if (client.age && client.weight && client.height) {
+    setTimeout(previewEditBMR, 100);
+  }
+}
+
+function closeEditBMR() {
+  // Only close the BMR modal, reopen client profile
+  var bmrModal = document.getElementById('modal-edit-bmr');
+  if (bmrModal) bmrModal.classList.remove('open');
+  // Reopen client profile if we have a client
+  if (_bmrEditClientId) {
+    openClientProfile(_bmrEditClientId);
+  } else {
+    closeAllModals();
+  }
+  _bmrEditClientId = null;
+}
+
+function previewEditBMR() {
+  var gender   = (document.getElementById('ebmr-gender')  ||{}).value || 'male';
+  var goal     = (document.getElementById('ebmr-goal')    ||{}).value || 'maintain';
+  var age      = parseFloat((document.getElementById('ebmr-age')    ||{}).value) || 0;
+  var weight   = parseFloat((document.getElementById('ebmr-weight') ||{}).value) || 0;
+  var height   = parseFloat((document.getElementById('ebmr-height') ||{}).value) || 0;
+  var activity = parseFloat((document.getElementById('ebmr-activity')||{}).value) || 1.55;
+  var cutF     = parseFloat((document.getElementById('ebmr-cut')    ||{}).value) || 0.85;
+  var bulkF    = parseFloat((document.getElementById('ebmr-bulk')   ||{}).value) || 1.10;
+
+  if (!age || !weight || !height) { showToast('Fill in age, weight and height first.'); return; }
+
+  var bmr    = Math.round((10*weight) + (6.25*height) - (5*age) + (gender==='male'?5:-161));
+  var tdee   = Math.round(bmr * activity);
+  var factor = goal==='cut' ? cutF : goal==='bulk' ? bulkF : 1;
+  var target = Math.round(tdee * factor);
+  var proteinG = Math.round(weight * (goal==='cut'?2.2:goal==='bulk'?2.0:1.8));
+  var fatG     = Math.round(weight * 0.9);
+  var carbsG   = Math.max(50, Math.round((target - proteinG*4 - fatG*9)/4));
+
+  var actLabels = {'1.2':'Sedentary','1.375':'Lightly Active','1.55':'Moderately Active','1.725':'Very Active','1.9':'Athlete'};
+
+  var el = document.getElementById('ebmr-preview');
+  if (el) el.innerHTML =
+    '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:16px">' +
+      '<div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">' +
+        macroChartHTML(proteinG, carbsG, fatG, target, 140) +
+        '<div style="flex:1;min-width:160px">' +
+          '<div class="bmr-stats-grid" style="grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">' +
+            '<div class="bmr-stat"><div class="bmr-stat-val" style="font-size:18px">' + bmr + '</div><div class="bmr-stat-label">BMR<br><small>at rest</small></div></div>' +
+            '<div class="bmr-stat"><div class="bmr-stat-val" style="font-size:18px">' + tdee + '</div><div class="bmr-stat-label">TDEE<br><small>' + (actLabels[String(activity)]||'') + '</small></div></div>' +
+            '<div class="bmr-stat accent" style="grid-column:span 2"><div class="bmr-stat-val" style="font-size:20px">' + target + '</div><div class="bmr-stat-label">Target kcal/day · ' + goal + '</div></div>' +
+          '</div>' +
+          '<p style="font-size:12px;color:var(--muted2)">P: ' + proteinG + 'g · C: ' + carbsG + 'g · F: ' + fatG + 'g</p>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+}
+
+async function saveEditClientBMR(cid) {
+  var clientId = cid || _bmrEditClientId;
+  var client = clientsList.find(function(c){ return c.id === clientId; });
+  if (!client) return;
+
+  var gender   = (document.getElementById('ebmr-gender')  ||{}).value || 'male';
+  var goal     = (document.getElementById('ebmr-goal')    ||{}).value || 'maintain';
+  var age      = parseFloat((document.getElementById('ebmr-age')    ||{}).value) || 0;
+  var weight   = parseFloat((document.getElementById('ebmr-weight') ||{}).value) || 0;
+  var height   = parseFloat((document.getElementById('ebmr-height') ||{}).value) || 0;
+  var activity = parseFloat((document.getElementById('ebmr-activity')||{}).value) || 1.55;
+  var cutF     = parseFloat((document.getElementById('ebmr-cut')    ||{}).value) || 0.85;
+  var bulkF    = parseFloat((document.getElementById('ebmr-bulk')   ||{}).value) || 1.10;
+
+  if (!age || !weight || !height) { showToast('Fill in age, weight and height.'); return; }
+
+  var bmr      = Math.round((10*weight) + (6.25*height) - (5*age) + (gender==='male'?5:-161));
+  var tdee     = Math.round(bmr * activity);
+  var factor   = goal==='cut' ? cutF : goal==='bulk' ? bulkF : 1;
+  var target   = Math.round(tdee * factor);
+  var proteinG = Math.round(weight * (goal==='cut'?2.2:goal==='bulk'?2.0:1.8));
+  var fatG     = Math.round(weight * 0.9);
+  var carbsG   = Math.max(50, Math.round((target - proteinG*4 - fatG*9)/4));
+
+  client.age    = age;
+  client.weight = weight;
+  client.height = height;
+  client.gender = gender;
+  client.goal   = goal;
+  client.bmrData = { bmr, tdee, target, proteinG, carbsG, fatG, goal, gender, activity, cutFactor: cutF, bulkFactor: bulkF };
+
+  await _saveClientProfile(clientId, client);
+  // Close BMR modal and reopen client profile
+  var bmrModal = document.getElementById('modal-edit-bmr');
+  if (bmrModal) bmrModal.classList.remove('open');
+  _bmrEditClientId = null;
+  openClientProfile(clientId);
+  showToast('BMR updated!');
+}
+
+async function saveAssignments() {
+  if (!_assigningClient) return;
+  var client = clientsList.find(function(c){ return c.id === _assigningClient; });
+  if (!client) return;
+
+  var saveBtn = document.querySelector('#modal-assign-content .btn-primary');
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.innerHTML = '<i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> Saving...'; }
+
+  try {
+    await _saveClientProfile(_assigningClient, client);
+    showToast('Assignments saved!');
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = '<i class="ti ti-device-floppy"></i> Save'; }
+    // Close assign modal and reopen client profile
+    document.getElementById('modal-assign-content').classList.remove('open');
+    renderClientsList();
+    openClientProfile(_assigningClient);
+  } catch(e) {
+    showToast('Save failed: ' + (e.code || e.message));
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = '<i class="ti ti-device-floppy"></i> Save'; }
+  }
+}
+
+function toggleAssign(itemId) {
+  if (!_assigningClient || !_assigningType) return;
+  var client  = clientsList.find(function(c){ return c.id === _assigningClient; });
+  if (!client) return;
+  var key     = _typeToKey(_assigningType);
+  var item    = _assignPool.find(function(x){ return (x.id||x.shareToken) === itemId; });
+  if (!item) return;
+
+  var arr     = client[key] || [];
+  var exists  = arr.findIndex(function(x){ return (x.id||x.shareToken) === itemId; });
+
+  if (exists > -1) arr.splice(exists, 1);
+  else arr.push(item);
+  client[key] = arr;
+
+  // Update the already-assigned set and re-render list WITHOUT resetting search/filter
+  _assignAlready = arr.map(function(x){ return x.id || x.shareToken; });
+  var q = document.getElementById('assign-search-input');
+  var activeBtn = document.querySelector('#assign-filter-pills .assign-pill.active');
+  var filter = activeBtn ? activeBtn.textContent : 'All';
+  renderAssignList(q ? q.value : '', filter);
+}
+
+function closeAssignModal() {
+  var m = document.getElementById('modal-assign-content');
+  if (m) m.classList.remove('open');
+  // Return to client profile
+  if (_assigningClient) {
+    var profileModal = document.getElementById('modal-client-profile');
+    if (profileModal) { profileModal.classList.add('open'); openClientProfile(_assigningClient); }
+  } else {
+    document.getElementById('modal-backdrop').classList.remove('open');
+  }
+}
+
+async function confirmAssign() {
+  if (!_assigningClient) { showToast('No client selected'); return; }
+  var client = clientsList.find(function(c){ return c.id === _assigningClient; });
+  if (!client) { showToast('Client not found'); return; }
+
+  var saveBtn = document.querySelector('#modal-assign-content .btn-primary');
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.innerHTML = '<i class="ti ti-loader"></i> Saving...'; }
+
+  try {
+    await _saveClientProfile(_assigningClient, client);
+    showToast('✓ Assignment saved!');
+    var m = document.getElementById('modal-assign-content');
+    if (m) m.classList.remove('open');
+    openClientProfile(_assigningClient);
+  } catch(e) {
+    showToast('Error saving: ' + (e.message || e.code));
+  } finally {
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = '<i class="ti ti-check"></i> Save Assignment'; }
+  }
+}
+
+async function unassignFromClient(clientId, key, itemId) {
+  var client = clientsList.find(function(c){ return c.id === clientId; });
+  if (!client) return;
+  client[key] = (client[key]||[]).filter(function(x){ return (x.id||x.shareToken) !== itemId; });
+  await _saveClientProfile(clientId, client);
+  openClientProfile(clientId);
+}
+
+async function deleteClient(clientId) {
+  var client = clientsList.find(function(c){ return c.id === clientId; });
+  if (!client) return;
+  if (!confirm('Delete client "' + client.name + '"? This will remove their account and all assigned content. This cannot be undone.')) return;
+
+  try {
+    // Call Cloud Function to delete Auth + Firestore
+    var fn = window._firebase.httpsCallable(window._functions, 'deleteClientAccount');
+    await fn({ clientUid: clientId });
+    clientsList = clientsList.filter(function(c){ return c.id !== clientId; });
+    closeAllModals();
+    renderClientsList();
+    showToast('Client deleted.');
+  } catch(e) {
+    console.error('deleteClient error:', e);
+    // Fallback: delete from Firestore only if function call fails
+    try {
+      await window._firebase.deleteDoc(window._firebase.doc(window._db, 'clientProfiles', clientId));
+      clientsList = clientsList.filter(function(c){ return c.id !== clientId; });
+      closeAllModals();
+      renderClientsList();
+      showToast('Client removed.');
+    } catch(e2) {
+      showToast('Delete failed: ' + (e.message || e.code));
+    }
+  }
+}
+
+async function _saveClientProfile(clientId, data) {
+  try {
+    // Ensure arrays exist before merging
+    var safeData = Object.assign({
+      assignedMenus:    [],
+      assignedPrograms: [],
+      assignedRoutines: [],
+      assignedRecipes:  []
+    }, data);
+    await window._firebase.setDoc(
+      window._firebase.doc(window._db, 'clientProfiles', clientId),
+      safeData, { merge: true }
+    );
+  } catch(e) { console.warn('Save client profile error:', e.code); }
+}
+
+function _typeToKey(type) {
+  return type === 'menus' ? 'assignedMenus' :
+         type === 'programs' ? 'assignedPrograms' :
+         type === 'recipes'  ? 'assignedRecipes'  :
+         'assignedRoutines';
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   TRAINER — Add own content (Menu / Recipe / Research)
+   Uses same admin modals but saves createdBy + isPublic
+══════════════════════════════════════════════════════════ */
+
+/* ── Program public/private toggle ──────────────────────── */
+function toggleProgPublic(btn) {
+  var hidden = document.getElementById('prog-is-public');
+  var icon   = document.getElementById('prog-public-icon');
+  var label  = document.getElementById('prog-public-label');
+  var isNowPublic = hidden.value !== 'true';
+  hidden.value = isNowPublic ? 'true' : 'false';
+  if (isNowPublic) {
+    btn.style.background    = 'rgba(126,232,162,0.1)';
+    btn.style.borderColor   = 'var(--accent)';
+    btn.style.color         = 'var(--accent)';
+    icon.className          = 'ti ti-world';
+    label.textContent       = 'Public';
+  } else {
+    btn.style.background    = 'rgba(251,191,36,0.1)';
+    btn.style.borderColor   = '#FBBF24';
+    btn.style.color         = '#FBBF24';
+    icon.className          = 'ti ti-lock';
+    label.textContent       = 'Private';
+  }
+}
+
+/* ── MENU ─────────────────────────────────────────────── */
+function openTrainerMenuModal(id) {
+  openAdminMenuModal(id);  // reuse admin modal
+  // Add public/private toggle if not already there
+  var existing = document.getElementById('trainer-menu-public-row');
+  if (!existing) {
+    var footer = document.querySelector('#modal-admin-menu .modal-body');
+    var row = document.createElement('div');
+    row.id = 'trainer-menu-public-row';
+    row.className = 'form-group';
+    row.style.marginTop = '8px';
+    row.innerHTML = '<label style="display:flex;align-items:center;gap:8px;cursor:pointer">' +
+      '<input type="checkbox" id="menu-is-public" checked style="width:16px;height:16px;accent-color:var(--accent)">' +
+      '<span style="font-size:13px;color:var(--muted)">Public — visible to all trainers</span></label>';
+    footer.appendChild(row);
+  }
+  if (id) {
+    var menu = menus.find(function(m){ return m.id === id; });
+    if (menu) document.getElementById('menu-is-public').checked = menu.isPublic !== false;
+  var langEl2 = document.getElementById('admin-menu-lang');
+  if (langEl2 && menu) langEl2.value = menu.lang || 'en';
+  }
+}
+
+/* override saveAdminMenu for trainer context */
+var _origSaveAdminMenu = null;
+function saveTrainerMenu() {
+  var isPublic = document.getElementById('menu-is-public');
+  // Inject createdBy before saving
+  var origFn = window.saveAdminMenu;
+  // We patch saveAdminMenu temporarily by setting a flag
+  window._trainerMenuOverride = {
+    createdBy:   state.user ? state.user.uid : null,
+    trainerName: state.user ? state.user.fullName : null,
+    isPublic:    isPublic ? isPublic.checked : true,
+  };
+  saveAdminMenu();
+}
+
+async function deleteTrainerMenu(id) {
+  if (!confirm('Delete this menu?')) return;
+  try {
+    await window._firebase.deleteDoc(window._firebase.doc(window._db, col('menus'), id));
+    menus = menus.filter(function(m){ return m.id !== id; });
+    renderMenuLibrary();
+    renderAdminMenuList();
+    showToast('Menu deleted.');
+  } catch(e) { showToast('Delete failed: ' + e.code); }
+}
+
+/* ── RECIPE ───────────────────────────────────────────── */
+function openTrainerRecipeModal(id) {
+  openAdminRecipeModal(id);
+  var existing = document.getElementById('trainer-recipe-public-row');
+  if (!existing) {
+    var body = document.querySelector('#modal-admin-recipe .modal-body');
+    var row = document.createElement('div');
+    row.id = 'trainer-recipe-public-row';
+    row.className = 'form-group';
+    row.style.marginTop = '8px';
+    row.innerHTML = '<label style="display:flex;align-items:center;gap:8px;cursor:pointer">' +
+      '<input type="checkbox" id="recipe-is-public" checked style="width:16px;height:16px;accent-color:var(--accent)">' +
+      '<span style="font-size:13px;color:var(--muted)">Public — visible to all trainers</span></label>';
+    body.appendChild(row);
+  }
+  if (id) {
+    var r = recipes.find(function(x){ return x.id === id; });
+    if (r) document.getElementById('recipe-is-public').checked = r.isPublic !== false;
+  }
+}
+
+async function deleteTrainerRecipe(id) {
+  if (!confirm('Delete this recipe?')) return;
+  try {
+    await window._firebase.deleteDoc(window._firebase.doc(window._db, col('recipes'), id));
+    recipes = recipes.filter(function(r){ return r.id !== id; });
+    renderRecipesView();
+    renderAdminRecipesList();
+    showToast('Recipe deleted.');
+  } catch(e) { showToast('Delete failed: ' + e.code); }
+}
+
+/* ── RESEARCH ─────────────────────────────────────────── */
+function openTrainerResearchModal(id) {
+  openAdminResearchModal(id);
+  var existing = document.getElementById('trainer-research-public-row');
+  if (!existing) {
+    var body = document.querySelector('#modal-admin-research .modal-body');
+    var row = document.createElement('div');
+    row.id = 'trainer-research-public-row';
+    row.className = 'form-group';
+    row.style.marginTop = '8px';
+    row.innerHTML = '<label style="display:flex;align-items:center;gap:8px;cursor:pointer">' +
+      '<input type="checkbox" id="research-is-public" checked style="width:16px;height:16px;accent-color:var(--accent)">' +
+      '<span style="font-size:13px;color:var(--muted)">Public — visible to all trainers</span></label>';
+    body.appendChild(row);
+  }
+  if (id) {
+    var r = researches.find(function(x){ return x.id === id; });
+    if (r) document.getElementById('research-is-public').checked = r.isPublic !== false;
+  }
+}
+
+async function deleteTrainerResearch(id) {
+  if (!confirm('Delete this study?')) return;
+  try {
+    await window._firebase.deleteDoc(window._firebase.doc(window._db, 'research', id));
+    researches = researches.filter(function(r){ return r.id !== id; });
+    renderResearchView();
+    renderAdminResearchList();
+    showToast('Study deleted.');
+  } catch(e) { showToast('Delete failed: ' + e.code); }
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   MOBILE TAB BAR
+══════════════════════════════════════════════════════════ */
+function mobileTab(viewId, btn) {
+  // Don't switch trainer views if client portal is active
+  var clientPortal = document.getElementById('screen-client-portal');
+  if (clientPortal && clientPortal.classList.contains('active')) return;
+  // Sync with desktop topnav
+  var desktopLink = document.getElementById('tnav-' + viewId);
+  setView(viewId, desktopLink);
+
+  // Update mobile tab active state
+  document.querySelectorAll('.mobile-tab-btn').forEach(function(b) {
+    b.classList.remove('active');
+  });
+  if (btn) btn.classList.add('active');
+}
+
+// Sync mobile tab bar when desktop nav is used
+var _origSetView = setView;
+setView = function(viewId, navEl) {
+  _origSetView(viewId, navEl);
+  // Update mobile tab bar
+  document.querySelectorAll('.mobile-tab-btn').forEach(function(b) {
+    b.classList.remove('active');
+  });
+  var mBtn = document.getElementById('mtab-' + viewId);
+  if (mBtn) mBtn.classList.add('active');
+};
+
    /* ══════════════════════════════════════════════════════════
       UTILS
    ══════════════════════════════════════════════════════════ */
@@ -2431,11 +7542,15 @@
    function delay(ms)     { return new Promise(r => setTimeout(r, ms)); }
    
    function showToast(msg) {
-     const t = document.getElementById('toast');
+     var t = document.getElementById('toast');
+     if (!t) return;
      t.textContent = msg;
      t.classList.add('show');
-     setTimeout(() => t.classList.remove('show'), 2800);
+     clearTimeout(t._hideTimer);
+     t._hideTimer = setTimeout(function(){ t.classList.remove('show'); }, 2800);
    }
+
+   /* openVideoPopup and closeVideoPopup defined globally above */
    
    function copyToClipboard(text) {
      navigator.clipboard.writeText(text).catch(() => {});

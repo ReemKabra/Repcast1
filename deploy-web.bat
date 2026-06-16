@@ -1,0 +1,9 @@
+@echo off
+echo Switching to WEB version...
+copy /Y public\index-web.html public\index.html
+echo Deploying to Firebase...
+firebase deploy --only hosting
+echo Done! Switching back to NATIVE version...
+copy /Y public\index-native.html public\index.html
+echo Ready for Android sync.
+pause

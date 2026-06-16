@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms of Service & Privacy Policy — RepCast</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0c0f; --surface: #111418; --border: rgba(255,255,255,0.08);
+    --accent: #7EE8A2; --text: #f0f2f5; --muted: #8a9bb0; --muted2: #556070;
+    --radius: 12px;
+  }
+  html { font-size: 16px; scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', Arial, sans-serif; line-height: 1.8; }
+
+  a.skip-link {
+    position: absolute; top: -100px; left: 0; z-index: 9999;
+    background: var(--accent); color: #071a0e;
+    padding: 12px 20px; font-weight: 700; border-radius: 0 0 8px 0;
+    text-decoration: none; transition: top 0.2s;
+  }
+  a.skip-link:focus { top: 0; }
+
+  header {
+    background: rgba(17,20,24,0.95); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-brand { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 800; color: var(--text); text-decoration: none; }
+  .header-brand span { color: var(--accent); }
+  .back-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border); color: var(--muted); text-decoration: none; font-size: 14px; transition: all 0.2s; }
+  .back-btn:hover { color: var(--text); border-color: var(--muted); }
+
+  main { max-width: 820px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  .page-hero { text-align: center; margin-bottom: 48px; padding: 36px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; }
+  .page-hero h1 { font-size: 26px; font-weight: 800; margin-bottom: 8px; }
+  .page-hero p { color: var(--muted); font-size: 14px; }
+  .page-hero .updated { display: inline-block; margin-top: 12px; font-size: 12px; color: var(--muted2); background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 4px 14px; }
+
+  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 40px; }
+  .toc h2 { font-size: 14px; font-weight: 600; color: var(--muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .toc ol { padding-right: 20px; }
+  .toc li { margin-bottom: 6px; }
+  .toc a { color: var(--accent); text-decoration: none; font-size: 14px; }
+  .toc a:hover { text-decoration: underline; }
+
+  section { margin-bottom: 48px; }
+  h2 { font-size: 20px; font-weight: 700; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  h2 i { color: var(--accent); font-size: 20px; }
+  h3 { font-size: 16px; font-weight: 600; margin: 20px 0 8px; color: var(--text); }
+  p { color: var(--muted); font-size: 15px; margin-bottom: 12px; line-height: 1.8; }
+  ul, ol { padding-right: 20px; margin-bottom: 14px; }
+  li { color: var(--muted); font-size: 14.5px; margin-bottom: 6px; }
+  strong { color: var(--text); }
+
+  .info-box { background: rgba(96,165,250,0.07); border: 1px solid rgba(96,165,250,0.2); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 20px; display: flex; gap: 12px; align-items: flex-start; font-size: 14px; color: var(--muted); }
+  .info-box i { color: #60A5FA; font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+  .warn-box { background: rgba(251,191,36,0.07); border: 1px solid rgba(251,191,36,0.2); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 20px; display: flex; gap: 12px; align-items: flex-start; font-size: 14px; color: var(--muted); }
+  .warn-box i { color: #FBBF24; font-size: 18px; flex-shrink: 0; }
+
+  .contact-block { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; }
+  .contact-block p { margin: 0 0 6px; }
+  .contact-block a { color: var(--accent); }
+
+  footer { text-align: center; padding: 24px; border-top: 1px solid var(--border); color: var(--muted2); font-size: 13px; }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  @media (max-width: 600px) { header { padding: 14px 16px; } main { padding: 24px 16px 60px; } }
+</style>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<header role="banner">
+  <a href="/" class="header-brand" aria-label="Back to RepCast homepage">
+    <i class="ti ti-barbell" aria-hidden="true"></i>
+    Rep<span>Cast</span>
+  </a>
+  <a href="/" class="back-btn" aria-label="Back to main site">
+    <i class="ti ti-arrow-left" aria-hidden="true"></i>
+    Back to Site
+  </a>
+</header>
+
+<main id="main-content" tabindex="-1">
+
+  <div class="page-hero">
+    <h1>Terms of Service &amp; Privacy Policy</h1>
+    <p>Please read these terms carefully before using RepCast. By registering or purchasing a subscription, you agree to be bound by these terms.</p>
+    <span class="updated">Last updated: May 2025</span>
+  </div>
+
+  <!-- Table of Contents -->
+  <div class="toc" role="navigation" aria-label="Table of contents">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#about">About RepCast</a></li>
+      <li><a href="#service">Description of Service</a></li>
+      <li><a href="#eligibility">Eligibility &amp; Age Restriction</a></li>
+      <li><a href="#account">Account Registration</a></li>
+      <li><a href="#subscription">Subscription &amp; Billing</a></li>
+      <li><a href="#cancellation">Cancellation &amp; Refund Policy</a></li>
+      <li><a href="#privacy">Privacy Policy</a></li>
+      <li><a href="#liability">Liability &amp; Disclaimer</a></li>
+      <li><a href="#content">Content &amp; Intellectual Property</a></li>
+      <li><a href="#contact">Contact &amp; Support</a></li>
+    </ol>
+  </div>
+
+  <!-- 1. About -->
+  <section id="about" aria-labelledby="about-heading">
+    <h2 id="about-heading"><i class="ti ti-building" aria-hidden="true"></i> 1. About RepCast</h2>
+    <div class="contact-block">
+      <p><strong>Business name:</strong> RepCast</p>
+      <p><strong>Website:</strong> <a href="https://repcast.co.il">repcast.co.il</a></p>
+      <p><strong>Email:</strong> <a href="mailto:reemkabra@gmail.com">reemkabra@gmail.com</a></p>
+      <p><strong>Phone:</strong> <a href="tel:+972526619527">+972-52-661-9527</a></p>
+      <p><strong>Address:</strong> Israel</p>
+    </div>
+  </section>
+
+  <!-- 2. Service -->
+  <section id="service" aria-labelledby="service-heading">
+    <h2 id="service-heading"><i class="ti ti-app" aria-hidden="true"></i> 2. Description of Service</h2>
+    <p>RepCast is a digital subscription platform designed for personal trainers and physiotherapists. It provides tools to:</p>
+    <ul>
+      <li>Browse a curated master library of exercises with video demonstrations</li>
+      <li>Upload custom exercise videos to build a personal library</li>
+      <li>Build personalised client exercise routines with sets, reps, and coaching notes</li>
+      <li>Share routines with clients via a unique link (no client login required)</li>
+    </ul>
+    <p>The service is provided entirely digitally. No physical goods are shipped. Access is granted immediately upon successful subscription.</p>
+  </section>
+
+  <!-- 3. Eligibility -->
+  <section id="eligibility" aria-labelledby="eligibility-heading">
+    <h2 id="eligibility-heading"><i class="ti ti-user-check" aria-hidden="true"></i> 3. Eligibility &amp; Age Restriction</h2>
+    <div class="warn-box">
+      <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+      <span><strong>You must be at least 18 years old to purchase a subscription on RepCast.</strong> By completing a purchase, you confirm that you are 18 years of age or older. RepCast reserves the right to cancel accounts found to be in violation of this requirement.</span>
+    </div>
+    <p>You must also be a professional or aspiring professional in fitness, personal training, physiotherapy, or a related field. RepCast is a professional tool, not intended for general consumer fitness use.</p>
+  </section>
+
+  <!-- 4. Account -->
+  <section id="account" aria-labelledby="account-heading">
+    <h2 id="account-heading"><i class="ti ti-lock" aria-hidden="true"></i> 4. Account Registration</h2>
+    <p>To use RepCast, you must create an account with a valid email address and password. You are responsible for maintaining the confidentiality of your login credentials and for all activity that occurs under your account.</p>
+    <p>You agree to provide accurate, current, and complete information and to update it as necessary. RepCast reserves the right to suspend or terminate accounts that provide false information or violate these terms.</p>
+  </section>
+
+  <!-- 5. Subscription & Billing -->
+  <section id="subscription" aria-labelledby="sub-heading">
+    <h2 id="sub-heading"><i class="ti ti-credit-card" aria-hidden="true"></i> 5. Subscription &amp; Billing</h2>
+
+    <h3>Plans</h3>
+    <ul>
+      <li><strong>Free Limited Plan</strong> — Access to 1-2 exercises per sub-category, up to 10 custom uploads. No payment required.</li>
+      <li><strong>Free Trial</strong> — 7-day full access at no charge. One trial per account. No credit card required to activate.</li>
+      <li><strong>Pro Subscription</strong> — ₪25/month. Full access to all features. Billed monthly via Grow by Meshulam.</li>
+    </ul>
+
+    <h3>Billing Cycle</h3>
+    <p>Pro subscriptions are billed monthly on the same date each month. Your subscription renews automatically unless cancelled. You will be charged ₪25 each billing cycle.</p>
+
+    <h3>Payment Processing</h3>
+    <p>All payments are processed securely by <strong>Grow by Meshulam</strong> (Green Invoice Ltd), a licensed payment service provider in Israel. RepCast does not store your credit card or payment details.</p>
+
+    <h3>Price Changes</h3>
+    <p>RepCast reserves the right to change subscription pricing with at least 14 days' notice via email. Continued use after the notice period constitutes acceptance of the new price.</p>
+  </section>
+
+  <!-- 6. Cancellation & Refunds -->
+  <section id="cancellation" aria-labelledby="cancel-heading">
+    <h2 id="cancel-heading"><i class="ti ti-x" aria-hidden="true"></i> 6. Cancellation &amp; Refund Policy</h2>
+
+    <h3>Cancellation</h3>
+    <p>You may cancel your Pro subscription at any time by contacting us at <a href="mailto:reemkabra@gmail.com" style="color:var(--accent)">reemkabra@gmail.com</a> or through your billing portal.</p>
+    <p>Upon cancellation, your subscription will remain active until the end of the current paid billing period. You will not be charged for the following month. No partial refunds are issued for unused time within a billing period.</p>
+
+    <h3>Refund Policy</h3>
+    <p>Cancellation requests submitted within <strong>14 days of the initial subscription purchase</strong> may be eligible for a full refund, provided the service has not been extensively used. To request a refund, contact us in writing at <a href="mailto:reemkabra@gmail.com" style="color:var(--accent)">reemkabra@gmail.com</a> with your account email and reason for cancellation.</p>
+    <p>Refunds are not available for subsequent monthly renewals or for the free trial period (which has no charge).</p>
+
+    <h3>Service Delivery</h3>
+    <p>RepCast is a fully digital service. Access is granted immediately upon payment confirmation. There is no physical product, shipping, or delivery involved.</p>
+
+    <div class="info-box">
+      <i class="ti ti-info-circle" aria-hidden="true"></i>
+      <span>Under the Israeli Consumer Protection Law, the right to cancel digital services may be limited once delivery has begun. By activating your subscription and accessing the service, you acknowledge that delivery has commenced.</span>
+    </div>
+  </section>
+
+  <!-- 7. Privacy Policy -->
+  <section id="privacy" aria-labelledby="privacy-heading">
+    <h2 id="privacy-heading"><i class="ti ti-shield" aria-hidden="true"></i> 7. Privacy Policy</h2>
+
+    <h3>Information We Collect</h3>
+    <p>When you register and use RepCast, we collect the following information:</p>
+    <ul>
+      <li>Name and email address (provided during registration)</li>
+      <li>Business name and professional specialty (optional, provided in your profile)</li>
+      <li>Exercise content and videos you upload to the platform</li>
+      <li>Routine data — exercises, sets, reps, and notes you create</li>
+      <li>Subscription and billing status (managed by Grow by Meshulam)</li>
+      <li>Usage data — which features you use, login times</li>
+    </ul>
+
+    <h3>How We Use Your Information</h3>
+    <p>RepCast uses your information exclusively for the purpose of operating the platform and providing the service you subscribed to. Specifically:</p>
+    <ul>
+      <li>To create and manage your account</li>
+      <li>To store and display your exercise library and client routines</li>
+      <li>To process your subscription payments (via Grow by Meshulam)</li>
+      <li>To send transactional emails such as account verification and billing receipts</li>
+      <li>To improve and maintain the platform</li>
+    </ul>
+    <p><strong>We do not sell, rent, or share your personal information with third parties for marketing purposes.</strong></p>
+
+    <h3>Data Storage &amp; Security</h3>
+    <p>All user data is stored securely using Google Firebase (Firestore and Firebase Storage), hosted on Google Cloud servers in the European region (eur3 — Belgium/Netherlands). Video files are stored in Firebase Storage with access controls that restrict viewing to authenticated users.</p>
+    <p>RepCast takes commercially reasonable precautions to protect your data from unauthorised access, disclosure, or destruction. We use HTTPS encryption for all data in transit.</p>
+
+    <h3>Data Retention</h3>
+    <p>Your data is retained for as long as your account remains active. Upon account deletion, your personal data and uploaded content will be deleted within 30 days.</p>
+
+    <h3>Cookies</h3>
+    <p>RepCast uses only essential session cookies required for authentication and to maintain your login state. We do not use advertising cookies or track your behaviour across other websites.</p>
+
+    <h3>Your Rights (GDPR &amp; Israeli Privacy Law)</h3>
+    <p>You have the right to access, correct, or request deletion of your personal data at any time. Contact us at <a href="mailto:reemkabra@gmail.com" style="color:var(--accent)">reemkabra@gmail.com</a> to exercise these rights.</p>
+  </section>
+
+  <!-- 8. Liability -->
+  <section id="liability" aria-labelledby="liability-heading">
+    <h2 id="liability-heading"><i class="ti ti-alert-circle" aria-hidden="true"></i> 8. Liability &amp; Disclaimer</h2>
+
+    <div class="warn-box">
+      <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+      <span><strong>RepCast is a professional tool, not a medical service.</strong> Exercise content on this platform does not constitute medical advice, diagnosis, or treatment. Trainers and physiotherapists using RepCast are solely responsible for ensuring that exercise programmes are appropriate for their individual clients.</span>
+    </div>
+
+    <p>RepCast and its operators shall not be liable for any direct, indirect, incidental, or consequential damages arising from:</p>
+    <ul>
+      <li>Use of or inability to use the service</li>
+      <li>Exercise programmes created and shared using the platform</li>
+      <li>Client injuries resulting from exercise routines sent via RepCast</li>
+      <li>Temporary service interruptions or data loss</li>
+      <li>Actions taken based on content appearing on the platform</li>
+    </ul>
+    <p>RepCast provides the platform as a tool only. The professional judgment, qualifications, and responsibilities of the trainer or physiotherapist using the platform remain entirely with that professional.</p>
+    <p>The service is provided "as is" without warranties of any kind, express or implied, including but not limited to warranties of merchantability, fitness for a particular purpose, or non-infringement.</p>
+  </section>
+
+  <!-- 9. Content & IP -->
+  <section id="content" aria-labelledby="content-heading">
+    <h2 id="content-heading"><i class="ti ti-copyright" aria-hidden="true"></i> 9. Content &amp; Intellectual Property</h2>
+
+    <h3>Your Content</h3>
+    <p>You retain full ownership of any videos and exercise content you upload to RepCast. By uploading content, you grant RepCast a limited, non-exclusive licence to store and display that content to you and your clients through the platform.</p>
+    <p>You are solely responsible for ensuring that content you upload does not infringe on third-party copyrights, trademarks, or other intellectual property rights.</p>
+
+    <h3>RepCast Content</h3>
+    <p>The RepCast master exercise library, platform design, code, and all associated content are the intellectual property of RepCast. You may not copy, reproduce, or distribute platform content without prior written permission.</p>
+
+    <h3>Prohibited Content</h3>
+    <p>You may not upload content that is illegal, defamatory, sexually explicit, or in violation of any applicable law. RepCast reserves the right to remove content and terminate accounts that violate these guidelines.</p>
+  </section>
+
+  <!-- 10. Contact -->
+  <section id="contact" aria-labelledby="contact-heading">
+    <h2 id="contact-heading"><i class="ti ti-headset" aria-hidden="true"></i> 10. Contact &amp; Support</h2>
+    <p>For any questions, cancellation requests, refund requests, or support enquiries, please contact us:</p>
+    <div class="contact-block">
+      <p><strong>Email:</strong> <a href="mailto:reemkabra@gmail.com">reemkabra@gmail.com</a></p>
+      <p><strong>Phone:</strong> <a href="tel:+972526619527">+972-52-661-9527</a></p>
+      <p><strong>Response time:</strong> We aim to respond to all enquiries within 2 business days.</p>
+    </div>
+    <p style="margin-top:16px;font-size:13px;color:var(--muted2)">These terms are governed by the laws of the State of Israel. Any disputes shall be subject to the exclusive jurisdiction of the courts of Israel.</p>
+  </section>
+
+</main>
+
+<footer role="contentinfo">
+  <p>© 2025 RepCast · <a href="/">repcast.co.il</a> · <a href="mailto:reemkabra@gmail.com">reemkabra@gmail.com</a> · <a href="/accessibility">Accessibility Statement</a></p>
+</footer>
+
+</body>
+</html>

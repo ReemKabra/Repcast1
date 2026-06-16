@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>הצהרת נגישות — RepCast</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0c0f; --surface: #111418; --border: rgba(255,255,255,0.08);
+    --accent: #7EE8A2; --text: #f0f2f5; --muted: #8a9bb0; --muted2: #556070;
+    --radius: 12px;
+  }
+  html { font-size: 16px; scroll-behavior: smooth; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Heebo', Arial, sans-serif;
+    line-height: 1.8; direction: rtl;
+  }
+
+  /* Skip link */
+  .skip-link {
+    position: absolute; top: -100px; right: 0; z-index: 9999;
+    background: var(--accent); color: #071a0e;
+    padding: 12px 20px; font-weight: 700; border-radius: 0 0 8px 8px;
+    text-decoration: none; transition: top 0.2s;
+  }
+  .skip-link:focus { top: 0; }
+
+  /* Header */
+  header {
+    background: rgba(17,20,24,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-brand {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 20px; font-weight: 800; color: var(--text);
+    text-decoration: none;
+  }
+  .header-brand span { color: var(--accent); }
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: 8px;
+    border: 1px solid var(--border); color: var(--muted);
+    text-decoration: none; font-size: 14px;
+    transition: all 0.2s;
+  }
+  .back-btn:hover { color: var(--text); border-color: var(--muted); }
+  .back-btn:focus { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  /* Main */
+  main {
+    max-width: 820px; margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* Hero */
+  .a11y-hero {
+    text-align: center; margin-bottom: 48px;
+    padding: 40px; background: var(--surface);
+    border-radius: 16px; border: 1px solid var(--border);
+  }
+  .a11y-hero .icon {
+    width: 64px; height: 64px;
+    background: rgba(126,232,162,0.12);
+    border-radius: 50%; margin: 0 auto 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; color: var(--accent);
+  }
+  .a11y-hero h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+  .a11y-hero p  { color: var(--muted); font-size: 15px; }
+
+  .compliance-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(126,232,162,0.1); border: 1px solid rgba(126,232,162,0.25);
+    color: var(--accent); padding: 6px 16px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; margin-top: 12px;
+  }
+
+  /* Sections */
+  section { margin-bottom: 40px; }
+  h2 {
+    font-size: 20px; font-weight: 700; margin-bottom: 16px;
+    padding-bottom: 10px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  h2 i { color: var(--accent); font-size: 20px; }
+  h3 { font-size: 16px; font-weight: 600; margin: 18px 0 8px; }
+  p  { color: var(--muted); font-size: 15px; margin-bottom: 12px; }
+  ul { list-style: none; padding: 0; }
+  ul li {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: var(--muted); font-size: 14.5px;
+  }
+  ul li::before {
+    content: '✓'; color: var(--accent);
+    font-weight: 700; flex-shrink: 0; margin-top: 2px;
+  }
+
+  /* Level badge */
+  .level-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px 24px;
+    display: flex; align-items: center; gap: 16px; margin-bottom: 16px;
+  }
+  .level-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: rgba(126,232,162,0.1); color: var(--accent);
+    display: flex; align-items: center; justify-content: center; font-size: 22px;
+    flex-shrink: 0;
+  }
+  .level-title { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  .level-desc  { color: var(--muted); font-size: 13px; }
+
+  /* Contact form */
+  .contact-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 28px;
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  label { font-size: 13px; font-weight: 600; color: var(--text); }
+  input, textarea, select {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px; color: var(--text);
+    font-family: 'Heebo', Arial, sans-serif; font-size: 14px;
+    width: 100%; direction: rtl;
+    transition: border-color 0.2s;
+  }
+  input:focus, textarea:focus, select:focus {
+    outline: none; border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(126,232,162,0.15);
+  }
+  textarea { resize: vertical; min-height: 100px; }
+  .submit-btn {
+    background: var(--accent); color: #071a0e;
+    border: none; border-radius: 8px; padding: 12px 28px;
+    font-weight: 700; font-size: 15px; cursor: pointer;
+    font-family: 'Heebo', Arial, sans-serif;
+    transition: opacity 0.2s; width: 100%;
+  }
+  .submit-btn:hover { opacity: 0.9; }
+  .submit-btn:focus { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+  /* Info box */
+  .info-box {
+    background: rgba(96,165,250,0.07); border: 1px solid rgba(96,165,250,0.18);
+    border-radius: var(--radius); padding: 16px 20px; margin-bottom: 20px;
+    display: flex; gap: 12px; align-items: flex-start;
+    font-size: 14px; color: var(--muted);
+  }
+  .info-box i { color: #60A5FA; font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
+  /* Footer */
+  footer {
+    text-align: center; padding: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--muted2); font-size: 13px;
+  }
+
+  /* Focus styles */
+  :focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 600px) {
+    header { padding: 14px 16px; }
+    main { padding: 24px 16px 60px; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">דלג לתוכן הראשי</a>
+
+<header role="banner">
+  <a href="/" class="header-brand" aria-label="חזרה לדף הבית של RepCast">
+    <i class="ti ti-barbell" aria-hidden="true"></i>
+    Rep<span>Cast</span>
+  </a>
+  <a href="/" class="back-btn" aria-label="חזרה לאתר הראשי">
+    <i class="ti ti-arrow-right" aria-hidden="true"></i>
+    חזרה לאתר
+  </a>
+</header>
+
+<main id="main-content" tabindex="-1">
+
+  <div class="a11y-hero" role="banner">
+    <div class="icon" aria-hidden="true"><i class="ti ti-accessible"></i></div>
+    <h1>הצהרת נגישות</h1>
+    <p>RepCast מחויבת לנגישות דיגיטלית לכלל המשתמשים, לרבות אנשים עם מוגבלויות</p>
+    <div class="compliance-badge">
+      <i class="ti ti-shield-check" aria-hidden="true"></i>
+      תואם לתקן ישראלי 5568 ו-WCAG 2.1 ברמה AA
+    </div>
+  </div>
+
+  <section aria-labelledby="status-heading">
+    <h2 id="status-heading"><i class="ti ti-chart-bar" aria-hidden="true"></i> מצב הנגישות</h2>
+
+    <div class="info-box" role="note">
+      <i class="ti ti-info-circle" aria-hidden="true"></i>
+      <span>אתר זה עומד בדרישות תקנות שוויון זכויות לאנשים עם מוגבלות (התאמות נגישות לשירות),
+      תשע"ג-2013, ועומד ברמת AA של תקן WCAG 2.1 ותקן ישראלי TI 5568.</span>
+    </div>
+
+    <div class="level-card">
+      <div class="level-icon" aria-hidden="true"><i class="ti ti-award"></i></div>
+      <div>
+        <div class="level-title">רמת תאימות: WCAG 2.1 AA</div>
+        <div class="level-desc">הבדיקה האחרונה בוצעה במאי 2025 על ידי צוות הפיתוח של RepCast</div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="features-heading">
+    <h2 id="features-heading"><i class="ti ti-settings" aria-hidden="true"></i> התאמות נגישות שבוצעו</h2>
+
+    <h3>ניווט ומקלדת</h3>
+    <ul>
+      <li>כל פונקציות האתר ניתנות לתפעול מלא באמצעות מקלדת בלבד</li>
+      <li>סדר Tab הגיוני ועקבי בכל דפי האתר</li>
+      <li>קישור "דלג לתוכן" מופיע בלחיצת Tab ראשונה בכל דף</li>
+      <li>מיקוד מקלדת גלוי ובולט בכל האלמנטים האינטראקטיביים</li>
+    </ul>
+
+    <h3>קוראי מסך ותמיכת ARIA</h3>
+    <ul>
+      <li>תגיות ARIA מלאות על כל אלמנטים אינטראקטיביים (role, aria-label, aria-expanded)</li>
+      <li>כותרות היררכיות תקינות (H1 → H2 → H3) בכל הדפים</li>
+      <li>תיאורי alt על כל התמונות והאיקונים</li>
+      <li>אזורי ניווט מסומנים: header, main, nav, footer</li>
+      <li>הודעות סטטוס מוכרזות ל-screen reader באמצעות aria-live</li>
+    </ul>
+
+    <h3>ויזואלי וצבעוניות</h3>
+    <ul>
+      <li>ניגודיות צבעים עומדת בדרישות WCAG AA (יחס מינימלי 4.5:1)</li>
+      <li>גופנים קריאים בגדלים מינימליים של 14px</li>
+      <li>מידע לא מועבר באמצעות צבע בלבד</li>
+      <li>תמיכה בהגדלת טקסט של עד 200% ללא איבוד תוכן</li>
+    </ul>
+
+    <h3>תפריט נגישות מובנה</h3>
+    <ul>
+      <li>כפתור נגישות קבוע ונגיש בכל דפי האתר</li>
+      <li>שינוי גודל טקסט (הגדלה והקטנה)</li>
+      <li>מצב ניגודיות גבוהה</li>
+      <li>מצב בהיר / כהה</li>
+      <li>מצב גוני אפור</li>
+      <li>גופן קריאות מוגברת</li>
+      <li>הדגשת קישורים</li>
+      <li>עצירת אנימציות</li>
+      <li>שמירת העדפות בין ביקורים</li>
+      <li>קריאה בקול (Text-to-Speech) — האתר מציע פונקציית קריאה בקול המשתמשת ב-Web Speech API המובנית בדפדפן. לחוויה מיטבית ולתמיכה מלאה בעברית מומלץ להשתמש בנקרני מסך ייעודיים כגון NVDA (Windows), VoiceOver (Mac/iOS) או TalkBack (Android)</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="limitations-heading">
+    <h2 id="limitations-heading"><i class="ti ti-alert-triangle" aria-hidden="true"></i> מגבלות ידועות</h2>
+    <p>למרות מאמצינו, ייתכנו מספר תחומים שטרם הושלמה הנגישות שלהם במלואה:</p>
+    <ul>
+      <li>חלק מתוכן הווידאו המועלה על ידי מאמנים עשוי לא לכלול כתוביות — מאמנים מוזמנים להוסיף תיאורים מפורטים</li>
+      <li>פונקציית הקריאה בקול המובנית תלויה בתמיכת הדפדפן ב-Web Speech API ובשפה העברית — לתמיכה מלאה מומלץ להשתמש בנקרן מסך ייעודי</li>
+      <li>ממשק ניהול הספריה עשוי לא להיות מותאם במלואו לכל עזרי הטכנולוגיה המסייעת</li>
+    </ul>
+    <p>אנו עובדים לשיפור מתמיד ומצפים לטפל במגבלות אלו בגרסאות הבאות.</p>
+  </section>
+
+  <section aria-labelledby="tech-heading">
+    <h2 id="tech-heading"><i class="ti ti-code" aria-hidden="true"></i> טכנולוגיות נגישות</h2>
+    <p>האתר נבנה תוך שימוש בטכנולוגיות הבאות לתמיכה בנגישות:</p>
+    <ul>
+      <li>HTML5 סמנטי עם תגיות ARIA מלאות</li>
+      <li>CSS עם תמיכה ב-prefers-reduced-motion ו-prefers-color-scheme</li>
+      <li>JavaScript לניהול מיקוד ולהודעות נגישות דינמיות</li>
+      <li>תמיכה מלאה בדפדפנים Chrome, Firefox, Safari, Edge</li>
+      <li>בדיקות תאימות עם NVDA, VoiceOver ו-JAWS</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="contact-heading">
+    <h2 id="contact-heading"><i class="ti ti-user-circle" aria-hidden="true"></i> רכז/ת הנגישות</h2>
+
+    <div class="contact-card">
+      <p style="margin-bottom:20px;font-size:14.5px">
+        נתקלתם בבעיית נגישות? יש לכם משוב? נשמח לשמוע ולטפל בפנייה בהקדם האפשרי.
+        על פי חוק, אנו מחויבים לענות לפניות נגישות תוך <strong style="color:var(--text)">7 ימי עסקים</strong>.
+      </p>
+
+      <div style="background:rgba(126,232,162,0.06);border:1px solid rgba(126,232,162,0.15);border-radius:10px;padding:16px 20px;margin-bottom:24px">
+        <div style="font-weight:700;margin-bottom:8px;font-size:15px">פרטי רכז/ת הנגישות</div>
+        <div style="color:var(--muted);font-size:14px;line-height:2">
+          <div><strong style="color:var(--text)">שם:</strong> ראם כברה</div>
+          <div><strong style="color:var(--text)">תפקיד:</strong> רכזת נגישות — RepCast</div>
+          <div><strong style="color:var(--text)">דוא"ל:</strong>
+            <a href="mailto:accessibility@repcast.co.il" style="color:var(--accent)">
+              accessibility@repcast.co.il
+            </a>
+          </div>
+          <div><strong style="color:var(--text)">אתר:</strong>
+            <a href="https://repcast.co.il" style="color:var(--accent)">repcast.co.il</a>
+          </div>
+        </div>
+      </div>
+
+      <form action="mailto:accessibility@repcast.co.il" method="post" enctype="text/plain"
+        aria-label="טופס פנייה לרכז הנגישות" novalidate>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="a11y-name">שם מלא <span aria-hidden="true">*</span></label>
+            <input type="text" id="a11y-name" name="name" required
+              autocomplete="name" placeholder="השם שלך" aria-required="true">
+          </div>
+          <div class="form-group">
+            <label for="a11y-email">דוא"ל <span aria-hidden="true">*</span></label>
+            <input type="email" id="a11y-email" name="email" required
+              autocomplete="email" placeholder="your@email.com" aria-required="true">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="a11y-type">סוג הפנייה</label>
+          <select id="a11y-type" name="type">
+            <option value="">בחר סוג פנייה</option>
+            <option value="bug">בעיית נגישות שמצאתי</option>
+            <option value="request">בקשה להתאמה</option>
+            <option value="feedback">משוב כללי</option>
+            <option value="other">אחר</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="a11y-page">דף / מיקום הבעיה</label>
+          <input type="text" id="a11y-page" name="page"
+            placeholder="לדוגמה: דף הספרייה, טופס ההתחברות...">
+        </div>
+
+        <div class="form-group">
+          <label for="a11y-message">תיאור הבעיה / הבקשה <span aria-hidden="true">*</span></label>
+          <textarea id="a11y-message" name="message" required aria-required="true"
+            placeholder="תארו בפירוט את הבעיה שנתקלתם בה..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="a11y-tech">טכנולוגיה מסייעת בשימוש (אם רלוונטי)</label>
+          <input type="text" id="a11y-tech" name="tech"
+            placeholder="לדוגמה: NVDA, VoiceOver, מקלדת בלבד...">
+        </div>
+
+        <button type="submit" class="submit-btn">
+          <i class="ti ti-send" aria-hidden="true"></i>
+          שלח פנייה
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <section aria-labelledby="legal-heading">
+    <h2 id="legal-heading"><i class="ti ti-scale" aria-hidden="true"></i> בסיס חוקי</h2>
+    <p>
+      הצהרת נגישות זו מתייחסת לאתר <strong>repcast.co.il</strong> ומשקפת את
+      מחויבותנו לעמוד בדרישות הנגישות על פי:
+    </p>
+    <ul>
+      <li>חוק שוויון זכויות לאנשים עם מוגבלות, התשנ"ח-1998</li>
+      <li>תקנות שוויון זכויות לאנשים עם מוגבלות (התאמות נגישות לשירות), תשע"ג-2013</li>
+      <li>תקן ישראלי TI 5568 לנגישות תכנים באינטרנט</li>
+      <li>WCAG 2.1 ברמת AA של ה-W3C</li>
+    </ul>
+    <p style="margin-top:16px;font-size:13px">
+      <strong>תאריך עדכון הצהרה זו:</strong> מאי 2025
+    </p>
+  </section>
+
+</main>
+
+<footer role="contentinfo">
+  <p>© 2025 RepCast · <a href="/" style="color:var(--accent)">repcast.co.il</a> ·
+  <a href="mailto:accessibility@repcast.co.il" style="color:var(--accent)">accessibility@repcast.co.il</a></p>
+</footer>
+
+</body>
+</html>

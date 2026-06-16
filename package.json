@@ -1,5 +1,29 @@
 {
   "dependencies": {
+    "@capacitor/android": "^8.4.0",
+    "@capacitor/browser": "^8.0.3",
+    "@capacitor/cli": "^8.4.0",
+    "@capacitor/core": "^8.4.0",
+    "@capacitor/ios": "^8.4.0",
+    "@codetrix-studio/capacitor-google-auth": "^3.4.0-rc.4",
     "firebase": "^12.13.0"
-  }
+  },
+  "name": "repcast",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ReemKabra/Repcast1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ReemKabra/Repcast1/issues"
+  },
+  "homepage": "https://github.com/ReemKabra/Repcast1#readme",
+  "description": ""
 }
