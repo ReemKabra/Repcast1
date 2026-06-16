@@ -731,6 +731,9 @@ document.addEventListener('DOMContentLoaded', function() {
        trialUsed,
      };
      state.isManager = false;
+     state.isClient  = false;
+     window._clientMode = false;
+     window._clientAssignedPrograms = [];
      bootTrainerApp();
    }
    
@@ -824,6 +827,11 @@ document.addEventListener('DOMContentLoaded', function() {
      } catch (e) { /* ignore */ }
      state.user      = null;
      state.isManager = false;
+     state.isClient  = false;
+     window._clientMode = false;
+     window._clientAssignedPrograms = [];
+     // Reset content arrays so next login loads fresh
+     menus = []; programs = []; recipes = [];
      state.cart.clear();
      showScreen('landing');
      showToast('Signed out.');
@@ -885,6 +893,17 @@ document.addEventListener('DOMContentLoaded', function() {
    
    /* ── Boot trainer app UI ────────────────────────────────── */
    async function bootTrainerApp() {
+  // Restore any nav elements hidden by a prior client session
+  ['mtab-clients','tnav-clients','tnav-billing','tab-custom','tab-myvideos','tab-myprograms','tab-mymenus','tab-myrecipes','tab-myresearch','recipes-add-btn','lib-upload-bar'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.style.display = '';
+  });
+  var cpTabReset = document.getElementById('mtab-client-profile');
+  if (cpTabReset) cpTabReset.style.display = 'none';
+  var mtabProfileReset = document.getElementById('mtab-profile');
+  if (mtabProfileReset) mtabProfileReset.style.display = '';
+  var tnavProfileReset = document.getElementById('tnav-profile');
+  if (tnavProfileReset) tnavProfileReset.setAttribute('onclick', "setView('profile',this)");
   // Patch save functions to support Hebrew collections
   try { patchHeSaves(); } catch(e) { console.warn('patchHeSaves error:', e); }
   // Expose renderers globally so applyLang() can call them from outside IIFE
@@ -1619,6 +1638,8 @@ document.addEventListener('DOMContentLoaded', function() {
    ══════════════════════════════════════════════════════════ */
    
    function switchLibTab(tab, btn) {
+     // Block upload tabs for clients
+     if (window._clientMode && (tab === 'custom')) return;
      state.activeTab = tab;
      document.querySelectorAll('.lib-tab').forEach(b => b.classList.remove('active'));
      btn.classList.add('active');
@@ -1963,6 +1984,7 @@ document.addEventListener('DOMContentLoaded', function() {
    function isExerciseLocked(ex) {
      if (!state.user) return false;
      const tier = state.user.tier;
+     if (tier === 'client') return false; // clients see everything their trainer's platform offers
      if (tier === 'trial' || tier === 'premium' || tier === 'premium_cancelled') return false;
      if (tier === 'free_limited') {
        // Premium-marked exercises always locked on free_limited
@@ -3788,14 +3810,424 @@ async function loadMenus() {
     var snap = await window._firebase.getDocs(window._firebase.collection(window._db, col('menus')));
     menus = [];
     snap.forEach(function(d){ menus.push(Object.assign({ id: d.id }, d.data())); });
+    if (menus.length === 0 && _lang === 'he') {
+      var snapEn = await window._firebase.getDocs(window._firebase.collection(window._db, 'menus'));
+      snapEn.forEach(function(d){ menus.push(Object.assign({ id: d.id }, d.data())); });
+    }
     renderMenuLibrary();
     renderAdminMenuList();
   } catch(e) {
     console.warn('Load menus error:', e.code, '— using local cache');
-    // If Firestore read fails (e.g. unauthenticated admin), keep existing array
     renderMenuLibrary();
     renderAdminMenuList();
   }
+}
+
+
+
+
+/* ── Workout Day Picker (client selects which day to train) ── */
+function showWorkoutDayPicker(program) {
+  var existing = document.getElementById('workout-day-picker-overlay');
+  if (existing) existing.remove();
+
+  var days = program.trainingDays || [];
+  if (!days.length) { showToast('This program has no training days.'); return; }
+
+  var overlay = document.createElement('div');
+  overlay.id = 'workout-day-picker-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:99997;background:rgba(0,0,0,0.75);display:flex;align-items:flex-end;justify-content:center;padding:0';
+
+  var sheet = '<div style="background:var(--surface);border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:500px;max-height:80vh;overflow-y:auto">' +
+    '<div style="width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div>' +
+    '<h3 style="margin:0 0 6px;font-size:16px;font-weight:700">Select Training Day</h3>' +
+    '<p style="font-size:13px;color:var(--muted);margin:0 0 16px">' + (program.name||'Program') + '</p>';
+
+  days.forEach(function(day, idx) {
+    var exCount = (day.exercises||[]).length;
+    sheet += '<div onclick="startWorkout(' + JSON.stringify(program).replace(/</g,'\u003c').replace(/'/g,"\'") + ',' + idx + ');closeWorkoutDayPicker()" ' +
+      'style="padding:14px 16px;background:var(--surface2);border:1px solid var(--border2);border-radius:12px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;touch-action:manipulation">' +
+      '<div>' +
+        '<div style="font-size:14px;font-weight:700">' + (day.day||('Day ' + (idx+1))) + '</div>' +
+        '<div style="font-size:12px;color:var(--muted);margin-top:2px">' + exCount + ' exercise' + (exCount !== 1 ? 's' : '') + '</div>' +
+      '</div>' +
+      '<i class="ti ti-player-play" style="color:var(--accent);font-size:18px"></i>' +
+    '</div>';
+  });
+
+  sheet += '<button onclick="closeWorkoutDayPicker()" style="width:100%;padding:12px;border:none;background:none;color:var(--muted);font-size:14px;cursor:pointer;margin-top:4px;font-family:inherit">Cancel</button>' +
+    '</div>';
+
+  overlay.innerHTML = sheet;
+  overlay.addEventListener('click', function(e){ if (e.target === overlay) closeWorkoutDayPicker(); });
+  document.body.appendChild(overlay);
+}
+
+function closeWorkoutDayPicker() {
+  var el = document.getElementById('workout-day-picker-overlay');
+  if (el) el.remove();
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   WORKOUT TRACKING SYSTEM
+══════════════════════════════════════════════════════════ */
+
+var _workout = null;          // active workout state
+var _workoutTimerInterval = null;
+var _workoutWeightUnit = localStorage.getItem('repcast_weight_unit') || 'kg';
+
+function startWorkoutFromDetail(programId, dayIndex) {
+  var program = programs.find(function(p){ return p.id === programId; });
+  if (!program) {
+    program = (JSON.parse(localStorage.getItem('repcast_my_programs')||'[]')).find(function(p){ return p.id === programId; });
+  }
+  if (!program) {
+    program = (window._clientAssignedPrograms || []).find(function(p){ return p.id === programId; });
+  }
+  if (!program) { showToast('Program not found'); return; }
+  closeAllModals();
+  startWorkout(program, dayIndex);
+}
+
+function startWorkout(program, dayIndex) {
+  var day = program.trainingDays && program.trainingDays[dayIndex];
+  if (!day) return;
+
+  _workout = {
+    programId:   program.id || '',
+    programName: program.name || '',
+    dayName:     day.name || day.day || ('Day ' + (dayIndex + 1)),
+    dayIndex:    dayIndex,
+    startTime:   Date.now(),
+    weightUnit:  _workoutWeightUnit,
+    exercises:   (day.exercises || []).map(function(ex, i) {
+      return {
+        exerciseId: ex.id || ex.videoId || '',
+        title:      ex.title || ex.name || 'Exercise',
+        muscle:     ex.muscle || '',
+        targetSets: parseInt(ex.sets) || 3,
+        targetReps: ex.reps || '',
+        restSeconds: parseRestToSeconds(ex.rest),
+        swapped:    false,
+        sets:       Array.from({length: parseInt(ex.sets)||3}, function(_,s) {
+          return { setNum: s+1, weight: '', reps: ex.reps||'', completed: false };
+        })
+      };
+    })
+  };
+
+  renderWorkoutScreen();
+  var modal = document.getElementById('modal-workout-tracking');
+  if (modal) modal.style.display = 'flex';
+  startWorkoutTimer();
+}
+
+/* Parse rest strings like "90s", "2 min", "1:30", "90" into seconds */
+function parseRestToSeconds(rest) {
+  if (!rest) return 60;
+  rest = String(rest).toLowerCase().trim();
+  // "1:30" format
+  if (rest.indexOf(':') > -1) {
+    var parts = rest.split(':');
+    return (parseInt(parts[0])||0) * 60 + (parseInt(parts[1])||0);
+  }
+  var num = parseFloat(rest.replace(/[^0-9.]/g, '')) || 0;
+  if (rest.indexOf('min') > -1) return Math.round(num * 60);
+  // bare number or "90s" → seconds; but if small (<10) and says min-ish, treat as minutes
+  return Math.round(num) || 60;
+}
+
+function renderWorkoutScreen() {
+  if (!_workout) return;
+  var titleEl = document.getElementById('workout-day-title');
+  if (titleEl) titleEl.textContent = _workout.dayName;
+
+  var unitBtn = document.getElementById('weight-unit-btn');
+  if (unitBtn) unitBtn.textContent = _workout.weightUnit;
+
+  var body = document.getElementById('workout-exercises-body');
+  if (!body) return;
+
+  body.innerHTML = _workout.exercises.map(function(ex, ei) {
+    var setsHTML = '<table class="workout-sets-table">' +
+      '<thead><tr><th>Set</th><th>' + _workout.weightUnit + '</th><th>Reps</th><th></th></tr></thead><tbody>' +
+      ex.sets.map(function(set, si) {
+        return '<tr class="workout-set-row' + (set.completed ? ' completed' : '') + '" id="workout-set-' + ei + '-' + si + '">' +
+          '<td style="font-size:13px;font-weight:700;color:var(--muted)">' + set.setNum + '</td>' +
+          '<td><input class="workout-set-input" type="number" inputmode="decimal" placeholder="0" value="' + (set.weight||'') + '" ' +
+            'onchange="updateWorkoutSet(' + ei + ',' + si + ',\'weight\',this.value)"></td>' +
+          '<td><input class="workout-set-input" type="number" inputmode="numeric" placeholder="0" value="' + (set.reps||'') + '" ' +
+            'onchange="updateWorkoutSet(' + ei + ',' + si + ',\'reps\',this.value)"></td>' +
+          '<td><button class="workout-check-btn' + (set.completed ? ' done' : '') + '" ' +
+            'onclick="toggleSetDone(' + ei + ',' + si + ')">' +
+            '<i class="ti ' + (set.completed ? 'ti-check' : 'ti-circle') + '"></i>' +
+          '</button></td>' +
+        '</tr>';
+      }).join('') + '</tbody></table>';
+
+    return '<div class="workout-exercise-card">' +
+      '<div class="workout-ex-header">' +
+        '<div>' +
+          '<div class="workout-ex-title">' + ex.title + (ex.swapped ? ' <span style="font-size:10px;color:var(--accent);background:rgba(126,232,162,0.1);padding:2px 6px;border-radius:4px">swapped</span>' : '') + '</div>' +
+          '<div class="workout-ex-muscle">' + (ex.muscle||'') + '</div>' +
+        '</div>' +
+        '<button class="workout-swap-btn" onclick="openSwapExercise(' + ei + ')"><i class="ti ti-refresh"></i> Swap</button>' +
+      '</div>' +
+      setsHTML +
+      '<button class="workout-add-set-btn" onclick="addWorkoutSet(' + ei + ')"><i class="ti ti-plus"></i> Add Set</button>' +
+    '</div>';
+  }).join('');
+}
+
+function updateWorkoutSet(exIdx, setIdx, field, value) {
+  if (_workout && _workout.exercises[exIdx] && _workout.exercises[exIdx].sets[setIdx]) {
+    _workout.exercises[exIdx].sets[setIdx][field] = value;
+  }
+}
+
+function toggleSetDone(exIdx, setIdx) {
+  if (!_workout) return;
+  var set = _workout.exercises[exIdx].sets[setIdx];
+  set.completed = !set.completed;
+  // Update just this row
+  var row = document.getElementById('workout-set-' + exIdx + '-' + setIdx);
+  if (row) {
+    row.className = 'workout-set-row' + (set.completed ? ' completed' : '');
+    var btn = row.querySelector('.workout-check-btn');
+    if (btn) {
+      btn.className = 'workout-check-btn' + (set.completed ? ' done' : '');
+      btn.querySelector('i').className = 'ti ' + (set.completed ? 'ti-check' : 'ti-circle');
+    }
+  }
+  // Start rest timer when a set is completed
+  if (set.completed) {
+    var restSec = _workout.exercises[exIdx].restSeconds || 60;
+    startRestTimer(restSec);
+  }
+}
+
+/* ── Rest Timer between sets ── */
+var _restInterval = null;
+var _restRemaining = 0;
+
+function startRestTimer(seconds) {
+  _restRemaining = seconds;
+  clearInterval(_restInterval);
+
+  var bar = document.getElementById('rest-timer-bar');
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.id = 'rest-timer-bar';
+    bar.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:100000;background:var(--accent);color:#0a0c0f;padding:16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 -4px 20px rgba(0,0,0,0.3)';
+    document.body.appendChild(bar);
+  }
+  bar.style.display = 'flex';
+
+  function render() {
+    var mm = Math.floor(_restRemaining / 60);
+    var ss = _restRemaining % 60;
+    var label = (mm > 0 ? mm + ':' + (ss<10?'0':'') + ss : ss + 's');
+    bar.innerHTML =
+      '<div style="display:flex;align-items:center;gap:12px">' +
+        '<i class="ti ti-clock-pause" style="font-size:22px"></i>' +
+        '<div><div style="font-size:12px;font-weight:600;opacity:0.7">REST</div>' +
+        '<div style="font-size:24px;font-weight:800;font-variant-numeric:tabular-nums" id="rest-timer-display">' + label + '</div></div>' +
+      '</div>' +
+      '<div style="display:flex;gap:8px">' +
+        '<button onclick="addRestTime(15)" style="background:rgba(0,0,0,0.18);border:none;color:#0a0c0f;font-weight:700;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:13px">+15s</button>' +
+        '<button onclick="skipRestTimer()" style="background:#0a0c0f;border:none;color:var(--accent);font-weight:700;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px">Skip</button>' +
+      '</div>';
+  }
+  render();
+
+  _restInterval = setInterval(function() {
+    _restRemaining--;
+    if (_restRemaining <= 0) {
+      clearInterval(_restInterval);
+      // Vibrate + sound cue when rest is over
+      try { if (navigator.vibrate) navigator.vibrate([200,100,200]); } catch(e){}
+      try { playRestDoneBeep(); } catch(e){}
+      var display = document.getElementById('rest-timer-display');
+      if (display) display.textContent = 'Done!';
+      setTimeout(skipRestTimer, 1500);
+    } else {
+      var d = document.getElementById('rest-timer-display');
+      if (d) {
+        var mm = Math.floor(_restRemaining / 60);
+        var ss = _restRemaining % 60;
+        d.textContent = (mm > 0 ? mm + ':' + (ss<10?'0':'') + ss : ss + 's');
+      }
+    }
+  }, 1000);
+}
+
+function addRestTime(sec) {
+  _restRemaining += sec;
+}
+
+function skipRestTimer() {
+  clearInterval(_restInterval);
+  var bar = document.getElementById('rest-timer-bar');
+  if (bar) bar.style.display = 'none';
+}
+
+function playRestDoneBeep() {
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+    osc.start(); osc.stop(ctx.currentTime + 0.5);
+  } catch(e) {}
+}
+
+function addWorkoutSet(exIdx) {
+  if (!_workout) return;
+  var ex = _workout.exercises[exIdx];
+  var lastSet = ex.sets[ex.sets.length - 1] || {};
+  ex.sets.push({
+    setNum: ex.sets.length + 1,
+    weight: lastSet.weight || '',
+    reps:   lastSet.reps || '',
+    completed: false
+  });
+  renderWorkoutScreen();
+}
+
+function toggleWorkoutWeightUnit() {
+  if (!_workout) return;
+  _workout.weightUnit = _workout.weightUnit === 'kg' ? 'lbs' : 'kg';
+  _workoutWeightUnit = _workout.weightUnit;
+  localStorage.setItem('repcast_weight_unit', _workoutWeightUnit);
+  renderWorkoutScreen();
+}
+
+function openSwapExercise(exIdx) {
+  _workout._swappingExIdx = exIdx;
+  // Reuse food-picker style modal with exercises
+  if (typeof openFoodPicker === 'function') {
+    // Open exercise picker instead
+    openExercisePicker(exIdx);
+  }
+}
+
+function openExercisePicker(exIdx) {
+  _workout._swappingExIdx = exIdx;
+  // Build a simple exercise search overlay
+  var existing = document.getElementById('workout-ex-picker');
+  if (existing) existing.remove();
+
+  var picker = document.createElement('div');
+  picker.id = 'workout-ex-picker';
+  picker.style.cssText = 'position:fixed;inset:0;z-index:999999;background:var(--bg);display:flex;flex-direction:column';
+  picker.innerHTML =
+    '<div style="background:var(--surface);padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">' +
+      '<button onclick="closeExercisePicker()" style="background:none;border:none;cursor:pointer;color:var(--text)"><i class="ti ti-arrow-left" style="font-size:20px"></i></button>' +
+      '<div class="search-wrap" style="flex:1"><i class="ti ti-search"></i>' +
+        '<input type="text" id="ex-picker-search" placeholder="Search exercises..." oninput="filterExPicker(this.value)" style="width:100%" autofocus>' +
+      '</div>' +
+    '</div>' +
+    '<div id="ex-picker-body" style="flex:1;overflow-y:auto;padding:12px"></div>';
+  document.body.appendChild(picker);
+  filterExPicker('');
+}
+
+function filterExPicker(q) {
+  var body = document.getElementById('ex-picker-body');
+  if (!body) return;
+  var pool = MASTER_EXERCISES || [];
+  var filtered = q ? pool.filter(function(ex){ return (ex.title||'').toLowerCase().includes(q.toLowerCase()); }) : pool.slice(0, 60);
+  body.innerHTML = filtered.map(function(ex) {
+    var enc = encodeURIComponent(JSON.stringify({id:ex.id,title:ex.title,muscle:ex.muscle}));
+    return '<div onclick="selectSwapExercise(\'' + enc + '\')" style="padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:space-between">' +
+      '<div><div style="font-size:14px;font-weight:600">' + (ex.title||'') + '</div><div style="font-size:12px;color:var(--muted)">' + (ex.muscle||'') + '</div></div>' +
+      '<i class="ti ti-replace" style="color:var(--accent)"></i>' +
+    '</div>';
+  }).join('') || '<div style="padding:30px;text-align:center;color:var(--muted)">No exercises found</div>';
+}
+
+function selectSwapExercise(enc) {
+  var ex = JSON.parse(decodeURIComponent(enc));
+  if (_workout && _workout._swappingExIdx !== undefined) {
+    var idx = _workout._swappingExIdx;
+    _workout.exercises[idx].title      = ex.title;
+    _workout.exercises[idx].muscle     = ex.muscle;
+    _workout.exercises[idx].exerciseId = ex.id;
+    _workout.exercises[idx].swapped    = true;
+  }
+  closeExercisePicker();
+  renderWorkoutScreen();
+}
+
+function closeExercisePicker() {
+  var el = document.getElementById('workout-ex-picker');
+  if (el) el.remove();
+}
+
+function startWorkoutTimer() {
+  clearInterval(_workoutTimerInterval);
+  _workoutTimerInterval = setInterval(function() {
+    var elapsed = Math.floor((Date.now() - _workout.startTime) / 1000);
+    var mm = Math.floor(elapsed / 60).toString().padStart(2, '0');
+    var ss = (elapsed % 60).toString().padStart(2, '0');
+    var el = document.getElementById('workout-timer');
+    if (el) el.textContent = mm + ':' + ss;
+  }, 1000);
+}
+
+function closeWorkout() {
+  if (!confirm('End workout without saving?')) return;
+  _workout = null;
+  clearInterval(_workoutTimerInterval);
+  skipRestTimer();
+  var modal = document.getElementById('modal-workout-tracking');
+  if (modal) modal.style.display = 'none';
+}
+
+async function finishWorkout() {
+  if (!_workout) return;
+  clearInterval(_workoutTimerInterval);
+  skipRestTimer();
+
+  var duration = Math.floor((Date.now() - _workout.startTime) / 1000);
+
+  var session = {
+    clientUid:    state.user.uid,
+    trainerUid:   state.user.linkedTrainer || '',
+    programId:    _workout.programId,
+    programName:  _workout.programName,
+    dayName:      _workout.dayName,
+    date:         new Date().toISOString(),
+    durationSeconds: duration,
+    weightUnit:   _workout.weightUnit,
+    exercises:    _workout.exercises.map(function(ex) {
+      return {
+        exerciseId: ex.exerciseId,
+        title:      ex.title,
+        muscle:     ex.muscle,
+        swapped:    ex.swapped,
+        sets:       ex.sets.filter(function(s){ return s.completed; })
+      };
+    }).filter(function(ex){ return ex.sets.length > 0; })
+  };
+
+  try {
+    await window._firebase.addDoc(
+      window._firebase.collection(window._db, 'workoutSessions'),
+      session
+    );
+    showToast('✓ Workout saved!');
+  } catch(e) {
+    showToast('Save failed: ' + e.message);
+  }
+
+  _workout = null;
+  var modal = document.getElementById('modal-workout-tracking');
+  if (modal) modal.style.display = 'none';
 }
 
 
@@ -3984,6 +4416,10 @@ async function loadFoods() {
     var snap = await window._firebase.getDocs(window._firebase.collection(window._db, col('foods')));
     foods = [];
     snap.forEach(function(d){ foods.push(Object.assign({ id: d.id }, d.data())); });
+    if (foods.length === 0 && _lang === 'he') {
+      var snapEn = await window._firebase.getDocs(window._firebase.collection(window._db, 'foods'));
+      snapEn.forEach(function(d){ foods.push(Object.assign({ id: d.id }, d.data())); });
+    }
     foods.sort(function(a,b){ return (a.category||'').localeCompare(b.category||'') || (a.name||'').localeCompare(b.name||''); });
     if (state.isManager) renderAdminFoodList();
   } catch(e) { console.warn('loadFoods error:', e); }
@@ -4108,9 +4544,12 @@ function filterMenus(goal, btn) {
 /* ── Render menu library (trainer view) ──────────────── */
 function renderMenuLibrary() {
   var myUid = state.user ? state.user.uid : null;
-  var pool = (menuFilter === 'all' ? menus : menus.filter(function(m){ return m.goal === menuFilter; }))
-    .filter(function(m){ return m.isPublic !== false || m.createdBy === myUid; })
-;  // col() already queries the right collection
+  var pool = (menuFilter === 'all' ? menus : menus.filter(function(m){ return m.goal === menuFilter; }));
+  // Clients: menus already contains only their assigned menus — show all.
+  // Trainers: filter to public + own.
+  if (!state.isClient) {
+    pool = pool.filter(function(m){ return m.isPublic !== false || m.createdBy === myUid; });
+  }
 
   // Sort by closest calories to bmrResult if available
   if (bmrResult && menuFilter !== 'all') {
@@ -4547,6 +4986,11 @@ async function loadPrograms() {
     var snap = await window._firebase.getDocs(window._firebase.collection(window._db, col('programs')));
     programs = [];
     snap.forEach(function(d){ programs.push(Object.assign({ id: d.id }, d.data())); });
+    // Fallback: if Hebrew collection is empty, load English content so the app isn't blank
+    if (programs.length === 0 && _lang === 'he') {
+      var snapEn = await window._firebase.getDocs(window._firebase.collection(window._db, 'programs'));
+      snapEn.forEach(function(d){ programs.push(Object.assign({ id: d.id }, d.data())); });
+    }
     renderProgramsView();
     renderAdminProgramsList();
   } catch(e) {
@@ -4559,22 +5003,27 @@ async function loadPrograms() {
 function renderProgramsView() {
   var body = document.getElementById('programs-body');
   if (!body) return;
-  var myPrograms = JSON.parse(localStorage.getItem('repcast_my_programs') || '[]');
-  // Show: public programs from library + trainer's own programs
   var myUid = state.user ? state.user.uid : null;
-  var libProgs = programs.filter(function(p){ return p.isPublic !== false || p.createdBy === myUid; })
-;  // col() already queries the right collection
-  var allPrograms = libProgs.concat(myPrograms);
+
+  var allPrograms;
+  if (state.isClient) {
+    // Clients see ONLY their assigned programs
+    allPrograms = programs.slice();
+  } else {
+    var myPrograms = JSON.parse(localStorage.getItem('repcast_my_programs') || '[]');
+    var libProgs = programs.filter(function(p){ return p.isPublic !== false || p.createdBy === myUid; });
+    allPrograms = libProgs.concat(myPrograms);
+  }
   if (!allPrograms.length) {
     var isNative = document.documentElement.classList.contains('is-native');
     body.innerHTML = '<div style="text-align:center;padding:40px 20px"><div class="empty-icon"><i class="ti ti-calendar"></i></div><h3>No programs yet</h3><p style="color:var(--muted);margin-bottom:20px">Training programs will appear here.</p>' +
-      (isNative ? '' : '<button class="btn btn-primary" onclick="openCreateOwnProgram()"><i class="ti ti-plus"></i> Create My Own Program</button>') +
+      ((isNative || state.isClient) ? '' : '<button class="btn btn-primary" onclick="openCreateOwnProgram()"><i class="ti ti-plus"></i> Create My Own Program</button>') +
     '</div>';
     return;
   }
   var gc = { strength:'#F472B6', hypertrophy:'#A78BFA', 'fat-loss':'#7EE8A2', endurance:'#60A5FA', rehab:'#FBBF24' };
   body.innerHTML =
-    (document.documentElement.classList.contains('is-native') ? '' : '<div style="display:flex;justify-content:flex-end;padding:0 24px 12px"><button class="btn btn-ghost" onclick="openCreateOwnProgram()"><i class="ti ti-plus"></i> Create My Own Program</button></div>') +
+    ((document.documentElement.classList.contains('is-native') || state.isClient) ? '' : '<div style="display:flex;justify-content:flex-end;padding:0 24px 12px"><button class="btn btn-ghost" onclick="openCreateOwnProgram()"><i class="ti ti-plus"></i> Create My Own Program</button></div>') +
     '<div class="resource-grid" style="padding:0 24px">' +
     allPrograms.map(function(p) {
       var col = gc[p.goal] || '#7EE8A2';
@@ -4611,15 +5060,18 @@ function openProgramDetail(id) {
       '<div class="bmr-stat"><div class="bmr-stat-val">' + (p.level||'?') + '</div><div class="bmr-stat-label">Level</div></div>' +
     '</div>' +
     '<p style="color:var(--muted);margin-bottom:20px">' + (p.desc||'') + '</p>' +
-    (days.length ? days.map(function(day) {
+    (days.length ? days.map(function(day, dayIdx) {
       return '<div class="meal-section">' +
-        '<div class="meal-header"><span class="meal-name">' + (day.name||'Day') + '</span>' +
+        '<div class="meal-header"><span class="meal-name">' + (day.name||day.day||'Day') + '</span>' +
         '<span class="meal-total" style="color:var(--muted2)">' + (day.muscleGroup||'') + '</span></div>' +
         (day.exercises && day.exercises.length ?
           '<table class="food-table"><thead><tr><th>Exercise</th><th>Muscle</th><th>Sets</th><th>Reps</th><th>Rest</th><th>Notes</th></tr></thead><tbody>' +
           day.exercises.map(function(ex){
-            return '<tr><td><strong>' + (ex.name||'') + '</strong></td><td>' + (ex.muscle||'') + '</td><td>' + (ex.sets||'') + '</td><td>' + (ex.reps||'') + '</td><td>' + (ex.rest||'') + '</td><td style="color:var(--muted);font-size:12px">' + (ex.notes||'') + '</td></tr>';
+            return '<tr><td><strong>' + (ex.name||ex.title||'') + '</strong></td><td>' + (ex.muscle||'') + '</td><td>' + (ex.sets||'') + '</td><td>' + (ex.reps||'') + '</td><td>' + (ex.rest||'') + '</td><td style="color:var(--muted);font-size:12px">' + (ex.notes||'') + '</td></tr>';
           }).join('') + '</tbody></table>' : '') +
+        // Start Workout button — only for clients
+        (state.isClient && day.exercises && day.exercises.length ?
+          '<button class="btn btn-primary" style="width:100%;margin-top:10px" onclick="startWorkoutFromDetail(\'' + id + '\',' + dayIdx + ')"><i class="ti ti-player-play"></i> Start This Workout</button>' : '') +
       '</div>';
     }).join('') : (p.schedule ? '<h4>Schedule</h4><div class="schedule-grid">' + p.schedule.split('\n').filter(Boolean).map(function(d){ return '<div class="schedule-day">' + d + '</div>'; }).join('') + '</div>' : '')) +
     (p.notes ? '<div style="margin-top:16px;padding:14px;background:var(--surface2);border-radius:8px;font-size:13px;color:var(--muted)"><i class="ti ti-info-circle" style="color:var(--accent)"></i> ' + p.notes + '</div>' : '');
@@ -4853,6 +5305,10 @@ async function loadRecipes() {
     var snap = await window._firebase.getDocs(window._firebase.collection(window._db, col('recipes')));
     recipes = [];
     snap.forEach(function(d){ recipes.push(Object.assign({ id: d.id }, d.data())); });
+    if (recipes.length === 0 && _lang === 'he') {
+      var snapEn = await window._firebase.getDocs(window._firebase.collection(window._db, 'recipes'));
+      snapEn.forEach(function(d){ recipes.push(Object.assign({ id: d.id }, d.data())); });
+    }
     renderRecipesView(); renderAdminRecipesList();
   } catch(e) {
     console.warn('loadRecipes:', e.code, '— keeping local data');
@@ -4871,9 +5327,11 @@ function renderRecipesView() {
   var body = document.getElementById('recipes-body');
   if (!body) return;
   var myUidR2 = state.user ? state.user.uid : null;
-  var pool = (recipeFilter === 'all' ? recipes : recipes.filter(function(r){ return r.category === recipeFilter; }))
-    .filter(function(r){ return r.isPublic !== false || r.createdBy === myUidR2; })
-;  // col() already queries the right collection
+  var pool = (recipeFilter === 'all' ? recipes : recipes.filter(function(r){ return r.category === recipeFilter; }));
+  // Clients see only their assigned recipes (already filtered); trainers see public + own
+  if (!state.isClient) {
+    pool = pool.filter(function(r){ return r.isPublic !== false || r.createdBy === myUidR2; });
+  }
   if (!pool.length) { body.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="ti ti-chef-hat"></i></div><h3>No recipes found</h3></div>'; return; }
   var cc = { breakfast:'#FBBF24', lunch:'#60A5FA', dinner:'#A78BFA', snack:'#7EE8A2', 'post-workout':'#F472B6' };
   body.innerHTML = '<div class="resource-grid">' + pool.map(function(r) {
@@ -5472,6 +5930,9 @@ function openProgramDetail(id) {
         }).join('') +
         '</tbody>' +
       '</table>' +
+      // Start Workout button — only for clients, per day
+      (state.isClient && exercises.length ?
+        '<button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="startWorkoutFromDetail(\'' + (p.id||id) + '\',' + i + ')"><i class="ti ti-player-play"></i> Start This Workout</button>' : '') +
     '</div>';
   }).join('');
 
@@ -6443,12 +6904,131 @@ async function bootClientPortal(user, profile) {
   state.user = {
     uid:           user.uid,
     email:         user.email,
-    fullName:      profile.fullName     || profile.name || 'Client',
+    fullName:      profile.fullName || profile.name || 'Client',
     tier:          'client',
     linkedTrainer: profile.linkedTrainer || null,
+    goal:          profile.goal || '',
+    photoURL:      profile.photoURL || '',
   };
-  showScreen('client-portal');
-  loadClientPortal(profile.linkedTrainer, user.uid);
+  state.isManager = false;
+  state.isClient  = true;
+  window._clientMode = true;
+
+  // Run the SHARED app initialization (muscle filters, master library,
+  // exercise library, views, event handlers). This is essential — without
+  // it the app shell is empty. We override data loading right after.
+  await bootClientApp();
+
+  // Apply client-specific nav filtering (hide upload tabs + Clients tab)
+  applyClientNav();
+
+  // Load their assigned content from Firestore (overrides loadClients etc)
+  await loadClientPortal(profile.linkedTrainer, user.uid);
+}
+
+/* Shared app boot for CLIENT — same as bootTrainerApp minus trainer-only loads */
+async function bootClientApp() {
+  // Expose renderers globally
+  window._renderMenuLibrary  = function(){ if(typeof renderMenuLibrary  === 'function') renderMenuLibrary(); };
+  window._renderProgramsView = function(){ if(typeof renderProgramsView === 'function') renderProgramsView(); };
+  window._renderRecipesView  = function(){ if(typeof renderRecipesView  === 'function') renderRecipesView(); };
+  window._renderResearchView = function(){ if(typeof renderResearchView === 'function') renderResearchView(); };
+
+  var u = state.user;
+  function setEl(id, prop, val) { try { var e = document.getElementById(id); if (e) e[prop] = val; } catch(err) {} }
+
+  // Identity
+  if (u.photoURL) {
+    var av = document.getElementById('topnav-avatar');
+    if (av) { av.style.backgroundImage='url('+u.photoURL+')'; av.style.backgroundSize='cover'; av.textContent=''; }
+  } else {
+    setEl('topnav-avatar', 'textContent', (u.fullName||'C')[0].toUpperCase());
+  }
+  setEl('topnav-name', 'textContent', u.fullName);
+
+  // Hide trial pill for clients
+  var trialPill = document.getElementById('trial-pill-top');
+  if (trialPill) trialPill.style.display = 'none';
+
+  showScreen('app');
+  buildMuscleFilters();
+
+  // Load shared library content (exercises)
+  await syncMasterLibraryFromFirestore();
+
+  // Load research (clients can see all research)
+  loadResearch();
+
+  // Render library so client can browse exercises
+  renderLibrary();
+}
+
+function applyClientNav() {
+  window._clientMode = true;
+
+  // ── Mobile bottom tab bar — hide Clients tab, show My Profile ──
+  var clientsTab = document.getElementById('mtab-clients');
+  if (clientsTab) clientsTab.style.display = 'none';
+
+  // Hide the trainer "Profile" (settings) tab for clients
+  var profileTab = document.getElementById('mtab-profile');
+  if (profileTab) profileTab.style.display = 'none';
+
+  // Show "My Profile" client tab
+  var cpTab = document.getElementById('mtab-client-profile');
+  if (cpTab) {
+    cpTab.style.display = 'flex';
+    cpTab.setAttribute('onclick', "mobileTab('client-profile',this)");
+  }
+
+  // ── Top nav — hide Clients link, reroute Profile to client-profile ──
+  var tnav = document.getElementById('tnav-clients');
+  if (tnav) tnav.style.display = 'none';
+
+  var tnavProfile = document.getElementById('tnav-profile');
+  if (tnavProfile) {
+    tnavProfile.setAttribute('onclick', "setView('client-profile',this)");
+  }
+  // The topnav-user avatar area also goes to trainer profile — reroute it
+  var topnavUser = document.querySelector('.topnav-user');
+  if (topnavUser) topnavUser.setAttribute('onclick', "setView('client-profile', document.getElementById('tnav-profile'))");
+
+  // ── Library tabs — hide ALL trainer upload tabs ──
+  ['tab-custom', 'tab-myvideos', 'tab-myprograms', 'tab-mymenus', 'tab-myrecipes', 'tab-myresearch'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+
+  // Hide upload bar
+  var uploadBar = document.getElementById('lib-upload-bar');
+  if (uploadBar) uploadBar.style.display = 'none';
+
+  // Hide billing tab for clients
+  var tnavBilling = document.getElementById('tnav-billing');
+  if (tnavBilling) tnavBilling.style.display = 'none';
+
+  // Hide trial/upgrade banner — clients have no trial
+  var nudgeBanner = document.getElementById('upgrade-nudge-banner');
+  if (nudgeBanner) nudgeBanner.style.display = 'none';
+  var trialPillTop = document.getElementById('trial-pill-top');
+  if (trialPillTop) trialPillTop.style.display = 'none';
+
+  // Hide Add Recipe button — clients don't create content
+  var addRecipeBtn = document.getElementById('recipes-add-btn');
+  if (addRecipeBtn) addRecipeBtn.style.display = 'none';
+
+  // Update name in topnav
+  var nameEl = document.getElementById('topnav-name');
+  if (nameEl && state.user) nameEl.textContent = state.user.fullName;
+
+  // Restore avatar if photoURL
+  if (state.user && state.user.photoURL) {
+    var av = document.getElementById('topnav-avatar');
+    if (av) { av.style.backgroundImage = 'url(' + state.user.photoURL + ')'; av.style.backgroundSize = 'cover'; av.textContent = ''; }
+  } else if (state.user) {
+    var av2 = document.getElementById('topnav-avatar');
+    if (av2) av2.textContent = (state.user.fullName || 'C')[0].toUpperCase();
+  }
 }
 
 async function loadClientPortal(trainerUid, clientUid) {
@@ -6459,41 +7039,255 @@ async function loadClientPortal(trainerUid, clientUid) {
     );
     var data = snap.exists() ? snap.data() : {};
 
-    menus     = data.assignedMenus    || [];
-    programs  = data.assignedPrograms || [];
-    recipes   = data.assignedRecipes  || [];
+    // Populate main app arrays with client's assigned content
+    menus    = data.assignedMenus    || [];
+    programs = data.assignedPrograms || [];
+    recipes  = data.assignedRecipes  || [];
     window._clientAssignedPrograms = data.assignedPrograms || [];
 
-    // Enrich routines — fetch full data from routines collection if exercises missing
+    // Enrich routines
     var rawRoutines = data.assignedRoutines || [];
     var enriched = [];
     for (var ri = 0; ri < rawRoutines.length; ri++) {
       var r = rawRoutines[ri];
       if (r.exercises && r.exercises.length > 0) {
-        enriched.push(r); // already has exercises
+        enriched.push(r);
       } else if (r.shareToken || r.id) {
-        // Fetch from Firestore
         try {
           var rSnap = await window._firebase.getDoc(
             window._firebase.doc(window._db, 'routines', r.shareToken || r.id)
           );
-          if (rSnap.exists()) {
-            enriched.push(Object.assign({}, r, rSnap.data()));
-          } else {
-            enriched.push(r);
-          }
+          if (rSnap.exists()) enriched.push(Object.assign({}, r, rSnap.data()));
+          else enriched.push(r);
         } catch(e) { enriched.push(r); }
-      } else {
-        enriched.push(r);
-      }
+      } else { enriched.push(r); }
     }
-    data.assignedRoutines = enriched;
+    sentRoutines = enriched;
+    window._clientData = data;
 
-    renderClientPortal(data);
+    // Render the client profile tab
+    renderClientProfileTab(data);
+
+    // Re-render content views with client's assigned content
+    renderMenuLibrary();
+    renderProgramsView();
+    renderRecipesView();
+    renderRoutinesHistory();
+
+    // Switch to library view by default (clients start in library)
+    setView('library', document.getElementById('tnav-library'));
+
+    // Mark mtab-library as active
+    var mlibTab = document.getElementById('mtab-library');
+    document.querySelectorAll('.mobile-tab-btn').forEach(function(b){ b.classList.remove('active'); });
+    if (mlibTab) mlibTab.classList.add('active');
+
   } catch(e) {
-    console.warn('loadClientPortal error:', e.code);
-    renderClientPortal({});
+    console.warn('loadClientPortal error:', e.code || e.message);
   }
+}
+
+/* ── Client Profile Tab — focuses on PROGRESS not personal details ── */
+async function renderClientProfileTab(data) {
+  var el = document.getElementById('view-client-profile');
+  if (!el) return;
+
+  var name  = state.user.fullName;
+  var goal  = data.goal || state.user.goal || '';
+  var goalColor = { cut:'#F472B6', maintain:'#60A5FA', bulk:'#7EE8A2' }[goal] || 'var(--accent)';
+  var goalLabel = { cut:'Cut', maintain:'Maintain', bulk:'Bulk' }[goal] || goal;
+
+  // Show loading first
+  el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted)"><i class="ti ti-loader" style="font-size:28px"></i><div style="margin-top:8px">Loading your progress...</div></div>';
+
+  // Fetch measurements from Firestore (entered by trainer)
+  var measurements = [];
+  try {
+    var snap = await window._firebase.getDocs(
+      window._firebase.query(
+        window._firebase.collection(window._db, 'clientMeasurements'),
+        window._firebase.where('clientUid', '==', state.user.uid),
+        window._firebase.orderBy('date', 'asc')
+      )
+    );
+    snap.forEach(function(d){ measurements.push(Object.assign({id:d.id}, d.data())); });
+  } catch(e) { console.warn('client measurements:', e.code || e.message); }
+
+  // Fetch workout sessions for progress
+  var sessions = [];
+  try {
+    var wsnap = await window._firebase.getDocs(
+      window._firebase.query(
+        window._firebase.collection(window._db, 'workoutSessions'),
+        window._firebase.where('clientUid', '==', state.user.uid),
+        window._firebase.orderBy('date', 'desc'),
+        window._firebase.limit(30)
+      )
+    );
+    wsnap.forEach(function(d){ sessions.push(Object.assign({id:d.id}, d.data())); });
+  } catch(e) { console.warn('client sessions:', e.code || e.message); }
+
+  var latest = measurements.length ? measurements[measurements.length - 1] : null;
+  var totalWorkouts = sessions.length;
+
+  el.innerHTML =
+    '<div style="padding:20px;max-width:600px;margin:0 auto">' +
+
+    // Compact greeting
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">' +
+      '<div style="width:48px;height:48px;border-radius:50%;background:rgba(126,232,162,0.15);border:2px solid ' + goalColor + ';display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:' + goalColor + '">' +
+        (name[0]||'?').toUpperCase() +
+      '</div>' +
+      '<div>' +
+        '<div style="font-size:13px;color:var(--muted)">My Progress</div>' +
+        '<div style="font-size:18px;font-weight:800">' + name.split(' ')[0] + (goalLabel ? ' · <span style="color:' + goalColor + ';font-size:13px">' + goalLabel + '</span>' : '') + '</div>' +
+      '</div>' +
+    '</div>' +
+
+    // Current stats — weight, body fat, workouts
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:24px">' +
+      _clientStatCard('ti-weight', (latest && latest.weight ? latest.weight + ' ' + (latest.weightUnit||'kg') : '—'), 'Weight', '#60A5FA') +
+      _clientStatCard('ti-percentage', (latest && latest.bodyFat ? latest.bodyFat + '%' : '—'), 'Body Fat', '#F472B6') +
+      _clientStatCard('ti-barbell', totalWorkouts, 'Workouts', '#7EE8A2') +
+    '</div>' +
+
+    // Progress graph
+    (measurements.length >= 2 ?
+      '<h3 style="font-size:15px;font-weight:700;margin:0 0 12px">Weight & Body Fat Trend</h3>' +
+      '<div style="background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:16px;margin-bottom:24px">' +
+        renderProgressGraph(measurements) +
+      '</div>'
+    : measurements.length === 1 ?
+      '<div style="background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:20px;margin-bottom:24px;text-align:center;color:var(--muted)">' +
+        '<i class="ti ti-chart-line" style="font-size:28px;opacity:0.4;display:block;margin-bottom:8px"></i>' +
+        '<div style="font-size:13px">One measurement so far. Your progress graph will appear after your next measurement.</div>' +
+      '</div>'
+    :
+      '<div style="background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:20px;margin-bottom:24px;text-align:center;color:var(--muted)">' +
+        '<i class="ti ti-ruler" style="font-size:28px;opacity:0.4;display:block;margin-bottom:8px"></i>' +
+        '<div style="font-size:13px">No measurements yet.<br>Your trainer will add your weight and body fat after your assessment.</div>' +
+      '</div>'
+    ) +
+
+    // Measurement history
+    (measurements.length ?
+      '<h3 style="font-size:15px;font-weight:700;margin:0 0 12px">Measurement History</h3>' +
+      measurements.slice().reverse().map(function(m) {
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;margin-bottom:6px">' +
+          '<span style="font-size:13px;color:var(--muted)">' + new Date(m.date).toLocaleDateString() + '</span>' +
+          '<div style="display:flex;gap:16px">' +
+            (m.weight ? '<span style="font-size:14px;font-weight:700"><i class="ti ti-weight" style="font-size:11px;color:#60A5FA"></i> ' + m.weight + ' ' + (m.weightUnit||'kg') + '</span>' : '') +
+            (m.bodyFat ? '<span style="font-size:14px;font-weight:700;color:#F472B6"><i class="ti ti-percentage" style="font-size:11px"></i> ' + m.bodyFat + '%</span>' : '') +
+          '</div>' +
+        '</div>';
+      }).join('')
+    : '') +
+
+    // Workout history summary
+    (sessions.length ?
+      '<h3 style="font-size:15px;font-weight:700;margin:24px 0 12px">Recent Workouts</h3>' +
+      sessions.slice(0, 8).map(function(s) {
+        var d = new Date(s.date);
+        var dur = s.durationSeconds ? Math.floor(s.durationSeconds/60) + ' min' : '';
+        return '<div style="padding:12px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;margin-bottom:6px">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center">' +
+            '<div style="font-size:14px;font-weight:700">' + (s.dayName||s.programName||'Workout') + '</div>' +
+            '<div style="font-size:12px;color:var(--muted)">' + d.toLocaleDateString() + (dur ? ' · ' + dur : '') + '</div>' +
+          '</div>' +
+          '<div style="font-size:12px;color:var(--muted);margin-top:3px">' + (s.exercises||[]).length + ' exercises completed</div>' +
+        '</div>';
+      }).join('')
+    : '') +
+
+  '</div>';
+}
+
+/* Simple SVG line graph of weight + body fat over time */
+function renderProgressGraph(measurements) {
+  var W = 500, H = 200, pad = 40;
+  var weights = measurements.map(function(m){ return m.weight || null; });
+  var bodyFats = measurements.map(function(m){ return m.bodyFat || null; });
+  var dates = measurements.map(function(m){ return new Date(m.date); });
+
+  var validW = weights.filter(function(w){ return w != null; });
+  var validBF = bodyFats.filter(function(b){ return b != null; });
+
+  function buildLine(values, color, minV, maxV) {
+    var range = maxV - minV || 1;
+    var pts = [];
+    values.forEach(function(v, i) {
+      if (v == null) return;
+      var x = pad + (i / Math.max(1, values.length - 1)) * (W - 2*pad);
+      var y = H - pad - ((v - minV) / range) * (H - 2*pad);
+      pts.push([x, y]);
+    });
+    if (!pts.length) return '';
+    var path = pts.map(function(p, i){ return (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ');
+    var dots = pts.map(function(p){ return '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="3.5" fill="' + color + '"/>'; }).join('');
+    return '<path d="' + path + '" fill="none" stroke="' + color + '" stroke-width="2.5"/>' + dots;
+  }
+
+  var wMin = Math.min.apply(null, validW), wMax = Math.max.apply(null, validW);
+  var bfMin = validBF.length ? Math.min.apply(null, validBF) : 0;
+  var bfMax = validBF.length ? Math.max.apply(null, validBF) : 1;
+
+  var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:auto;overflow:visible">';
+  // baseline
+  svg += '<line x1="' + pad + '" y1="' + (H-pad) + '" x2="' + (W-pad) + '" y2="' + (H-pad) + '" stroke="var(--border2)" stroke-width="1"/>';
+  // lines
+  if (validW.length) svg += buildLine(weights, '#60A5FA', wMin - 1, wMax + 1);
+  if (validBF.length) svg += buildLine(bodyFats, '#F472B6', bfMin - 1, bfMax + 1);
+  // date labels (first + last)
+  if (dates.length) {
+    svg += '<text x="' + pad + '" y="' + (H-pad+18) + '" font-size="11" fill="var(--muted)">' + dates[0].toLocaleDateString() + '</text>';
+    svg += '<text x="' + (W-pad) + '" y="' + (H-pad+18) + '" font-size="11" fill="var(--muted)" text-anchor="end">' + dates[dates.length-1].toLocaleDateString() + '</text>';
+  }
+  svg += '</svg>';
+
+  // legend
+  svg += '<div style="display:flex;gap:18px;justify-content:center;margin-top:10px">' +
+    (validW.length ? '<span style="font-size:12px;color:var(--muted)"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#60A5FA;margin-right:5px"></span>Weight</span>' : '') +
+    (validBF.length ? '<span style="font-size:12px;color:var(--muted)"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#F472B6;margin-right:5px"></span>Body Fat %</span>' : '') +
+  '</div>';
+
+  return svg;
+}
+
+function _clientStatCard(icon, count, label, color) {
+  return '<div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:16px;text-align:center">' +
+    '<i class="ti ' + icon + '" style="font-size:22px;color:' + color + '"></i>' +
+    '<div style="font-size:20px;font-weight:800;margin:6px 0 2px">' + count + '</div>' +
+    '<div style="font-size:12px;color:var(--muted)">' + label + '</div>' +
+  '</div>';
+}
+
+function renderClientMeasurements(measurements) {
+  if (!measurements || !measurements.length) {
+    return '<div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:20px;text-align:center;color:var(--muted)">' +
+      '<i class="ti ti-ruler" style="font-size:28px;opacity:0.4;display:block;margin-bottom:8px"></i>' +
+      '<div style="font-size:13px">No measurements recorded yet.<br>Your trainer will add these after your assessment.</div>' +
+    '</div>';
+  }
+
+  // Sort by date descending
+  var sorted = measurements.slice().sort(function(a,b){ return new Date(b.date) - new Date(a.date); });
+  var latest = sorted[0];
+
+  return '<h3 style="font-size:15px;font-weight:700;margin:20px 0 12px">Body Measurements</h3>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">' +
+      (latest.weight ? '<div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:16px;text-align:center"><i class="ti ti-weight" style="font-size:20px;color:#60A5FA"></i><div style="font-size:24px;font-weight:800;margin:6px 0 2px">' + latest.weight + ' ' + (latest.weightUnit||'kg') + '</div><div style="font-size:12px;color:var(--muted)">Weight</div></div>' : '') +
+      (latest.bodyFat ? '<div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:16px;text-align:center"><i class="ti ti-percentage" style="font-size:20px;color:#F472B6"></i><div style="font-size:24px;font-weight:800;margin:6px 0 2px">' + latest.bodyFat + '%</div><div style="font-size:12px;color:var(--muted)">Body Fat</div></div>' : '') +
+    '</div>' +
+    (sorted.length > 1 ? '<button class="btn btn-ghost btn-sm" onclick="showMeasurementsHistory()" style="margin-bottom:16px"><i class="ti ti-chart-line"></i> View Progress</button>' : '') +
+    sorted.slice(0, 3).map(function(m) {
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;margin-bottom:6px">' +
+        '<span style="font-size:13px;color:var(--muted)">' + new Date(m.date).toLocaleDateString() + '</span>' +
+        '<div style="display:flex;gap:16px">' +
+          (m.weight ? '<span style="font-size:13px;font-weight:600">' + m.weight + ' ' + (m.weightUnit||'kg') + '</span>' : '') +
+          (m.bodyFat ? '<span style="font-size:13px;font-weight:600;color:#F472B6">' + m.bodyFat + '%</span>' : '') +
+        '</div>' +
+      '</div>';
+    }).join('');
 }
 
 function renderClientPortal(data) {
@@ -6698,9 +7492,10 @@ async function loadClients() {
   } catch(e) { console.warn('loadClients:', e.code); }
 }
 
-function renderClientsList() {
+function renderClientsList(searchQuery) {
   var el = document.getElementById('clients-list-body');
   if (!el) return;
+  var query = (searchQuery || '').toLowerCase().trim();
   var cnt = document.getElementById('clients-count');
   if (cnt) cnt.textContent = clientsList.length + ' clients';
 
@@ -6715,7 +7510,16 @@ function renderClientsList() {
     return;
   }
 
-  el.innerHTML = clientsList.map(function(c) {
+  var filtered = query
+    ? clientsList.filter(function(c){ return (c.name||'').toLowerCase().includes(query) || (c.email||'').toLowerCase().includes(query); })
+    : clientsList;
+
+  if (!filtered.length) {
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)"><i class="ti ti-search" style="font-size:32px;opacity:0.3;display:block;margin-bottom:10px"></i>No clients match "' + query + '"</div>';
+    return;
+  }
+
+  el.innerHTML = filtered.map(function(c) {
     var goalColors = { cut:'#F472B6', maintain:'#60A5FA', bulk:'#7EE8A2' };
     var goalColor  = goalColors[c.goal] || 'var(--accent)';
     var assigned   = ((c.assignedMenus||[]).length + (c.assignedPrograms||[]).length + (c.assignedRoutines||[]).length + (c.assignedRecipes||[]).length);
@@ -6890,7 +7694,320 @@ function showClientCredentials(name, email) {
 }
 
 /* ── Client profile / assignment ───────────────────── */
-function openClientProfile(clientId) {
+function searchClients(q) {
+  renderClientsList(q);
+}
+
+/* ── Redesigned Trainer Client Profile ── */
+var _currentClientId = null;
+var _currentClientTab = 'assign';
+
+async function openClientProfile(clientId) {
+  _currentClientId = clientId;
+  var client = clientsList.find(function(c){ return c.id === clientId; });
+  if (!client) return;
+
+  // Set header
+  var goalColor = { cut:'#F472B6', maintain:'#60A5FA', bulk:'#7EE8A2' }[client.goal] || 'var(--accent)';
+  var avatarEl = document.getElementById('client-profile-avatar');
+  var nameEl   = document.getElementById('client-profile-modal-name');
+  var metaEl   = document.getElementById('client-profile-modal-meta');
+  if (avatarEl) { avatarEl.textContent = (client.name||'?')[0].toUpperCase(); avatarEl.style.borderColor = goalColor; avatarEl.style.color = goalColor; }
+  if (nameEl) nameEl.textContent = client.name || 'Client';
+  if (metaEl) metaEl.textContent = (client.email||'') + (client.goal ? ' · ' + client.goal : '');
+
+  // Open modal
+  var modal = document.getElementById('modal-client-profile');
+  if (modal) { modal.style.display = 'flex'; modal.classList.add('open'); }
+  document.getElementById('modal-backdrop').classList.add('open');
+
+  switchClientProfileTab('assign');
+}
+
+async function switchClientProfileTab(tab) {
+  _currentClientTab = tab;
+
+  // Update tab styles
+  ['assign','training','body'].forEach(function(t) {
+    var btn = document.getElementById('cptab-' + t);
+    if (btn) { btn.className = 'client-profile-tab' + (t === tab ? ' active' : ''); }
+  });
+
+  var body = document.getElementById('client-profile-modal-body');
+  var footer = document.getElementById('client-profile-modal-footer');
+  if (!body) return;
+
+  var client = clientsList.find(function(c){ return c.id === _currentClientId; });
+  if (!client) return;
+
+  if (tab === 'assign') {
+    renderClientAssignTab(body, footer, client);
+  } else if (tab === 'training') {
+    await renderClientTrainingTab(body, footer, client);
+  } else if (tab === 'body') {
+    await renderClientBodyTab(body, footer, client);
+  }
+}
+
+function renderClientAssignTab(body, footer, client) {
+  footer.innerHTML = '<button class="btn btn-ghost" onclick="closeAllModals()">Close</button>';
+  var menus2   = (client.assignedMenus    || []);
+  var progs    = (client.assignedPrograms || []);
+  var routs    = (client.assignedRoutines || []);
+  var recs     = (client.assignedRecipes  || []);
+
+  var html = '<div style="padding:16px">';
+
+  html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">';
+  [['menus','ti-salad','Menus',menus2],['programs','ti-calendar','Programs',progs],
+   ['routines','ti-run','Routines',routs],['recipes','ti-chef-hat','Recipes',recs]].forEach(function(item) {
+    html += '<button class="btn btn-ghost btn-sm" onclick="openAssignModal(\'' + client.id + '\',\'' + item[0] + '\')">' +
+      '<i class="ti ' + item[1] + '"></i> Assign ' + item[2] + ' <span style="background:var(--surface2);border-radius:10px;padding:0 6px;font-size:11px">' + item[3].length + '</span></button>';
+  });
+  html += '</div>';
+
+  // List assigned items
+  if (routs.length) {
+    html += '<h4 style="font-size:13px;font-weight:700;color:var(--muted);margin:12px 0 8px">ROUTINES</h4>';
+    routs.forEach(function(r) {
+      html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;margin-bottom:6px">' +
+        '<span style="font-size:14px;font-weight:600">' + (r.name||'Routine') + '</span>' +
+        '<button class="btn btn-ghost btn-sm" onclick="unassignFromClient(\'' + client.id + '\',\'assignedRoutines\',\'' + (r.id||r.shareToken) + '\')"><i class="ti ti-x"></i></button>' +
+      '</div>';
+    });
+  }
+  if (progs.length) {
+    html += '<h4 style="font-size:13px;font-weight:700;color:var(--muted);margin:12px 0 8px">PROGRAMS</h4>';
+    progs.forEach(function(p) {
+      html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;margin-bottom:6px">' +
+        '<span style="font-size:14px;font-weight:600">' + (p.name||'Program') + '</span>' +
+        '<button class="btn btn-ghost btn-sm" onclick="unassignFromClient(\'' + client.id + '\',\'assignedPrograms\',\'' + p.id + '\')"><i class="ti ti-x"></i></button>' +
+      '</div>';
+    });
+  }
+  if (menus2.length) {
+    html += '<h4 style="font-size:13px;font-weight:700;color:var(--muted);margin:12px 0 8px">MENUS</h4>';
+    menus2.forEach(function(m) {
+      html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;margin-bottom:6px">' +
+        '<span style="font-size:14px;font-weight:600">' + (m.name||'Menu') + '</span>' +
+        '<button class="btn btn-ghost btn-sm" onclick="unassignFromClient(\'' + client.id + '\',\'assignedMenus\',\'' + m.id + '\')"><i class="ti ti-x"></i></button>' +
+      '</div>';
+    });
+  }
+  if (recs.length) {
+    html += '<h4 style="font-size:13px;font-weight:700;color:var(--muted);margin:12px 0 8px">RECIPES</h4>';
+    recs.forEach(function(rc) {
+      html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;margin-bottom:6px">' +
+        '<span style="font-size:14px;font-weight:600">' + (rc.name||'Recipe') + '</span>' +
+        '<button class="btn btn-ghost btn-sm" onclick="unassignFromClient(\'' + client.id + '\',\'assignedRecipes\',\'' + rc.id + '\')"><i class="ti ti-x"></i></button>' +
+      '</div>';
+    });
+  }
+
+  if (!routs.length && !progs.length && !menus2.length && !recs.length) {
+    html += '<div style="text-align:center;padding:30px;color:var(--muted)"><i class="ti ti-clipboard-list" style="font-size:28px;opacity:0.3;display:block;margin-bottom:8px"></i>No content assigned yet. Use the buttons above to assign.</div>';
+  }
+
+  html += '</div>';
+  body.innerHTML = html;
+}
+
+async function renderClientTrainingTab(body, footer, client) {
+  footer.innerHTML = '<button class="btn btn-ghost" onclick="closeAllModals()">Close</button>';
+  body.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)"><i class="ti ti-loader" style="font-size:28px;animation:spin 1s linear infinite"></i><div style="margin-top:8px">Loading training log...</div></div>';
+
+  try {
+    var snap = await window._firebase.getDocs(
+      window._firebase.query(
+        window._firebase.collection(window._db, 'workoutSessions'),
+        window._firebase.where('clientUid', '==', client.id),
+        window._firebase.orderBy('date', 'desc'),
+        window._firebase.limit(20)
+      )
+    );
+    var sessions = [];
+    snap.forEach(function(d){ sessions.push(Object.assign({id:d.id}, d.data())); });
+
+    if (!sessions.length) {
+      body.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted)"><i class="ti ti-chart-line" style="font-size:36px;opacity:0.3;display:block;margin-bottom:10px"></i><div>No workouts logged yet.</div></div>';
+      return;
+    }
+
+    var html = '<div style="padding:16px">';
+
+    // Summary stats
+    var totalSessions = sessions.length;
+    var lastDate = new Date(sessions[0].date);
+    var daysSince = Math.floor((Date.now() - lastDate.getTime()) / 86400000);
+
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px">' +
+      _trainerStatCard(totalSessions, 'Sessions', 'ti-barbell', '#7EE8A2') +
+      _trainerStatCard((daysSince === 0 ? 'Today' : daysSince + 'd ago'), 'Last Workout', 'ti-clock', '#60A5FA') +
+      _trainerStatCard(sessions.reduce(function(a,s){ return a + (s.durationSeconds||0); }, 0) > 0 ? Math.round(sessions.reduce(function(a,s){ return a + (s.durationSeconds||0); }, 0) / sessions.length / 60) + ' min' : '-', 'Avg Duration', 'ti-stopwatch', '#FBBF24') +
+    '</div>';
+
+    // Session list
+    html += '<h4 style="font-size:13px;font-weight:700;color:var(--muted);margin:0 0 10px">SESSION HISTORY</h4>';
+    sessions.forEach(function(s) {
+      var d = new Date(s.date);
+      var dur = s.durationSeconds ? Math.floor(s.durationSeconds/60) + ' min' : '';
+      html += '<div onclick="expandTrainerSession(\'' + s.id + '\')" style="padding:12px 16px;background:var(--surface);border:1px solid var(--border2);border-radius:12px;margin-bottom:8px;cursor:pointer">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center">' +
+          '<div>' +
+            '<div style="font-size:14px;font-weight:700">' + (s.dayName||s.programName||'Workout') + '</div>' +
+            '<div style="font-size:12px;color:var(--muted);margin-top:2px">' + d.toLocaleDateString() + (dur ? ' · ' + dur : '') + ' · ' + (s.exercises||[]).length + ' exercises</div>' +
+          '</div>' +
+          '<i class="ti ti-chevron-right" style="color:var(--muted)"></i>' +
+        '</div>' +
+        '<div id="session-detail-' + s.id + '" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px">' +
+          (s.exercises||[]).map(function(ex) {
+            return '<div style="margin-bottom:8px"><div style="font-size:13px;font-weight:600">' + ex.title + '</div>' +
+              ex.sets.map(function(set) {
+                return '<span style="font-size:12px;color:var(--muted);margin-right:8px">Set ' + set.setNum + ': ' + (set.weight||'BW') + ' ' + (s.weightUnit||'kg') + ' × ' + (set.reps||'?') + ' reps</span>';
+              }).join('') + '</div>';
+          }).join('') +
+        '</div>' +
+      '</div>';
+    });
+
+    html += '</div>';
+    body.innerHTML = html;
+
+  } catch(e) {
+    body.innerHTML = '<div style="padding:20px;color:var(--danger)">Error loading sessions: ' + e.message + '</div>';
+  }
+}
+
+function expandTrainerSession(sessionId) {
+  var el = document.getElementById('session-detail-' + sessionId);
+  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function _trainerStatCard(value, label, icon, color) {
+  return '<div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:12px;text-align:center">' +
+    '<i class="ti ' + icon + '" style="font-size:18px;color:' + color + '"></i>' +
+    '<div style="font-size:18px;font-weight:800;margin:4px 0 2px">' + value + '</div>' +
+    '<div style="font-size:11px;color:var(--muted)">' + label + '</div>' +
+  '</div>';
+}
+
+async function renderClientBodyTab(body, footer, client) {
+  footer.innerHTML =
+    '<button class="btn btn-ghost" onclick="closeAllModals()">Close</button>' +
+    '<button class="btn btn-primary" onclick="openAddMeasurementModal(\'' + client.id + '\')">' +
+      '<i class="ti ti-plus"></i> Add Measurement' +
+    '</button>';
+
+  body.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)"><i class="ti ti-loader" style="font-size:28px;animation:spin 1s linear infinite"></i></div>';
+
+  try {
+    var snap = await window._firebase.getDocs(
+      window._firebase.query(
+        window._firebase.collection(window._db, 'clientMeasurements'),
+        window._firebase.where('clientUid', '==', client.id),
+        window._firebase.orderBy('date', 'desc')
+      )
+    );
+    var measurements = [];
+    snap.forEach(function(d){ measurements.push(Object.assign({id:d.id}, d.data())); });
+
+    if (!measurements.length) {
+      body.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted)"><i class="ti ti-ruler" style="font-size:36px;opacity:0.3;display:block;margin-bottom:10px"></i><div>No measurements yet.<br>Add the first measurement below.</div></div>';
+      return;
+    }
+
+    var html = '<div style="padding:16px">';
+    var latest = measurements[0];
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">' +
+      (latest.weight ? _trainerStatCard(latest.weight + ' ' + (latest.weightUnit||'kg'), 'Current Weight', 'ti-weight', '#60A5FA') : '') +
+      (latest.bodyFat ? _trainerStatCard(latest.bodyFat + '%', 'Body Fat', 'ti-percentage', '#F472B6') : '') +
+    '</div>';
+
+    html += '<h4 style="font-size:13px;font-weight:700;color:var(--muted);margin:0 0 10px">MEASUREMENT HISTORY</h4>';
+    measurements.forEach(function(m) {
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;margin-bottom:6px">' +
+        '<span style="font-size:13px;color:var(--muted)">' + new Date(m.date).toLocaleDateString() + '</span>' +
+        '<div style="display:flex;gap:16px;align-items:center">' +
+          (m.weight ? '<span style="font-size:14px;font-weight:700"><i class="ti ti-weight" style="font-size:11px;color:#60A5FA"></i> ' + m.weight + ' ' + (m.weightUnit||'kg') + '</span>' : '') +
+          (m.bodyFat ? '<span style="font-size:14px;font-weight:700;color:#F472B6"><i class="ti ti-percentage" style="font-size:11px"></i> ' + m.bodyFat + '%</span>' : '') +
+          (m.notes ? '<span style="font-size:12px;color:var(--muted)">' + m.notes + '</span>' : '') +
+          '<button onclick="deleteMeasurement(\'' + m.id + '\',\'' + client.id + '\')" style="background:none;border:none;cursor:pointer;color:var(--muted)"><i class="ti ti-trash" style="font-size:14px"></i></button>' +
+        '</div>' +
+      '</div>';
+    });
+    html += '</div>';
+    body.innerHTML = html;
+
+  } catch(e) {
+    body.innerHTML = '<div style="padding:20px;color:var(--danger)">Error: ' + e.message + '</div>';
+  }
+}
+
+function openAddMeasurementModal(clientId) {
+  var existing = document.getElementById('modal-add-measurement');
+  if (existing) existing.remove();
+  var modal = document.createElement('div');
+  modal.id = 'modal-add-measurement';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px';
+  modal.innerHTML =
+    '<div style="background:var(--surface);border-radius:16px;padding:24px;width:100%;max-width:400px">' +
+      '<h3 style="margin:0 0 16px;font-size:16px;font-weight:700">Add Measurement</h3>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">' +
+        '<div><label class="form-label">Weight</label><input class="form-input" type="number" id="meas-weight" placeholder="75.5"></div>' +
+        '<div><label class="form-label">Unit</label><select class="form-select" id="meas-unit"><option value="kg">kg</option><option value="lbs">lbs</option></select></div>' +
+      '</div>' +
+      '<div class="form-group"><label class="form-label">Body Fat %</label><input class="form-input" type="number" id="meas-bodyfat" placeholder="18.5"></div>' +
+      '<div class="form-group"><label class="form-label">Date</label><input class="form-input" type="date" id="meas-date" value="' + new Date().toISOString().split('T')[0] + '"></div>' +
+      '<div class="form-group"><label class="form-label">Notes</label><input class="form-input" id="meas-notes" placeholder="After morning weigh-in..."></div>' +
+      '<div style="display:flex;gap:8px;margin-top:16px">' +
+        '<button class="btn btn-ghost" style="flex:1" onclick="document.getElementById(\'modal-add-measurement\').remove()">Cancel</button>' +
+        '<button class="btn btn-primary" style="flex:2" onclick="saveMeasurement(\'' + clientId + '\')">' +
+          'Save Measurement</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(modal);
+}
+
+async function saveMeasurement(clientId) {
+  var weight  = parseFloat(document.getElementById('meas-weight').value) || 0;
+  var unit    = document.getElementById('meas-unit').value;
+  var bodyFat = parseFloat(document.getElementById('meas-bodyfat').value) || 0;
+  var date    = document.getElementById('meas-date').value;
+  var notes   = document.getElementById('meas-notes').value.trim();
+
+  if (!weight && !bodyFat) { showToast('Enter at least weight or body fat'); return; }
+
+  try {
+    await window._firebase.addDoc(
+      window._firebase.collection(window._db, 'clientMeasurements'),
+      { clientUid: clientId, trainerUid: state.user.uid, date, weight, weightUnit: unit, bodyFat, notes, createdAt: new Date().toISOString() }
+    );
+    showToast('✓ Measurement saved!');
+    document.getElementById('modal-add-measurement').remove();
+    // Refresh body tab
+    await renderClientBodyTab(
+      document.getElementById('client-profile-modal-body'),
+      document.getElementById('client-profile-modal-footer'),
+      clientsList.find(function(c){ return c.id === clientId; })
+    );
+  } catch(e) { showToast('Error: ' + e.message); }
+}
+
+async function deleteMeasurement(measurementId, clientId) {
+  if (!confirm('Delete this measurement?')) return;
+  try {
+    await window._firebase.deleteDoc(window._firebase.doc(window._db, 'clientMeasurements', measurementId));
+    showToast('Deleted');
+    await renderClientBodyTab(
+      document.getElementById('client-profile-modal-body'),
+      document.getElementById('client-profile-modal-footer'),
+      clientsList.find(function(c){ return c.id === clientId; })
+    );
+  } catch(e) { showToast('Error: ' + e.message); }
+}
+
+/* OLD openClientProfile placeholder - replaced above */
+function openClientProfile_OLD(clientId) {
   var client = clientsList.find(function(c){ return c.id === clientId; });
   if (!client) return;
 
@@ -7508,9 +8625,15 @@ async function deleteTrainerResearch(id) {
    MOBILE TAB BAR
 ══════════════════════════════════════════════════════════ */
 function mobileTab(viewId, btn) {
-  // Don't switch trainer views if client portal is active
-  var clientPortal = document.getElementById('screen-client-portal');
-  if (clientPortal && clientPortal.classList.contains('active')) return;
+  // Update mobile tab active state
+  document.querySelectorAll('.mobile-tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+
+  // Handle client-profile tab specially
+  if (viewId === 'client-profile') {
+    setView('client-profile', null);
+    return;
+  }
   // Sync with desktop topnav
   var desktopLink = document.getElementById('tnav-' + viewId);
   setView(viewId, desktopLink);

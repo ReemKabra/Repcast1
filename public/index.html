@@ -704,7 +704,7 @@
               <button class="lib-tab" onclick="filterRecipes('post-workout',this)">Post-Workout</button>
               <button class="lib-tab" onclick="filterRecipes('protein-dessert',this)">Protein Desserts</button>
             </div>
-            <button class="btn btn-ghost btn-sm" onclick="openTrainerRecipeModal()">
+            <button class="btn btn-ghost btn-sm" id="recipes-add-btn" onclick="openTrainerRecipeModal()">
               <i class="ti ti-plus"></i> Add Recipe
             </button>
           </div>
@@ -740,7 +740,7 @@
 
       <!-- CLIENTS VIEW -->
       <div class="view" id="view-clients" style="overflow-y:auto">
-        <div class="view-topbar">
+        <div class="view-topbar" style="flex-wrap:wrap;gap:10px">
           <div class="topbar-left">
             <h2 class="view-title"><i class="ti ti-users" style="color:var(--accent)"></i> My Clients</h2>
             <span id="clients-count" style="font-size:13px;color:var(--muted)"></span>
@@ -749,6 +749,10 @@
             <button class="btn btn-primary" onclick="openAddClientModal()">
               <i class="ti ti-user-plus"></i> Add Client
             </button>
+          </div>
+          <div class="search-wrap" style="width:100%;margin-top:4px">
+            <i class="ti ti-search"></i>
+            <input type="text" placeholder="Search clients by name or email..." oninput="searchClients(this.value)" style="width:100%">
           </div>
         </div>
         <div id="clients-list-body" style="padding:0 24px 24px">
@@ -810,6 +814,19 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- CLIENT PROFILE VIEW (for clients logged in) -->
+      <div class="view" id="view-client-profile" style="overflow-y:auto;-webkit-overflow-scrolling:touch">
+        <div class="view-topbar">
+          <div class="topbar-left">
+            <h2 class="view-title"><i class="ti ti-user-circle" style="color:var(--accent)"></i> My Profile</h2>
+          </div>
+          <div class="topbar-right">
+            <button class="btn btn-ghost btn-sm" onclick="doLogout()"><i class="ti ti-logout"></i> Sign Out</button>
+          </div>
+        </div>
+        <!-- Populated by renderClientProfileTab() -->
       </div>
 
       <!-- BILLING VIEW -->
@@ -2034,16 +2051,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
 </div>
 
 <!-- Client Profile Modal -->
-<div class="modal modal-wide" id="modal-client-profile">
-  <div class="modal-header">
-    <h3 id="client-profile-title"><i class="ti ti-user"></i> Client Profile</h3>
-    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
-  </div>
-  <div class="modal-body" id="client-profile-body"></div>
-  <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Close</button>
-  </div>
-</div>
+
 
 <!-- Assign Content Modal -->
 <!-- ══ ASSIGN CONTENT MODAL ══ -->
@@ -2304,7 +2312,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
            sendPasswordResetEmail,
     fetchSignInMethodsForEmail }              from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { getFirestore, doc, setDoc, getDoc,
-           collection, addDoc, query, where, getDocs,
+           collection, addDoc, query, where, getDocs, orderBy, limit,
            onSnapshot, deleteDoc }                                   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getStorage, ref, uploadBytesResumable,
            getDownloadURL, deleteObject }                           from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
@@ -2358,6 +2366,8 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     query,
     where,
     getDocs,
+    orderBy,
+    limit,
     onSnapshot,
     deleteDoc,
     // Storage
@@ -2620,6 +2630,10 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
   </button>
   <button class="mobile-tab-btn" id="mtab-research" onclick="mobileTab('research',this)">
     <i class="ti ti-microscope"></i>Research
+  </button>
+  <button class="mobile-tab-btn" id="mtab-client-profile" onclick="mobileTab('client-profile',this)" style="display:none">
+    <i class="ti ti-user-circle"></i>
+    <span>My Profile</span>
   </button>
   <button class="mobile-tab-btn" id="mtab-clients" onclick="mobileTab('clients',this)">
     <i class="ti ti-users"></i>Clients
@@ -3010,6 +3024,58 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     <button class="btn btn-ghost" onclick="closeAllModals()">ביטול</button>
     <button class="btn btn-ghost" onclick="validateSectionBulk('foods-he')"><i class="ti ti-check"></i> אמת</button>
     <button class="btn btn-primary" onclick="runSectionBulkImport('foods-he')"><i class="ti ti-file-import"></i> ייבוא לעברית</button>
+  </div>
+</div>
+
+
+<!-- ══ WORKOUT TRACKING SCREEN ══ -->
+<div id="modal-workout-tracking" style="display:none;position:fixed;inset:0;z-index:99999;background:var(--bg);overflow-y:auto;flex-direction:column">
+  <div style="background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10">
+    <button onclick="closeWorkout()" style="background:none;border:none;cursor:pointer;color:var(--text);font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px">
+      <i class="ti ti-x"></i> End Workout
+    </button>
+    <div style="text-align:center">
+      <div id="workout-day-title" style="font-size:15px;font-weight:700"></div>
+      <div id="workout-timer" style="font-size:13px;color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums">00:00</div>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <button id="weight-unit-btn" onclick="toggleWorkoutWeightUnit()" style="padding:4px 10px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text);font-size:12px;font-weight:700;cursor:pointer">kg</button>
+      <button onclick="finishWorkout()" style="padding:6px 14px;border-radius:8px;border:none;background:var(--accent);color:#0a0c0f;font-size:13px;font-weight:700;cursor:pointer">
+        <i class="ti ti-flag"></i> Finish
+      </button>
+    </div>
+  </div>
+  <div id="workout-exercises-body" style="padding:16px;max-width:600px;margin:0 auto;width:100%"></div>
+</div>
+
+<!-- ══ TRAINER CLIENT PROFILE MODAL ══ -->
+<div class="modal modal-wide" id="modal-client-profile" style="max-height:90vh;display:none;flex-direction:column">
+  <div class="modal-header" style="flex-shrink:0">
+    <div style="display:flex;align-items:center;gap:12px;flex:1">
+      <div id="client-profile-avatar" style="width:44px;height:44px;border-radius:50%;background:rgba(126,232,162,0.15);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--accent);flex-shrink:0">?</div>
+      <div>
+        <h3 id="client-profile-modal-name" style="margin:0;font-size:16px;font-weight:700"></h3>
+        <div id="client-profile-modal-meta" style="font-size:12px;color:var(--muted)"></div>
+      </div>
+    </div>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <!-- Profile Tabs -->
+  <div style="display:flex;border-bottom:1px solid var(--border);padding:0 16px;flex-shrink:0">
+    <button class="client-profile-tab active" id="cptab-assign" onclick="switchClientProfileTab('assign')">
+      <i class="ti ti-clipboard-list"></i> Assignments
+    </button>
+    <button class="client-profile-tab" id="cptab-training" onclick="switchClientProfileTab('training')">
+      <i class="ti ti-chart-line"></i> Training Log
+    </button>
+    <button class="client-profile-tab" id="cptab-body" onclick="switchClientProfileTab('body')">
+      <i class="ti ti-ruler" style=""></i> Body
+    </button>
+  </div>
+  <!-- Tab content -->
+  <div id="client-profile-modal-body" style="flex:1;overflow-y:auto;padding:0"></div>
+  <div class="modal-footer" id="client-profile-modal-footer" style="flex-shrink:0">
+    <button class="btn btn-ghost" onclick="closeAllModals()">Close</button>
   </div>
 </div>
 
