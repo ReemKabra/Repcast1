@@ -15,9 +15,37 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles-native.css?v=1781545210">
 </head>
-<body>
+<script>
+// Native app — always set is-native and is-android classes immediately
+document.documentElement.classList.add('is-native', 'is-android');
+// Update platform class when Capacitor is ready
+(function() {
+  function setPlatform() {
+    if (window.Capacitor && window.Capacitor.getPlatform) {
+      var p = window.Capacitor.getPlatform();
+      document.documentElement.classList.remove('is-android', 'is-ios');
+      document.documentElement.classList.add('is-' + p);
+    }
+  }
+  setTimeout(setPlatform, 100);
+})();
+</script>
+<body class="is-native">
+<script>
+// On native: skip landing page, go straight to auth
+// (unless already logged in — onAuthStateChanged handles that)
+document.addEventListener('DOMContentLoaded', function() {
+  // If we land on landing screen, switch to auth
+  var landing = document.getElementById('screen-landing');
+  var auth    = document.getElementById('screen-auth');
+  if (landing && landing.classList.contains('active') && auth) {
+    landing.classList.remove('active');
+    auth.classList.add('active');
+  }
+});
+</script>
 
 <!-- Skip to content link — mandatory for keyboard/screen reader accessibility -->
 <a href="#main-content" class="skip-to-content" tabindex="1">Skip to main content</a>
@@ -390,7 +418,7 @@
           Continue with Google
         </button>
         <!-- Native Google button — shown only in Capacitor app -->
-        <button class="btn-google-native btn-full" onclick="doGoogleLogin()" style="display:none">
+        <button class="btn-google-native btn-full" onclick="doGoogleLogin()">
           <svg width="18" height="18" viewBox="0 0 48 48" style="flex-shrink:0"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.6 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34.1 6.6 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.5 15.8 18.9 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34.1 6.6 29.3 4 24 4 16.3 4 9.7 8.4 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.3 35.3 26.8 36 24 36c-5.3 0-9.7-3.1-11.4-7.5L6 33.8C9.4 39.7 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.9 2.4-2.5 4.5-4.6 5.9l.1-.1 6.2 5.2c-.4.4 6.9-5 6.9-15 0-1.3-.1-2.6-.4-3.9z"/></svg>
           Continue with Google
         </button>
@@ -497,35 +525,49 @@
     </div>
     <div class="topnav-links">
       <a class="topnav-link active" id="tnav-library" onclick="setView('library',this)" href="#">
-        <i class="ti ti-layout-grid"></i> Library
+        <i class="ti ti-layout-grid"></i> <span id="tnav-library-label">Library</span>
       </a>
       <a class="topnav-link" id="tnav-routines" onclick="setView('routines',this)" href="#">
         <i class="ti ti-list-check"></i> Routines
         <span class="tnav-badge" id="tnav-routines-badge">0</span>
       </a>
       <a class="topnav-link" id="tnav-profile" onclick="setView('profile',this)" href="#">
-        <i class="ti ti-user-circle"></i> Profile
+        <i class="ti ti-user-circle"></i> <span id="tnav-profile-label">Profile</span>
       </a>
       <a class="topnav-link" id="tnav-nutrition" onclick="setView('nutrition',this)" href="#">
-        <i class="ti ti-salad"></i> Nutrition
+        <i class="ti ti-salad"></i> <span id="tnav-nutrition-label">Nutrition</span>
       </a>
       <a class="topnav-link" id="tnav-programs" onclick="setView('programs',this)" href="#">
-        <i class="ti ti-calendar"></i> Programs
+        <i class="ti ti-calendar"></i> <span id="tnav-programs-label">Programs</span>
       </a>
       <a class="topnav-link" id="tnav-recipes" onclick="setView('recipes',this)" href="#">
-        <i class="ti ti-chef-hat"></i> Recipes
+        <i class="ti ti-chef-hat"></i> <span id="tnav-recipes-label">Recipes</span>
+      </a>
+      <a class="topnav-link" id="tnav-group-workouts" onclick="setView('group-workouts',this)" href="#">
+        <i class="ti ti-users-group"></i> <span id="tnav-group-workouts-label">Group Workouts</span>
       </a>
       <a class="topnav-link" id="tnav-research" onclick="setView('research',this)" href="#">
-        <i class="ti ti-microscope"></i> Research
+        <i class="ti ti-microscope"></i> <span id="tnav-research-label">Research</span>
       </a>
       <a class="topnav-link" id="tnav-clients" onclick="setView('clients',this)" href="#">
-        <i class="ti ti-users"></i> Clients
+        <i class="ti ti-users"></i> <span id="tnav-clients-label">Clients</span>
       </a>
       <a class="topnav-link" id="tnav-billing" onclick="setView('billing',this)" href="#">
         <i class="ti ti-credit-card"></i> Billing
       </a>
     </div>
     <div class="topnav-right">
+      <!-- Language Toggle -->
+      <div class="lang-toggle-wrap" style="display:flex;gap:3px;background:var(--surface2);border-radius:8px;padding:3px;margin-right:6px">
+        <button id="lang-btn-en" onclick="setLang('en')"
+          style="padding:3px 8px;border-radius:6px;border:none;font-size:12px;font-weight:700;cursor:pointer;background:var(--accent);color:#0a0c0f">
+          EN
+        </button>
+        <button id="lang-btn-he" onclick="setLang('he')"
+          style="padding:3px 8px;border-radius:6px;border:none;font-size:12px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted)">
+          עב
+        </button>
+      </div>
       <div class="trial-pill-top" id="trial-pill-top">
         <i class="ti ti-star-filled"></i>
         Trial — <strong id="trial-days-top">5</strong> days left
@@ -535,16 +577,6 @@
         <div class="user-avatar-sm" id="topnav-avatar">JD</div>
         <span id="topnav-name">Jordan Davis</span>
         <i class="ti ti-chevron-down" style="font-size:12px;color:var(--muted)"></i>
-      </div>
-      <div style="display:flex;gap:4px;background:var(--surface2);border-radius:10px;padding:3px">
-        <button id="lang-btn-en" onclick="setLang('en')"
-          style="padding:4px 12px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:var(--accent);color:#0a0c0f;font-family:inherit">
-          🇺🇸 EN
-        </button>
-        <button id="lang-btn-he" onclick="setLang('he')"
-          style="padding:4px 12px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:transparent;color:var(--muted);font-family:inherit">
-          🇮🇱 עב
-        </button>
       </div>
       <button class="btn-icon-nav" onclick="doLogout()" title="Sign out">
         <i class="ti ti-logout"></i>
@@ -567,73 +599,72 @@
   </div>
 
   <div class="app-layout">
-    <!-- Sidebar (muscle filters only) -->
-    <aside class="sidebar" id="sidebar">
-      <div class="muscle-filter-panel" id="muscle-panel">
-        <div class="nav-section-label" style="padding:0 8px;margin-bottom:10px">Filter by Muscle</div>
-        <div id="muscle-filter-list"></div>
-        <button class="clear-filter-btn" id="clear-filter-btn" onclick="clearFilters()" style="display:none">
-          <i class="ti ti-x"></i> Clear filters
+    <!-- Native horizontal muscle filter bar -->
+    <div id="sidebar" style="display:flex;flex-direction:row;width:100%;height:48px;min-height:48px;max-height:48px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;overflow:hidden">
+      <div id="muscle-panel" style="display:flex;flex-direction:row;flex:1;overflow-x:auto;overflow-y:hidden;align-items:center;padding:0 8px;gap:6px;scrollbar-width:none;-webkit-overflow-scrolling:touch">
+        <div id="muscle-filter-list" style="display:flex;flex-direction:row;gap:6px;align-items:center;flex-shrink:0"></div>
+        <button class="clear-filter-btn" id="clear-filter-btn" onclick="clearFilters()" style="display:none;flex-shrink:0;white-space:nowrap;border-radius:20px;padding:4px 10px;font-size:11px;height:30px">
+          <i class="ti ti-x"></i> Clear
         </button>
       </div>
-    </aside>
+    </div>
 
     <!-- Main Content -->
     <main class="main-content" id="main-content" role="main" aria-label="Main content">
 
       <!-- LIBRARY VIEW -->
       <div class="view active" id="view-library">
-        <div class="view-topbar">
-          <div class="topbar-left">
-            <div class="lib-tabs">
-              <button class="lib-tab active" id="tab-master" onclick="switchLibTab('master', this)">
-                <i class="ti ti-database"></i> Master Library
-                <span class="tab-count" id="master-count">30</span>
-              </button>
-              <button class="lib-tab" id="tab-custom" onclick="switchLibTab('custom', this)">
-                <i class="ti ti-cloud-upload"></i> My Videos
-                <span class="tab-count" id="custom-count">0</span>
-              </button>
-              <button class="lib-tab" id="tab-mymenus" onclick="switchLibTab('mymenus', this)">
-                <i class="ti ti-salad"></i> My Menus
-              </button>
-              <button class="lib-tab" id="tab-myprograms" onclick="switchLibTab('myprograms', this)">
-                <i class="ti ti-calendar"></i> My Programs
-              </button>
-              <button class="lib-tab" id="tab-myrecipes" onclick="switchLibTab('myrecipes', this)">
-                <i class="ti ti-chef-hat"></i> My Recipes
-              </button>
-              <button class="lib-tab" id="tab-myresearch" onclick="switchLibTab('myresearch', this)">
-                <i class="ti ti-book"></i> My Research
-              </button>
-            </div>
-          </div>
-          <div class="topbar-right">
-            <div class="search-wrap">
-              <i class="ti ti-search"></i>
-              <input type="text" placeholder="Search exercises… (⌘K)" id="search-input" oninput="handleSearch(this.value)">
-              <span class="search-clear" id="search-clear" onclick="clearSearch()" style="display:none">
-                <i class="ti ti-x"></i>
-              </span>
-            </div>
-            <div id="lib-upload-bar" style="display:flex;gap:6px;align-items:center">
-              <button class="btn btn-ghost btn-sm" onclick="reloadMyVideos()" id="reload-videos-btn"
-                title="Videos not showing? Click to reload from Firebase">
-                <i class="ti ti-refresh"></i> Reload Videos
-              </button>
-              <button class="btn btn-primary" onclick="openModal('upload')">
-                <i class="ti ti-upload"></i> Upload Video
-              </button>
-            </div>
+        <!-- Library tabs — scrollable horizontal strip -->
+        <div id="lib-tabs-bar" style="display:flex;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;padding:0 8px;gap:4px;min-height:44px;align-items:center">
+          <button class="lib-tab active" id="tab-master" onclick="switchLibTab('master',this)" style="flex-shrink:0">
+            <i class="ti ti-database"></i> Library
+          </button>
+          <button class="lib-tab" id="tab-custom" onclick="switchLibTab('custom',this)" style="flex-shrink:0">
+            <i class="ti ti-cloud-upload"></i> My Videos
+          </button>
+          <button class="lib-tab" id="tab-mymenus" onclick="switchLibTab('mymenus',this)" style="flex-shrink:0">
+            <i class="ti ti-salad"></i> My Menus
+          </button>
+          <button class="lib-tab" id="tab-myprograms" onclick="switchLibTab('myprograms',this)" style="flex-shrink:0">
+            <i class="ti ti-calendar"></i> My Programs
+          </button>
+          <button class="lib-tab" id="tab-myrecipes" onclick="switchLibTab('myrecipes',this)" style="flex-shrink:0">
+            <i class="ti ti-chef-hat"></i> My Recipes
+          </button>
+          <button class="lib-tab" id="tab-myresearch" onclick="switchLibTab('myresearch',this)" style="flex-shrink:0">
+            <i class="ti ti-book"></i> My Research
+          </button>
+        </div>
+
+        <!-- Search bar — always visible -->
+        <div style="padding:8px 10px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0">
+          <div class="search-wrap" style="width:100%">
+            <i class="ti ti-search"></i>
+            <input type="text" placeholder="Search exercises..." id="search-input" oninput="handleSearch(this.value)" style="flex:1">
+            <span class="search-clear" id="search-clear" onclick="clearSearch()" style="display:none">
+              <i class="ti ti-x"></i>
+            </span>
           </div>
         </div>
-        <div class="library-body" id="library-body"></div>
+
+        <!-- Upload button — only shown on My Videos tab -->
+        <div id="lib-upload-bar" style="display:none;padding:6px 10px;border-bottom:1px solid var(--border);gap:8px;background:var(--surface);flex-shrink:0">
+          <button class="btn btn-ghost btn-sm" onclick="reloadMyVideos()">
+            <i class="ti ti-refresh"></i> Reload
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="openModal('upload')">
+            <i class="ti ti-upload"></i> Upload Video
+          </button>
+        </div>
+
+        <!-- Library content -->
+        <div class="library-body" id="library-body" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch"></div>
       </div>
 
       <!-- ROUTINES VIEW -->
       <div class="view" id="view-routines">
         <div class="view-topbar">
-          <div class="topbar-left"><h2 class="view-title">Sent Routines</h2></div>
+          <div class="topbar-left"><h2 class="view-title"><span id="view-routines-title">Sent Routines</span></h2></div>
         </div>
         <div class="routines-body" id="routines-body">
           <div class="empty-state">
@@ -654,7 +685,7 @@
         <div class="nutrition-section" style="margin-top:24px">
           <div class="view-topbar">
             <div class="topbar-left">
-              <h2 class="view-title"><i class="ti ti-book" style="color:var(--accent)"></i> Menu Library</h2>
+              <h2 class="view-title"><i class="ti ti-book" style="color:var(--accent)"></i> <span id="view-nutrition-title">Menu Library</span></h2>
             </div>
             <div class="topbar-right">
               <div class="lib-tabs" style="margin:0">
@@ -679,7 +710,7 @@
       <!-- PROGRAMS VIEW -->
       <div class="view" id="view-programs">
         <div class="view-topbar">
-          <div class="topbar-left"><h2 class="view-title"><i class="ti ti-calendar" style="color:var(--accent)"></i> Training Programs</h2></div>
+          <div class="topbar-left"><h2 class="view-title"><i class="ti ti-calendar" style="color:var(--accent)"></i> <span id="view-programs-title">Training Programs</span></h2></div>
         </div>
         <div id="programs-body">
           <div class="empty-state">
@@ -693,7 +724,7 @@
       <!-- RECIPES VIEW -->
       <div class="view" id="view-recipes">
         <div class="view-topbar">
-          <div class="topbar-left"><h2 class="view-title"><i class="ti ti-chef-hat" style="color:var(--accent)"></i> Recipe Library</h2></div>
+          <div class="topbar-left"><h2 class="view-title"><i class="ti ti-chef-hat" style="color:var(--accent)"></i> <span id="view-recipes-title">Recipe Library</span></h2></div>
           <div class="topbar-right">
             <div class="lib-tabs" style="margin:0">
               <button class="lib-tab active" id="recipe-tab-all" onclick="filterRecipes('all',this)">All</button>
@@ -704,9 +735,7 @@
               <button class="lib-tab" onclick="filterRecipes('post-workout',this)">Post-Workout</button>
               <button class="lib-tab" onclick="filterRecipes('protein-dessert',this)">Protein Desserts</button>
             </div>
-            <button class="btn btn-ghost btn-sm" id="recipes-add-btn" onclick="openTrainerRecipeModal()">
-              <i class="ti ti-plus"></i> Add Recipe
-            </button>
+
           </div>
         </div>
         <div id="recipes-body">
@@ -719,14 +748,29 @@
       </div>
 
       <!-- RESEARCH VIEW -->
-      <div class="view" id="view-research">
+      <!-- GROUP WORKOUTS VIEW -->
+      <div class="view" id="view-group-workouts" style="overflow-y:auto">
         <div class="view-topbar">
-          <div class="topbar-left"><h2 class="view-title"><i class="ti ti-microscope" style="color:var(--accent)"></i> Research Library</h2></div>
+          <div class="topbar-left">
+            <h2 class="view-title"><i class="ti ti-users-group" style="color:var(--accent)"></i> <span id="view-group-workouts-title">Group Workouts</span></h2>
+          </div>
+          <div class="topbar-right">
+            <button class="btn btn-primary" onclick="openCreateGroupWorkout()">
+              <i class="ti ti-plus"></i> Create Workout
+            </button>
+          </div>
+        </div>
+        <div id="group-workouts-body" style="padding:0 16px 24px">
+          <div class="empty-state"><div class="empty-icon"><i class="ti ti-users-group"></i></div><h3>Loading...</h3></div>
+        </div>
+      </div>
+
+            <div class="view" id="view-research">
+        <div class="view-topbar">
+          <div class="topbar-left"><h2 class="view-title"><i class="ti ti-microscope" style="color:var(--accent)"></i> <span id="view-research-title">Research Library</span></h2></div>
           <div class="topbar-right">
             <input class="search-input" id="research-search" placeholder="Search studies..." oninput="filterResearch(this.value)" style="width:180px">
-            <button class="btn btn-ghost btn-sm" onclick="openTrainerResearchModal()">
-              <i class="ti ti-plus"></i> Add Study
-            </button>
+
           </div>
         </div>
         <div id="research-body">
@@ -742,7 +786,7 @@
       <div class="view" id="view-clients" style="overflow-y:auto">
         <div class="view-topbar" style="flex-wrap:wrap;gap:10px">
           <div class="topbar-left">
-            <h2 class="view-title"><i class="ti ti-users" style="color:var(--accent)"></i> My Clients</h2>
+            <h2 class="view-title"><i class="ti ti-users" style="color:var(--accent)"></i> <span id="view-clients-title">My Clients</span></h2>
             <span id="clients-count" style="font-size:13px;color:var(--muted)"></span>
           </div>
           <div class="topbar-right">
@@ -752,16 +796,30 @@
           </div>
           <div class="search-wrap" style="width:100%;margin-top:4px">
             <i class="ti ti-search"></i>
-            <input type="text" placeholder="Search clients by name or email..." oninput="searchClients(this.value)" style="width:100%">
+            <input type="text" placeholder="Search clients..." oninput="searchClients(this.value)" style="width:100%">
           </div>
         </div>
-        <div id="clients-list-body" style="padding:0 24px 24px">
+        <div id="clients-list-body" style="padding:0 16px 24px">
           <div class="empty-state"><div class="empty-icon"><i class="ti ti-users"></i></div><h3>Loading...</h3></div>
         </div>
       </div>
 
+      <!-- CLIENT PROFILE VIEW (for clients logged in) -->
+      <div class="view" id="view-client-profile" style="overflow-y:auto;-webkit-overflow-scrolling:touch">
+        <div class="view-topbar">
+          <div class="topbar-left">
+            <h2 class="view-title"><i class="ti ti-user-circle" style="color:var(--accent)"></i> My Profile</h2>
+          </div>
+        <!-- Today's Group Workout Banner + Log Workout injected by applyClientNav() -->
+          <div class="topbar-right">
+            <button class="btn btn-ghost btn-sm" onclick="doLogout()"><i class="ti ti-logout"></i> Sign Out</button>
+          </div>
+        </div>
+        <!-- Populated by renderClientProfileTab() -->
+      </div>
+
       <!-- PROFILE VIEW -->
-      <div class="view" id="view-profile">
+      <div class="view" id="view-profile" style="overflow-y:auto;-webkit-overflow-scrolling:touch">
         <div class="view-topbar">
           <div class="topbar-left"><h2 class="view-title">Profile &amp; Settings</h2></div>
           <div class="topbar-right">
@@ -816,17 +874,17 @@
         </div>
       </div>
 
-      <!-- CLIENT PROFILE VIEW (for clients logged in) -->
-      <div class="view" id="view-client-profile" style="overflow-y:auto;-webkit-overflow-scrolling:touch">
-        <div class="view-topbar">
-          <div class="topbar-left">
-            <h2 class="view-title"><i class="ti ti-user-circle" style="color:var(--accent)"></i> My Profile</h2>
-          </div>
-          <div class="topbar-right">
-            <button class="btn btn-ghost btn-sm" onclick="doLogout()"><i class="ti ti-logout"></i> Sign Out</button>
-          </div>
-        </div>
-        <!-- Populated by renderClientProfileTab() -->
+      <!-- NATIVE LINKS — Accessibility + Terms -->
+      <div style="display:none" id="native-links-placeholder"></div>
+
+      <!-- ACCESSIBILITY + TERMS (native) -->
+      <div style="padding:20px 24px;border-top:1px solid var(--border);margin-top:16px;display:flex;gap:12px;flex-wrap:wrap" id="native-legal-links">
+        <a href="javascript:void(0)" onclick="openInBrowser('https://repcast.co.il/accessibility')" style="color:var(--muted);font-size:13px;display:flex;align-items:center;gap:6px">
+          <i class="ti ti-accessibility"></i> Accessibility
+        </a>
+        <a href="javascript:void(0)" onclick="openInBrowser('https://repcast.co.il/terms')" style="color:var(--muted);font-size:13px;display:flex;align-items:center;gap:6px">
+          <i class="ti ti-file-text"></i> Terms &amp; Privacy
+        </a>
       </div>
 
       <!-- BILLING VIEW -->
@@ -937,16 +995,7 @@
     </div>
     <div class="topnav-right">
       <span id="client-portal-name" style="font-size:14px;color:var(--muted)"></span>
-      <div style="display:flex;gap:4px;background:var(--surface2);border-radius:10px;padding:3px">
-        <button id="lang-btn-en-mgr" onclick="setLang('en')"
-          style="padding:4px 12px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:var(--accent);color:#0a0c0f;font-family:inherit">
-          🇺🇸 EN
-        </button>
-        <button id="lang-btn-he-mgr" onclick="setLang('he')"
-          style="padding:4px 12px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700;background:transparent;color:var(--muted);font-family:inherit">
-          🇮🇱 עב
-        </button>
-      </div>
+      <button class="lang-toggle-btn btn btn-ghost btn-sm" onclick="toggleLang()" style="font-size:13px;padding:4px 10px;margin-left:8px">🇮🇱 עב</button>
       <button class="btn btn-ghost btn-sm" onclick="doLogout()" style="margin-left:12px">
         <i class="ti ti-logout"></i> Sign Out
       </button>
@@ -954,6 +1003,10 @@
   </nav>
 
   <div style="max-width:800px;margin:0 auto;padding:24px;overflow-y:auto;height:calc(100vh - 56px)">
+
+    <!-- Today's Group Workout Banner -->
+    <div id="client-group-workout-banner" style="display:none;align-items:center;gap:12px;margin:0 0 16px;padding:14px 16px;background:var(--accent);color:#0a0c0f;border-radius:14px;cursor:pointer;box-shadow:0 4px 16px rgba(126,232,162,0.25)">
+    </div>
 
     <!-- BMR Stats -->
     <div id="client-bmr-stats" style="margin-bottom:24px"></div>
@@ -1051,19 +1104,7 @@
           </button>
         </div>
       </div>
-      <!-- EN / HE tabs for exercises -->
-      <div style="display:flex;gap:0;padding:12px 16px 0;border-bottom:1px solid var(--border)">
-        <button id="admin-tab-exercises-en" onclick="setAdminLang('exercises','en')"
-          style="padding:6px 18px;border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;cursor:pointer;font-weight:600;font-size:13px;background:var(--surface2);color:var(--text);margin-right:4px">
-          🇺🇸 English
-        </button>
-        <button id="admin-tab-exercises-he" onclick="setAdminLang('exercises','he')"
-          style="padding:6px 18px;border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;cursor:pointer;font-weight:600;font-size:13px;background:transparent;color:var(--muted)">
-          🇮🇱 עברית
-        </button>
-      </div>
-      <!-- English exercises table -->
-      <div id="exercises-en-wrap" class="admin-table-wrap">
+      <div class="admin-table-wrap">
         <table class="admin-table" id="admin-table">
           <thead>
             <tr>
@@ -1077,12 +1118,6 @@
           </thead>
           <tbody id="admin-table-body"></tbody>
         </table>
-      </div>
-      <!-- Hebrew exercises list -->
-      <div id="exercises-he-wrap" style="display:none;flex:1;overflow-y:auto;padding:16px">
-        <div id="admin-exercises-he-list">
-          <div class="empty-state"><div class="empty-icon"><i class="ti ti-language"></i></div><h3>No Hebrew exercises yet</h3><p>Add exercises or bulk import to add Hebrew content.</p></div>
-        </div>
       </div>
     </div>
 
@@ -1112,10 +1147,7 @@
       <div class="admin-view-topbar">
         <div><h2 class="admin-view-title">Nutrition Menus</h2><span id="admin-menu-count" style="font-size:13px;color:var(--muted)">0 menus</span></div>
         
-
-        <button class="btn btn-ghost btn-sm" onclick="openModal('bulk-menus')">
-          <i class="ti ti-file-import"></i> Bulk Import
-        </button>      </div>
+      </div>
       <div style="display:flex;gap:0;padding:12px 16px 0;border-bottom:1px solid var(--border)">
         <button id="admin-tab-menus-en" onclick="setAdminLang('menus','en')"
           style="padding:6px 18px;border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;cursor:pointer;font-weight:600;font-size:13px;background:var(--surface2);color:var(--text);margin-right:4px">
@@ -1134,12 +1166,12 @@
     <!-- ══ ADMIN PROGRAMS ══ -->
     <div class="admin-view" id="admin-view-foods">
       <div class="admin-view-topbar">
-        <div><h2 class="admin-view-title">Food Database</h2><span style="font-size:13px;color:var(--muted)">Master food collection — trainers pick from this when building menus</span></div>
+        <div><h2 class="admin-view-title">Food Database</h2><span style="font-size:13px;color:var(--muted)">Master food collection for menus</span></div>
         <button class="btn btn-ghost btn-sm" onclick="openModal('bulk-foods')">
-          <i class="ti ti-file-import"></i> Bulk Import
+          <i class="ti ti-file-import"></i> Import
         </button>
-        <button class="btn btn-primary" onclick="openAdminFoodModal()">
-          <i class="ti ti-plus"></i> Add Food
+        <button class="btn btn-primary btn-sm" onclick="openAdminFoodModal()">
+          <i class="ti ti-plus"></i> Add
         </button>
       </div>
       <div style="display:flex;gap:0;padding:12px 16px 0;border-bottom:1px solid var(--border)">
@@ -1160,10 +1192,7 @@
       <div class="admin-view-topbar">
         <div><h2 class="admin-view-title">Training Programs</h2><span id="admin-programs-count" style="font-size:13px;color:var(--muted)">0 programs</span></div>
         
-
-        <button class="btn btn-ghost btn-sm" onclick="openModal('bulk-programs')">
-          <i class="ti ti-file-import"></i> Bulk Import
-        </button>      </div>
+      </div>
       <div style="display:flex;gap:0;padding:12px 16px 0;border-bottom:1px solid var(--border)">
         <button id="admin-tab-programs-en" onclick="setAdminLang('programs','en')"
           style="padding:6px 18px;border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;cursor:pointer;font-weight:600;font-size:13px;background:var(--surface2);color:var(--text);margin-right:4px">
@@ -1184,10 +1213,7 @@
       <div class="admin-view-topbar">
         <div><h2 class="admin-view-title">Recipe Library</h2><span id="admin-recipes-count" style="font-size:13px;color:var(--muted)">0 recipes</span></div>
         
-
-        <button class="btn btn-ghost btn-sm" onclick="openModal('bulk-recipes')">
-          <i class="ti ti-file-import"></i> Bulk Import
-        </button>      </div>
+      </div>
       <div style="display:flex;gap:0;padding:12px 16px 0;border-bottom:1px solid var(--border)">
         <button id="admin-tab-recipes-en" onclick="setAdminLang('recipes','en')"
           style="padding:6px 18px;border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;cursor:pointer;font-weight:600;font-size:13px;background:var(--surface2);color:var(--text);margin-right:4px">
@@ -1208,10 +1234,7 @@
       <div class="admin-view-topbar">
         <div><h2 class="admin-view-title">Research Library</h2><span id="admin-research-count" style="font-size:13px;color:var(--muted)">0 studies</span></div>
         
-
-        <button class="btn btn-ghost btn-sm" onclick="openModal('bulk-research')">
-          <i class="ti ti-file-import"></i> Bulk Import
-        </button>      </div>
+      </div>
       <div id="admin-research-list"><div class="empty-state"><div class="empty-icon"><i class="ti ti-microscope"></i></div><h3>No studies yet</h3></div></div>
     </div>
 
@@ -1756,12 +1779,15 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
         <label class="form-label">Notes / Progression Rules</label>
         <textarea class="form-textarea" id="prog-notes" rows="2" placeholder="Progressive overload guidelines, warm-up instructions, etc."></textarea>
       </div>
-      <div class="form-group" style="flex:0;min-width:140px">
+      <div class="form-group" style="flex:0;min-width:160px">
         <label class="form-label">Visibility</label>
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 0">
-          <input type="checkbox" id="prog-is-public" checked style="width:16px;height:16px;accent-color:var(--accent)">
-          <span style="font-size:13px;color:var(--muted)">Public to all trainers</span>
-        </label>
+        <input type="hidden" id="prog-is-public" value="true">
+        <button type="button" id="prog-public-toggle"
+          onclick="toggleProgPublic(this)"
+          style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;border:1px solid var(--accent);background:rgba(126,232,162,0.1);color:var(--accent);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;width:100%;touch-action:manipulation">
+          <i class="ti ti-world" id="prog-public-icon"></i>
+          <span id="prog-public-label">Public</span>
+        </button>
       </div>
     </div>
 
@@ -2051,8 +2077,6 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
 </div>
 
 <!-- Client Profile Modal -->
-
-
 <!-- Assign Content Modal -->
 <!-- ══ ASSIGN CONTENT MODAL ══ -->
 <div class="modal modal-wide" id="modal-assign-content">
@@ -2081,7 +2105,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
 <div class="modal" id="modal-edit-bmr" style="max-width:520px">
   <div class="modal-header">
     <h3><i class="ti ti-calculator" style="color:var(--accent)"></i> <span id="ebmr-title">Edit BMR</span></h3>
-    <button class="modal-close" onclick="closeEditBMR()"><i class="ti ti-x"></i></button>
+    <button class="modal-close" onclick="closeBmrEditModal()"><i class="ti ti-x"></i></button>
   </div>
   <div class="modal-body">
     <div class="form-row">
@@ -2152,7 +2176,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     <div id="ebmr-preview" style="margin-top:16px"></div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeEditBMR()">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeBmrEditModal()">Cancel</button>
     <button class="btn btn-primary" onclick="saveEditClientBMR()">
       <i class="ti ti-check"></i> Save
     </button>
@@ -2384,7 +2408,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
   window.dispatchEvent(new Event('firebaseReady'));
 </script>
 
-<script src="app.js" defer></script>
+<script src="app.js?v=1781872092" defer></script>
 <script>
 /* ── Accessibility Widget ─────────────────────────────────────── */
 (function() {
@@ -2614,32 +2638,35 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
 <!-- MOBILE BOTTOM TAB BAR — fixed, global level -->
 <nav class="mobile-tab-bar" id="mobile-tab-bar" aria-label="Mobile navigation">
   <button class="mobile-tab-btn active" id="mtab-library" onclick="mobileTab('library',this)">
-    <i class="ti ti-layout-grid"></i>Library
+    <i class="ti ti-layout-grid"></i><span id="mtab-library-label">Library</span>
   </button>
   <button class="mobile-tab-btn" id="mtab-routines" onclick="mobileTab('routines',this)">
-    <i class="ti ti-list-check"></i>Routines
+    <i class="ti ti-list-check"></i><span id="mtab-routines-label">Routines</span>
   </button>
   <button class="mobile-tab-btn" id="mtab-nutrition" onclick="mobileTab('nutrition',this)">
-    <i class="ti ti-salad"></i>Nutrition
+    <i class="ti ti-salad"></i><span id="mtab-nutrition-label">Nutrition</span>
   </button>
   <button class="mobile-tab-btn" id="mtab-programs" onclick="mobileTab('programs',this)">
-    <i class="ti ti-calendar"></i>Programs
+    <i class="ti ti-calendar"></i><span id="mtab-programs-label">Programs</span>
   </button>
   <button class="mobile-tab-btn" id="mtab-recipes" onclick="mobileTab('recipes',this)">
-    <i class="ti ti-chef-hat"></i>Recipes
+    <i class="ti ti-chef-hat"></i><span id="mtab-recipes-label">Recipes</span>
   </button>
   <button class="mobile-tab-btn" id="mtab-research" onclick="mobileTab('research',this)">
-    <i class="ti ti-microscope"></i>Research
+    <i class="ti ti-microscope"></i><span id="mtab-research-label">Research</span>
   </button>
   <button class="mobile-tab-btn" id="mtab-client-profile" onclick="mobileTab('client-profile',this)" style="display:none">
-    <i class="ti ti-user-circle"></i>
-    <span>My Profile</span>
+    <i class="ti ti-user-circle"></i><span>My Profile</span>
+  </button>
+  <button class="mobile-tab-btn" id="mtab-group-workouts" onclick="mobileTab('group-workouts',this)" style="display:none">
+    <i class="ti ti-dumbbell"></i>
+    <span id="mtab-group-workouts-label">Workouts</span>
   </button>
   <button class="mobile-tab-btn" id="mtab-clients" onclick="mobileTab('clients',this)">
-    <i class="ti ti-users"></i>Clients
+    <i class="ti ti-users"></i><span id="mtab-clients-label">Clients</span>
   </button>
   <button class="mobile-tab-btn" id="mtab-profile" onclick="mobileTab('profile',this)">
-    <i class="ti ti-user-circle"></i>Profile
+    <i class="ti ti-user-circle"></i><span id="mtab-profile-label">Profile</span>
   </button>
 </nav>
 
@@ -2671,124 +2698,6 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </button>
   </div>
 </div>
-
-
-<!-- ══ BULK IMPORT — MENUS ══ -->
-<div class="modal modal-wide" id="modal-bulk-menus">
-  <div class="modal-header">
-    <h3><i class="ti ti-salad" style="color:var(--accent)"></i> Bulk Import Menus</h3>
-    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
-  </div>
-  <div class="modal-body">
-    <div style="font-size:12px;color:var(--muted);margin-bottom:10px;padding:8px 12px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--accent)">
-      Required fields: <code>name</code>, <code>goal</code> (cut/bulk/maintain), <code>meals</code> (array of meal objects)
-    </div>
-    <div style="display:flex;gap:8px;margin-bottom:10px">
-      <button class="btn btn-ghost btn-sm" onclick="downloadBulkTemplate('menus')"><i class="ti ti-download"></i> Template JSON</button>
-      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bulk-file-menus').click()"><i class="ti ti-upload"></i> Upload File</button>
-      <input type="file" id="bulk-file-menus" accept=".json" style="display:none" onchange="loadBulkFile(this,'menus-textarea')">
-    </div>
-    <textarea id="menus-textarea" class="form-textarea" style="font-family:monospace;font-size:12px;min-height:220px;resize:vertical" placeholder='[{"name":"High Protein Cut","goal":"cut","desc":"...","isPublic":true,"meals":[{"name":"Breakfast","items":[{"name":"Oats","qty":80,"unit":"g","calories":300,"protein":10,"carbs":55,"fat":5}]}]}]'></textarea>
-    <div id="bulk-menus-result" style="display:none;margin-top:10px"></div>
-    <div id="bulk-menus-progress" style="display:none;margin-top:10px">
-      <div style="font-size:13px;color:var(--muted);margin-bottom:4px">Importing... <span id="bulk-menus-prog-text">0/0</span></div>
-      <div style="height:6px;background:var(--surface2);border-radius:3px"><div id="bulk-menus-prog-bar" style="height:100%;background:var(--accent);width:0%;border-radius:3px;transition:width 0.2s"></div></div>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
-    <button class="btn btn-ghost" onclick="validateSectionBulk('menus')"><i class="ti ti-check"></i> Validate</button>
-    <button class="btn btn-primary" onclick="runSectionBulkImport('menus')"><i class="ti ti-file-import"></i> Import Menus</button>
-  </div>
-</div>
-
-<!-- ══ BULK IMPORT — PROGRAMS ══ -->
-<div class="modal modal-wide" id="modal-bulk-programs">
-  <div class="modal-header">
-    <h3><i class="ti ti-calendar" style="color:var(--accent)"></i> Bulk Import Programs</h3>
-    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
-  </div>
-  <div class="modal-body">
-    <div style="font-size:12px;color:var(--muted);margin-bottom:10px;padding:8px 12px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--accent)">
-      Required fields: <code>name</code>, <code>goal</code>, <code>level</code>, <code>trainingDays</code> (array of day objects with exercises)
-    </div>
-    <div style="display:flex;gap:8px;margin-bottom:10px">
-      <button class="btn btn-ghost btn-sm" onclick="downloadBulkTemplate('programs')"><i class="ti ti-download"></i> Template JSON</button>
-      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bulk-file-programs').click()"><i class="ti ti-upload"></i> Upload File</button>
-      <input type="file" id="bulk-file-programs" accept=".json" style="display:none" onchange="loadBulkFile(this,'programs-textarea')">
-    </div>
-    <textarea id="programs-textarea" class="form-textarea" style="font-family:monospace;font-size:12px;min-height:220px;resize:vertical" placeholder='[{"name":"12-Week Hypertrophy","goal":"hypertrophy","level":"Intermediate","weeks":12,"days":4,"desc":"...","isPublic":true,"trainingDays":[{"day":"Day 1 - Chest","exercises":[{"title":"Incline Dumbbell Press","muscle":"chest","sets":"4","reps":"10","rest":"90","notes":""}]}]}]'></textarea>
-    <div id="bulk-programs-result" style="display:none;margin-top:10px"></div>
-    <div id="bulk-programs-progress" style="display:none;margin-top:10px">
-      <div style="font-size:13px;color:var(--muted);margin-bottom:4px">Importing... <span id="bulk-programs-prog-text">0/0</span></div>
-      <div style="height:6px;background:var(--surface2);border-radius:3px"><div id="bulk-programs-prog-bar" style="height:100%;background:var(--accent);width:0%;border-radius:3px;transition:width 0.2s"></div></div>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
-    <button class="btn btn-ghost" onclick="validateSectionBulk('programs')"><i class="ti ti-check"></i> Validate</button>
-    <button class="btn btn-primary" onclick="runSectionBulkImport('programs')"><i class="ti ti-file-import"></i> Import Programs</button>
-  </div>
-</div>
-
-<!-- ══ BULK IMPORT — RECIPES ══ -->
-<div class="modal modal-wide" id="modal-bulk-recipes">
-  <div class="modal-header">
-    <h3><i class="ti ti-chef-hat" style="color:var(--accent)"></i> Bulk Import Recipes</h3>
-    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
-  </div>
-  <div class="modal-body">
-    <div style="font-size:12px;color:var(--muted);margin-bottom:10px;padding:8px 12px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--accent)">
-      Required fields: <code>name</code>, <code>category</code>, <code>calories</code>, <code>ingredients</code>, <code>instructions</code>
-    </div>
-    <div style="display:flex;gap:8px;margin-bottom:10px">
-      <button class="btn btn-ghost btn-sm" onclick="downloadBulkTemplate('recipes')"><i class="ti ti-download"></i> Template JSON</button>
-      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bulk-file-recipes').click()"><i class="ti ti-upload"></i> Upload File</button>
-      <input type="file" id="bulk-file-recipes" accept=".json" style="display:none" onchange="loadBulkFile(this,'recipes-textarea')">
-    </div>
-    <textarea id="recipes-textarea" class="form-textarea" style="font-family:monospace;font-size:12px;min-height:220px;resize:vertical" placeholder='[{"name":"Protein Pancakes","category":"breakfast","prepTime":15,"calories":380,"protein":35,"carbs":40,"fat":8,"ingredients":"2 scoops whey\n2 eggs","instructions":"Mix and cook.","tips":"","photoURL":"","videoURL":"","isPublic":true}]'></textarea>
-    <div id="bulk-recipes-result" style="display:none;margin-top:10px"></div>
-    <div id="bulk-recipes-progress" style="display:none;margin-top:10px">
-      <div style="font-size:13px;color:var(--muted);margin-bottom:4px">Importing... <span id="bulk-recipes-prog-text">0/0</span></div>
-      <div style="height:6px;background:var(--surface2);border-radius:3px"><div id="bulk-recipes-prog-bar" style="height:100%;background:var(--accent);width:0%;border-radius:3px;transition:width 0.2s"></div></div>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
-    <button class="btn btn-ghost" onclick="validateSectionBulk('recipes')"><i class="ti ti-check"></i> Validate</button>
-    <button class="btn btn-primary" onclick="runSectionBulkImport('recipes')"><i class="ti ti-file-import"></i> Import Recipes</button>
-  </div>
-</div>
-
-<!-- ══ BULK IMPORT — RESEARCH ══ -->
-<div class="modal modal-wide" id="modal-bulk-research">
-  <div class="modal-header">
-    <h3><i class="ti ti-microscope" style="color:var(--accent)"></i> Bulk Import Research</h3>
-    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
-  </div>
-  <div class="modal-body">
-    <div style="font-size:12px;color:var(--muted);margin-bottom:10px;padding:8px 12px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--accent)">
-      Required fields: <code>title</code>, <code>summary</code>, <code>category</code>. Optional: <code>authors</code>, <code>year</code>, <code>journal</code>, <code>url</code>, <code>application</code>
-    </div>
-    <div style="display:flex;gap:8px;margin-bottom:10px">
-      <button class="btn btn-ghost btn-sm" onclick="downloadBulkTemplate('research')"><i class="ti ti-download"></i> Template JSON</button>
-      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bulk-file-research').click()"><i class="ti ti-upload"></i> Upload File</button>
-      <input type="file" id="bulk-file-research" accept=".json" style="display:none" onchange="loadBulkFile(this,'research-textarea')">
-    </div>
-    <textarea id="research-textarea" class="form-textarea" style="font-family:monospace;font-size:12px;min-height:220px;resize:vertical" placeholder='[{"title":"Protein timing study","authors":"Phillips SM","year":2023,"journal":"J Sports Sci","category":"Nutrition","summary":"Post-workout protein maximizes MPS.","url":"https://pubmed.ncbi.nlm.nih.gov/","application":"30-40g protein within 30 min post-workout"}]'></textarea>
-    <div id="bulk-research-result" style="display:none;margin-top:10px"></div>
-    <div id="bulk-research-progress" style="display:none;margin-top:10px">
-      <div style="font-size:13px;color:var(--muted);margin-bottom:4px">Importing... <span id="bulk-research-prog-text">0/0</span></div>
-      <div style="height:6px;background:var(--surface2);border-radius:3px"><div id="bulk-research-prog-bar" style="height:100%;background:var(--accent);width:0%;border-radius:3px;transition:width 0.2s"></div></div>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
-    <button class="btn btn-ghost" onclick="validateSectionBulk('research')"><i class="ti ti-check"></i> Validate</button>
-    <button class="btn btn-primary" onclick="runSectionBulkImport('research')"><i class="ti ti-file-import"></i> Import Research</button>
-  </div>
-</div>
-
 
 <!-- ══ ADMIN FOOD EDIT MODAL ══ -->
 <div class="modal" id="modal-admin-food">
@@ -3027,19 +2936,18 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
   </div>
 </div>
 
-
 <!-- ══ WORKOUT TRACKING SCREEN ══ -->
 <div id="modal-workout-tracking" style="display:none;position:fixed;inset:0;z-index:99999;background:var(--bg);overflow-y:auto;flex-direction:column">
   <div style="background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10">
-    <button onclick="closeWorkout()" style="background:none;border:none;cursor:pointer;color:var(--text);font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px">
-      <i class="ti ti-x"></i> End Workout
+    <button onclick="minimizeWorkout()" title="Minimize" style="background:none;border:none;cursor:pointer;color:var(--text);font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px;padding:6px">
+      <i class="ti ti-chevron-down" style="font-size:22px"></i>
     </button>
     <div style="text-align:center">
       <div id="workout-day-title" style="font-size:15px;font-weight:700"></div>
       <div id="workout-timer" style="font-size:13px;color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums">00:00</div>
     </div>
     <div style="display:flex;gap:6px;align-items:center">
-      <button id="weight-unit-btn" onclick="toggleWorkoutWeightUnit()" style="padding:4px 10px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text);font-size:12px;font-weight:700;cursor:pointer">kg</button>
+      <button id="weight-unit-btn" onclick="toggleWorkoutWeightUnit()" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text);font-size:12px;font-weight:700;cursor:pointer">kg</button>
       <button onclick="finishWorkout()" style="padding:6px 14px;border-radius:8px;border:none;background:var(--accent);color:#0a0c0f;font-size:13px;font-weight:700;cursor:pointer">
         <i class="ti ti-flag"></i> Finish
       </button>
@@ -3076,6 +2984,139 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
   <div id="client-profile-modal-body" style="flex:1;overflow-y:auto;padding:0"></div>
   <div class="modal-footer" id="client-profile-modal-footer" style="flex-shrink:0">
     <button class="btn btn-ghost" onclick="closeAllModals()">Close</button>
+  </div>
+</div>
+
+<!-- ══ BULK IMPORT — EXERCISES (Hebrew / masterLibrary_he) ══ -->
+<div class="modal modal-wide" id="modal-bulk-import-he-exercises">
+  <div class="modal-header">
+    <h3><i class="ti ti-barbell" style="color:var(--accent)"></i> ייבוא תרגילים — עברית</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:10px;padding:8px 12px;background:var(--surface2);border-radius:8px;border-right:3px solid var(--accent);direction:rtl;text-align:right">
+      שדות חובה: <code>title</code>, <code>muscle</code> — שמירה ל: <strong>masterLibrary_he</strong>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bulk-file-exercises-he').click()"><i class="ti ti-upload"></i> העלה קובץ</button>
+      <input type="file" id="bulk-file-exercises-he" accept=".json" style="display:none" onchange="loadBulkFile(this,'exercises-he-textarea')">
+    </div>
+    <textarea id="exercises-he-textarea" class="form-textarea" style="font-family:monospace;font-size:12px;min-height:240px;resize:vertical"
+      placeholder='[{"id":"he_ex_001","title":"לחיצת חזה עם מוט","muscle":"חזה","sub":"חזה עליון","desc":"תיאור...","diff":"בינוני","premium":false,"videoURL":"https://youtube.com/...","lang":"he"}]'
+      dir="auto"></textarea>
+    <div id="bulk-exercises-he-result" style="display:none;margin-top:10px"></div>
+    <div id="bulk-exercises-he-progress" style="display:none;margin-top:10px">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:4px">מייבא... <span id="bulk-exercises-he-prog-text">0/0</span></div>
+      <div style="height:6px;background:var(--surface2);border-radius:3px">
+        <div id="bulk-exercises-he-prog-bar" style="height:100%;background:var(--accent);width:0%;border-radius:3px;transition:width 0.3s"></div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">ביטול</button>
+    <button class="btn btn-ghost" onclick="validateSectionBulk('exercises-he')"><i class="ti ti-check"></i> אמת JSON</button>
+    <button class="btn btn-primary" onclick="runSectionBulkImport('exercises-he')"><i class="ti ti-file-import"></i> ייבוא לעברית</button>
+  </div>
+</div>
+
+<!-- ══ GROUP WORKOUT CREATOR MODAL ══ -->
+<div class="modal modal-wide" id="modal-group-workout-modal" style="max-width:700px">
+  <div class="modal-header">
+    <h3><i class="ti ti-users-group" style="color:var(--accent)"></i> Create Group Workout</h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body" style="overflow-y:auto;max-height:70vh">
+    <div class="form-row" style="gap:12px">
+      <div class="form-group" style="flex:2">
+        <label class="form-label">Workout Name</label>
+        <input class="form-input" id="gw-name" placeholder="e.g. Upper Body Blast, Monday Legs...">
+      </div>
+      <div class="form-group" style="flex:1">
+        <label class="form-label">Date</label>
+        <input class="form-input" type="date" id="gw-date">
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-top:16px">
+      <label class="form-label">Exercises</label>
+      <div class="prog-ex-header" style="margin-bottom:4px"><span>Exercise</span><span>Sets</span><span>Reps</span><span>Rest</span><span>Notes</span><span></span></div>
+      <div id="gw-exercises-body"></div>
+      <button class="btn btn-ghost btn-sm" onclick="addGWExercise()" style="margin-top:8px">
+        <i class="ti ti-plus"></i> Add Exercise
+      </button>
+    </div>
+
+    <div class="form-group" style="margin-top:16px">
+      <label class="form-label">Assign to Clients</label>
+      <div id="gw-client-picker" style="max-height:300px;overflow-y:auto;-webkit-overflow-scrolling:touch"></div>
+    </div>
+
+    <div class="form-group" style="margin-top:16px">
+      <label class="form-label">Notes / Instructions</label>
+      <textarea class="form-input" id="gw-notes" rows="3" placeholder="Warm-up instructions, focus points, etc."></textarea>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveGroupWorkout()"><i class="ti ti-check"></i> Save & Assign</button>
+  </div>
+</div>
+
+<!-- ══ GROUP WORKOUT DETAIL / RESULTS MODAL ══ -->
+<div class="modal modal-wide" id="modal-gw-detail" style="max-width:680px">
+  <div class="modal-header">
+    <div>
+      <h3 id="gw-detail-title">Group Workout Results</h3>
+      <div id="gw-detail-date" style="font-size:13px;color:var(--muted);margin-top:2px"></div>
+    </div>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body" style="overflow-y:auto;max-height:70vh">
+    <div id="gw-progress-chart" style="margin-bottom:16px"></div>
+    <div id="gw-detail-body"></div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">Close</button>
+  </div>
+</div>
+
+<!-- ══ FREE WORKOUT LOG MODAL (Client) ══ -->
+<div class="modal modal-wide" id="modal-client-workout-log" style="max-width:680px">
+  <div class="modal-header">
+    <h3><i class="ti ti-dumbbell" style="color:var(--accent)"></i> <span id="client-log-title">Log a Workout</span></h3>
+    <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body" style="padding:0;overflow-y:auto;max-height:75vh">
+
+    <!-- Step 1: Pick exercises -->
+    <div id="client-log-step1" style="padding:16px">
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <div id="client-log-muscle-filter" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+      </div>
+      <div style="position:relative;margin-bottom:12px">
+        <input class="form-input" id="client-log-search" placeholder="Search exercises..."
+          oninput="filterClientLogSearch(this.value)" style="width:100%;padding-left:36px">
+        <i class="ti ti-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted)"></i>
+      </div>
+      <div id="client-log-results" style="display:flex;flex-direction:column;gap:6px;max-height:300px;overflow-y:auto"></div>
+    </div>
+
+    <!-- Divider -->
+    <div style="border-top:2px solid var(--border);margin:0"></div>
+
+    <!-- Step 2: Exercises to log with sets -->
+    <div id="client-log-step2" style="padding:16px">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Selected Exercises</div>
+      <div id="client-log-exercises"></div>
+      <div id="client-log-empty" style="text-align:center;color:var(--muted);font-size:14px;padding:20px">
+        <i class="ti ti-arrow-up" style="display:block;font-size:24px;margin-bottom:8px"></i>
+        Search and add exercises above
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-primary" onclick="saveClientWorkoutLog()"><i class="ti ti-check"></i> Save Workout</button>
   </div>
 </div>
 

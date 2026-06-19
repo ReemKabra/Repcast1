@@ -44,6 +44,15 @@ var _i18n = {
     addMeal:'+ Add Meal', addFood:'Add Food',
     mealName:'Meal name...', foodName:'Food name',
     qty:'Qty', unit:'Unit', cal:'Cal', pro:'Pro', carbs:'Carbs', fat:'Fat',
+    colExercise:'Exercise', colMuscle:'Muscle', colSets:'Sets', colReps:'Reps', colRest:'Rest', colNotes:'Notes',
+    filterAll:'All', filterCut:'Cut', filterMaintain:'Maintain', filterBulk:'Bulk',
+    navGroupWorkouts:'Group Workouts', groupWorkoutsTitle:'Group Workouts',
+    createGroupWorkout:'Create Group Workout', logWorkout:'Log Workout',
+    todaysWorkout:"Today's Workout", freeWorkout:'Free Workout',
+    assignToClients:'Assign to Clients', submittedBy:'Submitted by',
+    filterStrength:'Strength', filterHypertrophy:'Hypertrophy', filterFatLoss:'Fat Loss',
+    libraryAll:'All Exercises', menuLibrary:'Menu Library', programsLib:'Programs',
+    colCalories:'Calories', colProtein:'Protein', colCarbs:'Carbs', colFat:'Fat', colQty:'Qty',
     menuName:'Menu Name', menuGoal:'Goal', menuDesc:'Description',
     goalCut:'Cut', goalBulk:'Bulk', goalMaintain:'Maintain',
     saveMenu:'Save Menu', deleteMenu:'Delete Menu',
@@ -144,6 +153,15 @@ var _i18n = {
     specialty:'התמחות', bio:'ביו / אודות',
     /* ── Auth ── */
     signIn:'התחברות', signUp:'הרשמה', signOut:'התנתק',
+    colExercise:'תרגיל', colMuscle:'שריר', colSets:'סטים', colReps:'חזרות', colRest:'מנוחה', colNotes:'הערות',
+    filterAll:'הכל', filterCut:'חיתוך', filterMaintain:'שמירה', filterBulk:'עלייה',
+    navGroupWorkouts:'אימוני קבוצה', groupWorkoutsTitle:'אימוני קבוצה',
+    createGroupWorkout:'צור אימון קבוצתי', logWorkout:'תעד אימון',
+    todaysWorkout:'אימון היום', freeWorkout:'אימון חופשי',
+    assignToClients:'שייך ללקוחות', submittedBy:'הוגש על ידי',
+    filterStrength:'כוח', filterHypertrophy:'היפרטרופיה', filterFatLoss:'שריפת שומן',
+    libraryAll:'כל התרגילים', menuLibrary:'ספריית תפריטים', programsLib:'תוכניות',
+    colCalories:'קלוריות', colProtein:'חלבון', colCarbs:'פחמימות', colFat:'שומן', colQty:'כמות',
     emailLabel:'אימייל', passwordLabel:'סיסמה', forgotPassword:'שכחת סיסמה?',
     continueGoogle:'המשך עם Google', alreadyAccount:'כבר יש לך חשבון?',
     noAccount:'אין לך חשבון?', register:'הרשמה',
@@ -190,11 +208,69 @@ function ct(item, field) {
 }
 
 function applyLang(lang) {
+  // Admin panel always stays in English regardless of saved language
+  if (state && state.isManager) lang = 'en';
+  var d = _i18n[lang] || _i18n.en;
+  var isHe = lang === 'he';
+
+  // Always LTR — only tables are RTL via CSS
+  document.documentElement.setAttribute('dir', 'ltr');
+  document.documentElement.setAttribute('lang', lang);
+  document.documentElement.classList.toggle('lang-he', isHe);
+
+  // Helper to set text safely
+  function setText(id, key) {
+    var el = document.getElementById(id);
+    if (el && d[key]) el.textContent = d[key];
+  }
+  function setPlaceholder(id, key) {
+    var el = document.getElementById(id);
+    if (el && d[key]) el.placeholder = d[key];
+  }
+
+  // Nav labels
+  setText('tnav-library-label',       'navLibrary');
+  setText('tnav-routines-label',      'navRoutines');
+  setText('tnav-nutrition-label',     'navNutrition');
+  setText('tnav-programs-label',      'navPrograms');
+  setText('tnav-recipes-label',       'navRecipes');
+  setText('tnav-research-label',      'navResearch');
+  setText('tnav-clients-label',       'navClients');
+  setText('tnav-profile-label',       'navProfile');
+  setText('tnav-group-workouts-label','navGroupWorkouts');
+
+  // Mobile tabs
+  setText('mtab-library-label',        'navLibrary');
+  setText('mtab-routines-label',       'navRoutines');
+  setText('mtab-nutrition-label',      'navNutrition');
+  setText('mtab-programs-label',       'navPrograms');
+  setText('mtab-recipes-label',        'navRecipes');
+  setText('mtab-research-label',       'navResearch');
+  setText('mtab-clients-label',        'navClients');
+  setText('mtab-profile-label',        'navProfile');
+  setText('mtab-group-workouts-label', 'navGroupWorkouts');
+  // client profile tab label (Hebrew: "הפרופיל שלי")
+  var cpTabLabel = document.querySelector('#mtab-client-profile span');
+  if (cpTabLabel) cpTabLabel.textContent = (lang === 'he') ? 'הפרופיל שלי' : 'My Profile';
+
+  // View titles
+  setText('view-library-title',        'libraryTitle');
+  setText('view-routines-title',       'routinesTitle');
+  setText('view-nutrition-title',      'nutritionTitle');
+  setText('view-programs-title',       'programsTitle');
+  setText('view-recipes-title',        'recipesTitle');
+  setText('view-research-title',       'researchTitle');
+  setText('view-clients-title',        'clientsTitle');
+  setText('view-group-workouts-title', 'groupWorkoutsTitle');
+
+  // Search placeholders
+  setPlaceholder('exercises-search', 'searchExercises');
+  setPlaceholder('menu-search',      'searchMenus');
+
   _lang = lang;
   localStorage.setItem('repcast_lang', lang);
 
-  // Always LTR — Hebrew works fine left-to-right
-  document.documentElement.dir  = 'ltr';
+  // dir is already set above (useRTL logic) — don't override it here
   document.documentElement.lang = lang;
 
   // Swap all data-i18n elements
@@ -221,36 +297,61 @@ function applyLang(lang) {
 }
 
 async function setLang(newLang) {
-  if (_lang === newLang) return;
   _lang = newLang;
   localStorage.setItem('repcast_lang', newLang);
+  var isHe = (newLang === 'he');
 
-  // Update button styles — active button highlighted
+  // ── 1. Always LTR — only tables are RTL via CSS html[lang="he"]
+  document.documentElement.setAttribute('dir', 'ltr');
+  document.documentElement.setAttribute('lang', newLang);
+  document.documentElement.classList.toggle('lang-he', isHe);
+
+  // ── 2. Update toggle button styles ──
   ['en','he'].forEach(function(l) {
     ['lang-btn-'+l, 'lang-btn-'+l+'-mgr'].forEach(function(id) {
       var btn = document.getElementById(id);
       if (!btn) return;
-      if (l === newLang) {
-        btn.style.background = 'var(--accent)';
-        btn.style.color      = '#0a0c0f';
-      } else {
-        btn.style.background = 'transparent';
-        btn.style.color      = 'var(--muted)';
-      }
+      btn.style.background = (l === newLang) ? 'var(--accent)' : 'transparent';
+      btn.style.color      = (l === newLang) ? '#0a0c0f'       : 'var(--muted)';
     });
   });
 
-  showToast(newLang === 'he' ? '🇮🇱 עברית' : '🇺🇸 English');
+  // ── 3. Apply translated UI labels ──
+  applyLang(newLang);
 
-  // Clear and reload from correct language collections
+  showToast(isHe ? '🇮🇱 עברית' : '🇺🇸 English');
+
+  // ── 4. Reload content from correct language collection ──
   menus = []; programs = []; recipes = []; foods = [];
-  try { await Promise.all([loadMenus(), loadPrograms(), loadRecipes(), loadFoods()]); } catch(e){}
+  try {
+    // Sync master library FIRST (sequential) so renderLibrary has the right exercises
+    await syncMasterLibraryFromFirestore();
+    // Then load other collections in parallel
+    await Promise.all([loadMenus(), loadPrograms(), loadRecipes(), loadFoods()]);
+  } catch(e){}
 
-  // Re-render current views
-  if (window._renderMenuLibrary)  try { window._renderMenuLibrary(); }  catch(e){}
-  if (window._renderProgramsView) try { window._renderProgramsView(); } catch(e){}
-  if (window._renderRecipesView)  try { window._renderRecipesView(); }  catch(e){}
-  if (window._renderClientsList)  try { window._renderClientsList(); }  catch(e){}
+  // ── 5. Re-render all visible content ──
+  try { buildMuscleFilters(); } catch(e){}
+  try { renderLibrary(); }       catch(e){}
+  try { renderMenuLibrary(); }   catch(e){}
+  try { renderProgramsView(); }  catch(e){}
+  try { renderRecipesView(); }   catch(e){}
+  try { renderResearchView(); }  catch(e){}
+  // If client — re-filter assigned items by new language
+  if (state && state.isClient) {
+    try {
+      var clientData = window._clientRawData;
+      if (clientData) {
+        var lf = isHe ? 'he' : 'en';
+        function mL(item){ return (item.lang||'en') === lf; }
+        window._clientPrograms = (clientData.assignedPrograms||[]).filter(mL);
+        window._clientMenus    = (clientData.assignedMenus||[]).filter(mL);
+        window._clientRecipes  = (clientData.assignedRecipes||[]).filter(mL);
+        renderClientSections();
+      }
+    } catch(e){}
+    try { loadClientGroupWorkouts(); } catch(e){}
+  }
 }
 
 function toggleLang() { setLang(_lang === 'en' ? 'he' : 'en'); }
@@ -296,6 +397,17 @@ document.addEventListener('DOMContentLoaded', function() {
      core:      ['Abs', 'Obliques', 'Transverse Abs'],
      fullbody:  ['Compound', 'HIIT', 'Functional'],
      physio:    ['Shoulder Rehab', 'Knee Rehab', 'Lower Back Rehab', 'Hip Rehab', 'Ankle Rehab', 'Neck Rehab', 'Balance', 'Breathing'],
+   };
+
+   const SUBCATS_HE = {
+     'חזה':     ['חזה עליון', 'חזה אמצעי', 'חזה תחתון'],
+     'גב':      ['גב עליון', 'לטיסימוס', 'גב תחתון'],
+     'רגליים':  ['ארבע ראשי', 'המסטרינג', 'תאומים', 'ישבן'],
+     'כתפיים':  ['דלטואיד קדמי', 'דלטואיד צדי', 'דלטואיד אחורי'],
+     'ידיים':   ['יד קדמית', 'יד אחורית', 'אמות'],
+     'בטן':     ['בטן', 'אלכסונים'],
+     'גוף מלא': ['מורכב', 'HIIT', 'פונקציונלי'],
+     'פיזיו':   ['שיקום כתף', 'שיקום ברך', 'שיקום גב תחתון', 'שיקום ירך'],
    };
    
    // Master library — manager can add/edit/delete via admin panel
@@ -351,13 +463,27 @@ document.addEventListener('DOMContentLoaded', function() {
    async function syncMasterLibraryFromFirestore() {
      if (!window._firebase || !window._db) return;
      try {
-       const { getDoc, doc } = window._firebase;
-       const snap = await getDoc(doc(window._db, 'config', 'masterLibrary'));
-       if (snap.exists()) {
-         const data = snap.data();
-         if (data.exercises && data.exercises.length) {
-           MASTER_EXERCISES = data.exercises;
-           localStorage.setItem('repcast_master', JSON.stringify(MASTER_EXERCISES));
+       if (_lang === 'he') {
+         // Hebrew: load from masterLibrary_he collection (individual docs)
+         const snap = await window._firebase.getDocs(
+           window._firebase.collection(window._db, 'masterLibrary_he')
+         );
+         const exercises = [];
+         snap.forEach(function(d){ exercises.push(Object.assign({ id: d.id }, d.data())); });
+         if (exercises.length) {
+           MASTER_EXERCISES = exercises;
+           // Don't cache HE exercises in localStorage to avoid overwriting EN cache
+         }
+       } else {
+         // English: load from config/masterLibrary single doc
+         const { getDoc, doc } = window._firebase;
+         const snap = await getDoc(doc(window._db, 'config', 'masterLibrary'));
+         if (snap.exists()) {
+           const data = snap.data();
+           if (data.exercises && data.exercises.length) {
+             MASTER_EXERCISES = data.exercises;
+             localStorage.setItem('repcast_master', JSON.stringify(MASTER_EXERCISES));
+           }
          }
        }
      } catch (e) {
@@ -398,6 +524,12 @@ document.addEventListener('DOMContentLoaded', function() {
      function loginSuccess(name) {
        state.isManager = true;
        state.user = { uid:'manager', email:email, fullName:name||'Manager', role:'manager' };
+       // Admin is always in English
+       _lang = 'en';
+       localStorage.setItem('repcast_lang', 'en');
+       document.documentElement.setAttribute('dir', 'ltr');
+       document.documentElement.setAttribute('lang', 'en');
+       document.documentElement.classList.remove('lang-he');
        showScreen('manager');
        renderAdminTable();
        updateAdminStats();
@@ -894,9 +1026,9 @@ document.addEventListener('DOMContentLoaded', function() {
    /* ── Boot trainer app UI ────────────────────────────────── */
    async function bootTrainerApp() {
   // Restore any nav elements hidden by a prior client session
-  ['mtab-clients','tnav-clients','tnav-billing','tab-custom','tab-myvideos','tab-myprograms','tab-mymenus','tab-myrecipes','tab-myresearch','recipes-add-btn','lib-upload-bar'].forEach(function(id){
+  ['mtab-clients','tnav-clients','tnav-billing','tnav-group-workouts','tab-custom','tab-myvideos','tab-myprograms','tab-mymenus','tab-myrecipes','tab-myresearch','recipes-add-btn','lib-upload-bar'].forEach(function(id){
     var el = document.getElementById(id);
-    if (el) el.style.display = '';
+    if (el) { el.style.removeProperty('display'); el.style.display = ''; }
   });
   var cpTabReset = document.getElementById('mtab-client-profile');
   if (cpTabReset) cpTabReset.style.display = 'none';
@@ -904,6 +1036,11 @@ document.addEventListener('DOMContentLoaded', function() {
   if (mtabProfileReset) mtabProfileReset.style.display = '';
   var tnavProfileReset = document.getElementById('tnav-profile');
   if (tnavProfileReset) tnavProfileReset.setAttribute('onclick', "setView('profile',this)");
+  // Reset topnav-user click to go to profile (client mode changes this)
+  var topnavUser = document.querySelector('.topnav-user');
+  if (topnavUser) topnavUser.setAttribute('onclick', "setView('profile', document.getElementById('tnav-profile'))");
+  // Load group workouts
+  loadGroupWorkouts().catch(function(){});
   // Patch save functions to support Hebrew collections
   try { patchHeSaves(); } catch(e) { console.warn('patchHeSaves error:', e); }
   // Expose renderers globally so applyLang() can call them from outside IIFE
@@ -1492,9 +1629,13 @@ document.addEventListener('DOMContentLoaded', function() {
      var musclePanel = document.getElementById('muscle-panel');
      if (musclePanel) musclePanel.style.display = viewId === 'library' ? '' : 'none';
      // Reload data on first visit to each section
-     if (viewId === 'nutrition') { if (!menus.length)     loadMenus();    else renderMenuLibrary(); }
-     if (viewId === 'programs')  { if (!programs.length)  loadPrograms(); else renderProgramsView(); }
-     if (viewId === 'recipes')   { if (!recipes.length)   loadRecipes();  else renderRecipesView(); }
+     if (viewId === 'group-workouts') {
+      if (state.isClient) { loadClientGroupWorkouts(); }
+      else { loadGroupWorkouts(); }
+    }
+     if (viewId === 'nutrition') { if (!menus.length || state.isClient)     loadMenus();    else renderMenuLibrary(); }
+     if (viewId === 'programs')  { if (!programs.length || state.isClient)  loadPrograms(); else renderProgramsView(); }
+     if (viewId === 'recipes')   { if (!recipes.length || state.isClient)   loadRecipes();  else renderRecipesView(); }
      if (viewId === 'research')  { if (!researches.length) loadResearch(); else renderResearchView(); }
    }
 
@@ -1529,7 +1670,18 @@ document.addEventListener('DOMContentLoaded', function() {
    ══════════════════════════════════════════════════════════ */
    
    function buildMuscleFilters() {
-     const muscles = [
+     var isHe = (typeof _lang !== 'undefined' && _lang === 'he');
+
+     const muscles = isHe ? [
+       { id:'חזה',     label:'חזה',     color:'#F472B6' },
+       { id:'גב',      label:'גב',      color:'#60A5FA' },
+       { id:'רגליים',  label:'רגליים',  color:'#7EE8A2' },
+       { id:'כתפיים',  label:'כתפיים',  color:'#FBBF24' },
+       { id:'ידיים',   label:'ידיים',   color:'#A78BFA' },
+       { id:'בטן',     label:'בטן',     color:'#FB923C' },
+       { id:'גוף מלא', label:'גוף מלא', color:'#3ECFCF' },
+       { id:'פיזיו',   label:'פיזיו',   color:'#818CF8' },
+     ] : [
        { id:'chest',     label:'Chest',     color:'#F472B6' },
        { id:'back',      label:'Back',      color:'#60A5FA' },
        { id:'legs',      label:'Legs',      color:'#7EE8A2' },
@@ -1557,6 +1709,7 @@ document.addEventListener('DOMContentLoaded', function() {
          }).join('');
      } else {
        // Web: original expand/collapse with sub-categories
+       var subcatMap = isHe ? SUBCATS_HE : SUBCATS;
        document.getElementById('muscle-filter-list').innerHTML = muscles.map(m => `
          <div class="muscle-group">
            <div class="muscle-group-header" onclick="toggleMuscleGroup('${m.id}',this)">
@@ -1565,7 +1718,7 @@ document.addEventListener('DOMContentLoaded', function() {
              <i class="ti ti-chevron-right chevron"></i>
            </div>
            <div class="muscle-sub-list" id="sub-${m.id}">
-             ${(SUBCATS[m.id] || []).map(s => `
+             ${(subcatMap[m.id] || []).map(s => `
                <div class="muscle-sub-item" onclick="filterBySub('${m.id}','${s}',this)">${s}</div>
              `).join('')}
            </div>
@@ -1968,8 +2121,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     <i class="ti ti-lock"></i> Locked
                   </button>`
                : `<button class="add-to-cart-btn${inCart ? ' added' : ''}" onclick="toggleCart('${ex.id}')">
-                    <i class="ti ti-${inCart ? 'check' : 'plus'}"></i> ${inCart ? 'Added' : 'Add'}
-                  </button>`
+                       <i class="ti ti-${inCart ? 'check' : 'plus'}"></i> ${inCart ? 'Added' : 'Add'}
+                     </button>`
              }
            </div>
          </div>
@@ -2081,7 +2234,34 @@ document.addEventListener('DOMContentLoaded', function() {
       CART
    ══════════════════════════════════════════════════════════ */
    
-   function toggleCart(id) {
+   // ── Client: Log exercises chosen from master library ──────
+  function openClientCartCheckout() {
+    if (!state.cart.size) { showToast('Add at least one exercise first'); return; }
+    // Convert cart items into _clientLogExercises format (3 default sets each)
+    _clientLogExercises = [];
+    _clientLogGroupId = null;
+    state.cart.forEach(function(ex) {
+      var sets = parseInt(ex.sets) || 3;
+      var reps = ex.reps || '';
+      _clientLogExercises.push({
+        title: ex.title,
+        muscle: ex.muscle || '',
+        sets: Array.from({ length: sets }, function(_, i) {
+          return { setNum: i + 1, weight: '', reps: reps, completed: false };
+        })
+      });
+    });
+    document.getElementById('client-log-title').textContent = _lang === 'he' ? 'תיעוד אימון' : 'Log Workout';
+    // Hide search step + divider — exercises already chosen from library
+    var step1 = document.getElementById('client-log-step1');
+    var divider = step1 && step1.nextElementSibling;
+    if (step1) step1.style.display = 'none';
+    if (divider && divider.style && divider.style.borderTop !== undefined) divider.style.display = 'none';
+    renderClientLogExercises();
+    openModal('client-workout-log');
+  }
+
+  function toggleCart(id) {
      const all = [...MASTER_EXERCISES, ...customExercises];
      const ex  = all.find(e => e.id === id);
      if (!ex) return;
@@ -2118,6 +2298,17 @@ document.addEventListener('DOMContentLoaded', function() {
      document.getElementById('cart-count').textContent = n;
      document.getElementById('cart-label').textContent = n === 1 ? 'exercise selected' : 'exercises selected';
      document.getElementById('cart-bar').classList.toggle('visible', n > 0);
+     // Swap cart button label/action depending on role
+     var cartBtn = document.querySelector('#cart-bar .btn-accent');
+     if (cartBtn) {
+       if (state.isClient) {
+         cartBtn.innerHTML = '<i class="ti ti-dumbbell"></i> Log Workout <i class="ti ti-arrow-right"></i>';
+         cartBtn.onclick = function(){ openClientCartCheckout(); };
+       } else {
+         cartBtn.innerHTML = '<i class="ti ti-clipboard-list"></i> Review &amp; Assign <i class="ti ti-arrow-right"></i>';
+         cartBtn.onclick = function(){ openModal('checkout'); renderCheckout(); };
+       }
+     }
      document.getElementById('tnav-routines-badge').textContent = sentRoutines.length;
    }
    
@@ -2256,7 +2447,43 @@ document.addEventListener('DOMContentLoaded', function() {
      const muscle = document.getElementById(muscleSelectId).value;
      const sc     = document.getElementById(subcatSelectId);
      if (!muscle) { sc.innerHTML = '<option value="">Select group first</option>'; return; }
-     sc.innerHTML = (SUBCATS[muscle] || []).map(s => `<option value="${s}">${s}</option>`).join('');
+     // Use Hebrew subcats when editing/adding Hebrew exercises
+     var subcatMap = (window._saveExToHe || window._addExToHe) ? SUBCATS_HE : SUBCATS;
+     sc.innerHTML = (subcatMap[muscle] || []).map(s => `<option value="${s}">${s}</option>`).join('');
+   }
+
+   function switchExModalToHebrew() {
+     var sel = document.getElementById('admin-ex-muscle');
+     if (!sel) return;
+     sel.innerHTML =
+       '<option value="">בחר קבוצת שריר…</option>' +
+       '<option value="חזה">חזה</option>' +
+       '<option value="גב">גב</option>' +
+       '<option value="רגליים">רגליים</option>' +
+       '<option value="כתפיים">כתפיים</option>' +
+       '<option value="ידיים">ידיים</option>' +
+       '<option value="בטן">בטן</option>' +
+       '<option value="גוף מלא">גוף מלא</option>' +
+       '<option value="פיזיו">פיזיו</option>';
+     var sc = document.getElementById('admin-ex-subcat');
+     if (sc) sc.innerHTML = '<option value="">בחר קבוצה קודם</option>';
+   }
+
+   function switchExModalToEnglish() {
+     var sel = document.getElementById('admin-ex-muscle');
+     if (!sel) return;
+     sel.innerHTML =
+       '<option value="">Select muscle…</option>' +
+       '<option value="chest">Chest</option>' +
+       '<option value="back">Back</option>' +
+       '<option value="legs">Legs</option>' +
+       '<option value="shoulders">Shoulders</option>' +
+       '<option value="arms">Arms</option>' +
+       '<option value="core">Core</option>' +
+       '<option value="fullbody">Full Body</option>' +
+       '<option value="physio">Physiotherapy</option>';
+     var sc = document.getElementById('admin-ex-subcat');
+     if (sc) sc.innerHTML = '<option value="">Select group first</option>';
    }
    
    function handleAdminFileSelect(input) {
@@ -3273,6 +3500,11 @@ document.addEventListener('DOMContentLoaded', function() {
      const modal   = document.getElementById('modal-admin-exercise');
      const titleEl = document.getElementById('admin-modal-title');
      const saveBtn = document.getElementById('admin-modal-save-btn');
+
+     // Ensure English muscle dropdown (in case Hebrew modal was open before)
+     window._saveExToHe = false;
+     window._addExToHe  = false;
+     switchExModalToEnglish();
    
      // Reset form fields
      document.getElementById('admin-edit-id').value       = '';
@@ -3383,6 +3615,22 @@ document.addEventListener('DOMContentLoaded', function() {
      }
    
      if (editId) {
+       // Hebrew save path
+       if (window._saveExToHe) {
+         try {
+           await window._firebase.setDoc(
+             window._firebase.doc(window._db, 'masterLibrary_he', editId),
+             { title, muscle, sub, diff, desc, premium, videoURL, lang:'he', updatedAt: new Date().toISOString() },
+             { merge: true }
+           );
+           showToast('✓ "' + title + '" עודכן!');
+           window._saveExToHe = false;
+           await loadHeExercises();
+           renderHeExercisesList();
+           closeAllModals();
+         } catch(e) { showToast('Save error: ' + e.message); }
+         return;
+       }
        const idx = MASTER_EXERCISES.findIndex(e => e.id === editId);
        if (idx === -1) return;
        MASTER_EXERCISES[idx] = {
@@ -3806,6 +4054,15 @@ function findMatchingMenus() {
 /* ── Load menus from Firestore ───────────────────────── */
 async function loadMenus() {
   if (!window._firebase || !window._db) return;
+  // Clients: re-fetch only their assigned menus
+  if (state.isClient && state.user) {
+    try {
+      var cp = await window._firebase.getDoc(window._firebase.doc(window._db, 'clientProfiles', state.user.uid));
+      if (cp.exists()) menus = cp.data().assignedMenus || [];
+    } catch(e) { console.warn('client loadMenus:', e.message); }
+    renderMenuLibrary();
+    return;
+  }
   try {
     var snap = await window._firebase.getDocs(window._firebase.collection(window._db, col('menus')));
     menus = [];
@@ -3923,19 +4180,24 @@ function startWorkout(program, dayIndex) {
   startWorkoutTimer();
 }
 
-/* Parse rest strings like "90s", "2 min", "1:30", "90" into seconds */
+/* Parse rest strings. A bare number means MINUTES (e.g. "2" = 2 min).
+   "90s" = 90 seconds, "1:30" = 1 min 30 sec, "2 min" = 2 minutes. */
 function parseRestToSeconds(rest) {
-  if (!rest) return 60;
+  if (!rest && rest !== 0) return 90;
   rest = String(rest).toLowerCase().trim();
-  // "1:30" format
+  if (rest === '') return 90;
+  // "1:30" format → minutes:seconds
   if (rest.indexOf(':') > -1) {
     var parts = rest.split(':');
     return (parseInt(parts[0])||0) * 60 + (parseInt(parts[1])||0);
   }
   var num = parseFloat(rest.replace(/[^0-9.]/g, '')) || 0;
-  if (rest.indexOf('min') > -1) return Math.round(num * 60);
-  // bare number or "90s" → seconds; but if small (<10) and says min-ish, treat as minutes
-  return Math.round(num) || 60;
+  // Explicit seconds: "90s", "90 sec", "90 seconds"
+  if (rest.indexOf('sec') > -1 || /\d\s*s$/.test(rest)) return Math.round(num);
+  // Explicit minutes: "2 min", "2m"
+  if (rest.indexOf('min') > -1 || /\d\s*m$/.test(rest)) return Math.round(num * 60);
+  // Bare number → MINUTES (per trainer convention: "2" means 2 minutes)
+  return Math.round(num * 60) || 90;
 }
 
 function renderWorkoutScreen() {
@@ -3977,7 +4239,8 @@ function renderWorkoutScreen() {
       setsHTML +
       '<button class="workout-add-set-btn" onclick="addWorkoutSet(' + ei + ')"><i class="ti ti-plus"></i> Add Set</button>' +
     '</div>';
-  }).join('');
+  }).join('') +
+  '<button onclick="closeWorkout()" style="width:100%;padding:14px;margin-top:8px;border:1px solid rgba(255,107,107,0.3);background:rgba(255,107,107,0.06);color:var(--danger);font-size:14px;font-weight:600;border-radius:12px;cursor:pointer;font-family:inherit"><i class="ti ti-x"></i> End Workout Without Saving</button>';
 }
 
 function updateWorkoutSet(exIdx, setIdx, field, value) {
@@ -4005,6 +4268,8 @@ function toggleSetDone(exIdx, setIdx) {
     var restSec = _workout.exercises[exIdx].restSeconds || 60;
     startRestTimer(restSec);
   }
+  // Auto-save workout state
+  saveWorkoutToStorage();
 }
 
 /* ── Rest Timer between sets ── */
@@ -4035,7 +4300,8 @@ function startRestTimer(seconds) {
         '<div style="font-size:24px;font-weight:800;font-variant-numeric:tabular-nums" id="rest-timer-display">' + label + '</div></div>' +
       '</div>' +
       '<div style="display:flex;gap:8px">' +
-        '<button onclick="addRestTime(15)" style="background:rgba(0,0,0,0.18);border:none;color:#0a0c0f;font-weight:700;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:13px">+15s</button>' +
+        '<button onclick="addRestTime(-15)" style="background:rgba(0,0,0,0.18);border:none;color:#0a0c0f;font-weight:600;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:13px">-15s</button>' +
+        '<button onclick="addRestTime(15)" style="background:rgba(0,0,0,0.18);border:none;color:#0a0c0f;font-weight:700;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:13px">+15s</button>' +
         '<button onclick="skipRestTimer()" style="background:#0a0c0f;border:none;color:var(--accent);font-weight:700;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px">Skip</button>' +
       '</div>';
   }
@@ -4075,13 +4341,20 @@ function skipRestTimer() {
 function playRestDoneBeep() {
   try {
     var ctx = new (window.AudioContext || window.webkitAudioContext)();
-    var osc = ctx.createOscillator();
-    var gain = ctx.createGain();
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.frequency.value = 880;
-    gain.gain.setValueAtTime(0.3, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
-    osc.start(); osc.stop(ctx.currentTime + 0.5);
+    // Three descending beeps — gym-style done signal
+    [[0, 880], [0.25, 660], [0.5, 880]].forEach(function(item) {
+      var delay = item[0], freq = item[1];
+      var osc  = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, ctx.currentTime + delay);
+      gain.gain.linearRampToValueAtTime(0.9, ctx.currentTime + delay + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + delay + 0.22);
+      osc.start(ctx.currentTime + delay);
+      osc.stop(ctx.currentTime + delay + 0.25);
+    });
   } catch(e) {}
 }
 
@@ -4171,11 +4444,15 @@ function closeExercisePicker() {
 function startWorkoutTimer() {
   clearInterval(_workoutTimerInterval);
   _workoutTimerInterval = setInterval(function() {
+    if (!_workout) return;
     var elapsed = Math.floor((Date.now() - _workout.startTime) / 1000);
     var mm = Math.floor(elapsed / 60).toString().padStart(2, '0');
     var ss = (elapsed % 60).toString().padStart(2, '0');
     var el = document.getElementById('workout-timer');
     if (el) el.textContent = mm + ':' + ss;
+    // Keep the floating pill in sync when minimized
+    var pill = document.getElementById('workout-floating-pill');
+    if (pill && pill.style.display !== 'none') updateWorkoutPill();
   }, 1000);
 }
 
@@ -4184,26 +4461,113 @@ function closeWorkout() {
   _workout = null;
   clearInterval(_workoutTimerInterval);
   skipRestTimer();
+  removeWorkoutPill();
+  clearWorkoutStorage();
   var modal = document.getElementById('modal-workout-tracking');
   if (modal) modal.style.display = 'none';
+  // Remove backdrop blur left behind when workout modal bypasses closeAllModals()
+  var backdrop = document.getElementById('modal-backdrop');
+  if (backdrop) backdrop.classList.remove('open');
+}
+
+/* ── Minimize / floating pill ── */
+function minimizeWorkout() {
+  if (!_workout) return;
+  var modal = document.getElementById('modal-workout-tracking');
+  if (modal) modal.style.display = 'none';
+  // Timer keeps running in the background; show floating pill
+  showWorkoutPill();
+}
+
+function resumeWorkout() {
+  if (!_workout) return;
+  removeWorkoutPill();
+  var modal = document.getElementById('modal-workout-tracking');
+  if (modal) modal.style.display = 'flex';
+}
+
+function showWorkoutPill() {
+  var pill = document.getElementById('workout-floating-pill');
+  if (!pill) {
+    pill = document.createElement('div');
+    pill.id = 'workout-floating-pill';
+    pill.onclick = resumeWorkout;
+    document.body.appendChild(pill);
+  }
+  pill.style.display = 'flex';
+  updateWorkoutPill();
+}
+
+function removeWorkoutPill() {
+  var pill = document.getElementById('workout-floating-pill');
+  if (pill) pill.style.display = 'none';
+}
+
+function updateWorkoutPill() {
+  var pill = document.getElementById('workout-floating-pill');
+  if (!pill || !_workout) return;
+
+  // Are we resting?
+  var resting = (_restRemaining > 0 && document.getElementById('rest-timer-bar') &&
+                 document.getElementById('rest-timer-bar').style.display !== 'none');
+
+  var elapsed = Math.floor((Date.now() - _workout.startTime) / 1000);
+  var mm = Math.floor(elapsed / 60).toString().padStart(2,'0');
+  var ss = (elapsed % 60).toString().padStart(2,'0');
+
+  if (resting) {
+    var rm = Math.floor(_restRemaining / 60);
+    var rs = _restRemaining % 60;
+    var restLabel = (rm > 0 ? rm + ':' + (rs<10?'0':'') + rs : rs + 's');
+    pill.innerHTML =
+      '<div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">' +
+        '<div style="width:36px;height:36px;border-radius:50%;background:rgba(10,12,15,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+          '<i class="ti ti-clock-pause" style="font-size:18px"></i></div>' +
+        '<div style="min-width:0;overflow:hidden">' +
+          '<div style="font-size:11px;font-weight:700;opacity:0.75;text-transform:uppercase;letter-spacing:0.5px">Resting</div>' +
+          '<div style="font-size:17px;font-weight:800;font-variant-numeric:tabular-nums">' + restLabel + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:8px;flex-shrink:0">' +
+        '<span style="font-size:12px;font-weight:700;opacity:0.7;font-variant-numeric:tabular-nums">' + mm + ':' + ss + '</span>' +
+        '<i class="ti ti-chevron-up" style="font-size:18px"></i>' +
+      '</div>';
+  } else {
+    pill.innerHTML =
+      '<div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">' +
+        '<div style="width:36px;height:36px;border-radius:50%;background:rgba(10,12,15,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+          '<i class="ti ti-barbell" style="font-size:18px"></i></div>' +
+        '<div style="min-width:0;overflow:hidden">' +
+          '<div style="font-size:11px;font-weight:700;opacity:0.75;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Workout in progress</div>' +
+          '<div style="font-size:17px;font-weight:800;font-variant-numeric:tabular-nums">' + mm + ':' + ss + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">' +
+        '<span style="font-size:12px;font-weight:600;opacity:0.8">Tap to resume</span>' +
+        '<i class="ti ti-chevron-up" style="font-size:18px"></i>' +
+      '</div>';
+  }
 }
 
 async function finishWorkout() {
   if (!_workout) return;
+  if (!confirm('Finish workout and save your progress?')) return;
   clearInterval(_workoutTimerInterval);
   skipRestTimer();
 
   var duration = Math.floor((Date.now() - _workout.startTime) / 1000);
 
   var session = {
-    clientUid:    state.user.uid,
-    trainerUid:   state.user.linkedTrainer || '',
-    programId:    _workout.programId,
-    programName:  _workout.programName,
-    dayName:      _workout.dayName,
-    date:         new Date().toISOString(),
+    clientUid:      state.user.uid,
+    clientName:     state.user.fullName || '',
+    trainerUid:     state.user.linkedTrainer || '',
+    programId:      _workout.programId,
+    groupWorkoutId: _workout.groupWorkoutId || null,
+    programName:    _workout.programName,
+    dayName:        _workout.dayName,
+    date:           new Date().toISOString(),
     durationSeconds: duration,
-    weightUnit:   _workout.weightUnit,
+    weightUnit:     _workout.weightUnit,
     exercises:    _workout.exercises.map(function(ex) {
       return {
         exerciseId: ex.exerciseId,
@@ -4226,9 +4590,109 @@ async function finishWorkout() {
   }
 
   _workout = null;
+  removeWorkoutPill();
+  clearWorkoutStorage();
   var modal = document.getElementById('modal-workout-tracking');
   if (modal) modal.style.display = 'none';
+  // Remove backdrop blur left behind when workout modal bypasses closeAllModals()
+  var backdrop = document.getElementById('modal-backdrop');
+  if (backdrop) backdrop.classList.remove('open');
 }
+
+
+
+/* ══════════════════════════════════════════════════════════
+   BACKGROUND KEEP-ALIVE — Workout survives backgrounding
+   Uses Page Visibility API + localStorage for persistence
+══════════════════════════════════════════════════════════ */
+
+var _workoutPausedAt = null;
+
+function saveWorkoutToStorage() {
+  if (!_workout) return;
+  try {
+    var data = JSON.stringify({
+      workout:    _workout,
+      startTime:  _workout.startTime,
+      savedAt:    Date.now(),
+      restRemaining: _restRemaining
+    });
+    localStorage.setItem('repcast_active_workout', data);
+  } catch(e) {}
+}
+
+function loadWorkoutFromStorage() {
+  try {
+    var raw = localStorage.getItem('repcast_active_workout');
+    if (!raw) return null;
+    var data = JSON.parse(raw);
+    // Only restore if saved within the last 2 hours
+    if (!data || (Date.now() - data.savedAt) > 7200000) {
+      localStorage.removeItem('repcast_active_workout');
+      return null;
+    }
+    return data;
+  } catch(e) { return null; }
+}
+
+function clearWorkoutStorage() {
+  localStorage.removeItem('repcast_active_workout');
+}
+
+// Save workout state whenever it changes
+function _autoSaveWorkout() {
+  if (_workout) saveWorkoutToStorage();
+}
+
+// Called when app returns to foreground
+function onAppResume() {
+  if (!_workout) {
+    // Check if there was an active workout we can restore
+    var saved = loadWorkoutFromStorage();
+    if (saved && saved.workout) {
+      _workout = saved.workout;
+      // Recalculate start time so elapsed reflects real time
+      var realElapsed = Date.now() - saved.startTime;
+      _workout.startTime = saved.startTime; // keep original start
+      renderWorkoutScreen();
+      startWorkoutTimer();
+      showWorkoutPill();
+      // Restore rest timer if was resting
+      if (saved.restRemaining > 0) {
+        var elapsed = Math.floor((Date.now() - saved.savedAt) / 1000);
+        var remaining = saved.restRemaining - elapsed;
+        if (remaining > 0) {
+          _restRemaining = remaining;
+          startRestTimer(remaining);
+        }
+      }
+      showToast('Workout restored!');
+    }
+    return;
+  }
+  // Workout was already in memory — just update timer
+  // (timers resume automatically on foreground)
+}
+
+// Page Visibility API — fires when app backgrounds/foregrounds
+document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState === 'hidden') {
+    // App going to background — save everything
+    saveWorkoutToStorage();
+  } else if (document.visibilityState === 'visible') {
+    // App returned to foreground
+    onAppResume();
+  }
+});
+
+// Also handle Capacitor-specific app state events
+document.addEventListener('resume', onAppResume);
+document.addEventListener('pause', saveWorkoutToStorage);
+
+// Auto-save every 10 seconds when workout is active
+setInterval(function() {
+  if (_workout) saveWorkoutToStorage();
+}, 10000);
 
 
 /* ══════════════════════════════════════════════════════════
@@ -4240,9 +4704,12 @@ var _foodPickerCat    = 'All';
 async function openFoodPicker(mealId) {
   _foodPickerMealId = mealId;
   _foodPickerCat    = 'All';
+  // In Hebrew mode, ensure we have Hebrew foods loaded
   if (!foods.length) await loadFoods();
-
-  // Close menu modal first, keep backdrop open
+  // If Hebrew is active but foods are English (no lang field), reload from Hebrew collection
+  if (_lang === 'he' && foods.length > 0 && foods[0] && foods[0].lang !== 'he') {
+    await loadFoods();
+  }
   var menuModal = document.getElementById('modal-admin-menu');
   if (menuModal) menuModal.classList.remove('open');
 
@@ -4647,11 +5114,11 @@ function openMenuDetail(id) {
       '<table class="food-table">' +
         '<thead><tr>' +
           '<th style="text-align:left">Food</th>' +
-          '<th>Qty</th>' +
+          '<th>' + t('colQty') + '</th>' +
           '<th>Cal</th>' +
-          '<th style="color:#60A5FA">Protein</th>' +
-          '<th style="color:#FBBF24">Carbs</th>' +
-          '<th style="color:#F472B6">Fat</th>' +
+          '<th style="color:#60A5FA">' + t('colProtein') + '</th>' +
+          '<th style="color:#FBBF24">' + t('colCarbs') + '</th>' +
+          '<th style="color:#F472B6">' + t('colFat') + '</th>' +
         '</tr></thead>' +
         '<tbody>' +
         (meal.items||[]).map(function(item) {
@@ -4684,10 +5151,10 @@ function openMenuDetail(id) {
         '<span class="menu-grand-label">Daily Total</span>' +
       '</div>' +
       '<div class="menu-grand-macros">' +
-        '<div class="menu-grand-macro"><span class="menu-grand-val">' + Math.round(grandTot.cal) + '</span><em>Calories</em></div>' +
-        '<div class="menu-grand-macro" style="color:#60A5FA"><span class="menu-grand-val">' + Math.round(grandTot.p) + 'g</span><em>Protein</em></div>' +
-        '<div class="menu-grand-macro" style="color:#FBBF24"><span class="menu-grand-val">' + Math.round(grandTot.c) + 'g</span><em>Carbs</em></div>' +
-        '<div class="menu-grand-macro" style="color:#F472B6"><span class="menu-grand-val">' + Math.round(grandTot.f) + 'g</span><em>Fat</em></div>' +
+        '<div class="menu-grand-macro"><span class="menu-grand-val">' + Math.round(grandTot.cal) + '</span><em>' + t('colCalories') + '</em></div>' +
+        '<div class="menu-grand-macro" style="color:#60A5FA"><span class="menu-grand-val">' + Math.round(grandTot.p) + 'g</span><em>' + t('colProtein') + '</em></div>' +
+        '<div class="menu-grand-macro" style="color:#FBBF24"><span class="menu-grand-val">' + Math.round(grandTot.c) + 'g</span><em>' + t('colCarbs') + '</em></div>' +
+        '<div class="menu-grand-macro" style="color:#F472B6"><span class="menu-grand-val">' + Math.round(grandTot.f) + 'g</span><em>' + t('colFat') + '</em></div>' +
       '</div>' +
     '</div>';
 
@@ -4808,7 +5275,7 @@ function renderMealEditor(meal) {
       '<span style="width:60px">Qty</span>' +
       '<span style="width:60px">Unit</span>' +
       '<span style="width:65px">Calories</span>' +
-      '<span style="width:55px">Protein</span>' +
+      '<span style="width:55px">' + t('colProtein') + '</span>' +
       '<span style="width:55px">Carbs</span>' +
       '<span style="width:55px">Fat</span>' +
       '<span style="width:32px"></span>' +
@@ -4866,7 +5333,7 @@ function updateAdminMenuPreview() {
     '<div class="menu-grand-total" style="margin-top:12px">' +
       '<div class="menu-grand-macros">' +
         '<div class="menu-grand-macro"><span class="menu-grand-val">' + Math.round(cal) + '</span><em>Calories</em></div>' +
-        '<div class="menu-grand-macro" style="color:#60A5FA"><span class="menu-grand-val">' + Math.round(pro) + 'g</span><em>Protein</em></div>' +
+        '<div class="menu-grand-macro" style="color:#60A5FA"><span class="menu-grand-val">' + Math.round(pro) + 'g</span><em>' + t('colProtein') + '</em></div>' +
         '<div class="menu-grand-macro" style="color:#FBBF24"><span class="menu-grand-val">' + Math.round(car) + 'g</span><em>Carbs</em></div>' +
         '<div class="menu-grand-macro" style="color:#F472B6"><span class="menu-grand-val">' + Math.round(fat) + 'g</span><em>Fat</em></div>' +
       '</div>' +
@@ -4982,6 +5449,20 @@ var programs = [];
 
 async function loadPrograms() {
   if (!window._firebase || !window._db) return;
+  // For clients, re-fetch their assigned programs from their profile
+  if (state.isClient && state.user) {
+    try {
+      var cpSnap = await window._firebase.getDoc(window._firebase.doc(window._db, 'clientProfiles', state.user.uid));
+      if (cpSnap.exists()) {
+        programs = cpSnap.data().assignedPrograms || [];
+        window._clientAssignedPrograms = programs;
+    // Cache raw data so language switch can re-filter without re-fetching
+    window._clientRawData = data;
+      }
+    } catch(e) { console.warn('client loadPrograms:', e.message); }
+    renderProgramsView();
+    return;
+  }
   try {
     var snap = await window._firebase.getDocs(window._firebase.collection(window._db, col('programs')));
     programs = [];
@@ -5065,7 +5546,7 @@ function openProgramDetail(id) {
         '<div class="meal-header"><span class="meal-name">' + (day.name||day.day||'Day') + '</span>' +
         '<span class="meal-total" style="color:var(--muted2)">' + (day.muscleGroup||'') + '</span></div>' +
         (day.exercises && day.exercises.length ?
-          '<table class="food-table"><thead><tr><th>Exercise</th><th>Muscle</th><th>Sets</th><th>Reps</th><th>Rest</th><th>Notes</th></tr></thead><tbody>' +
+          '<table class="food-table"><thead><tr><th>' + t('colExercise') + '</th><th>' + t('colMuscle') + '</th><th>' + t('colSets') + '</th><th>' + t('colReps') + '</th><th>' + t('colRest') + '</th><th>' + t('colNotes') + '</th></tr></thead><tbody>' +
           day.exercises.map(function(ex){
             return '<tr><td><strong>' + (ex.name||ex.title||'') + '</strong></td><td>' + (ex.muscle||'') + '</td><td>' + (ex.sets||'') + '</td><td>' + (ex.reps||'') + '</td><td>' + (ex.rest||'') + '</td><td style="color:var(--muted);font-size:12px">' + (ex.notes||'') + '</td></tr>';
           }).join('') + '</tbody></table>' : '') +
@@ -5128,7 +5609,9 @@ async function assignProgToClient(progId, clientId) {
     arr.splice(exists, 1);
     showToast('Program removed from ' + client.name);
   } else {
-    arr.push(prog);
+    // Tag the item with current language so client can filter
+    var progWithLang = Object.assign({}, prog, { lang: (typeof _lang !== 'undefined' ? _lang : 'en') });
+    arr.push(progWithLang);
     showToast('Program assigned to ' + client.name + '!');
   }
   client.assignedPrograms = arr;
@@ -5152,11 +5635,11 @@ function addProgramDay(dayData) {
   var exHTML = dayData && dayData.exercises ? dayData.exercises.map(function(ex){ return programExerciseHTML(ex); }).join('') : '';
   div.innerHTML =
     '<div class="meal-editor-header">' +
-      '<input class="form-input prog-day-name" value="' + (dayData&&dayData.name||'Day 1') + '" placeholder="Day name e.g. Monday — Chest" style="flex:2">' +
-      '<input class="form-input prog-day-muscle" value="' + (dayData&&dayData.muscleGroup||'') + '" placeholder="Muscle group" style="flex:1">' +
+      '<input class="form-input prog-day-name" value="' + (dayData&&(dayData.name||dayData.day)||'Day 1') + '" placeholder="' + ((_lang==='he') ? 'שם יום לדוג׳ שני — חזה' : 'Day name e.g. Monday — Chest') + '" style="flex:2" dir="' + ((_lang==='he')?'rtl':'ltr') + '">' +
+      '<input class="form-input prog-day-muscle" value="' + (dayData&&dayData.muscleGroup||'') + '" placeholder="' + ((_lang==='he') ? 'קבוצת שריר' : 'Muscle group') + '" style="flex:1" dir="' + ((_lang==='he')?'rtl':'ltr') + '">' +
       '<button class="admin-action-btn delete" onclick="this.closest(\'.meal-editor\').remove()"><i class="ti ti-trash"></i></button>' +
     '</div>' +
-    '<div class="prog-ex-header"><span style="flex:2;min-width:230px">Exercise</span><span style="width:52px">Sets</span><span style="width:60px">Reps</span><span style="width:60px">Rest</span><span style="flex:1">Notes</span><span style="width:32px"></span></div>' +
+    '<div class="prog-ex-header"><span style="flex:2;min-width:230px">' + ((_lang==='he')?'תרגיל':'Exercise') + '</span><span style="width:52px">' + ((_lang==='he')?'סטים':'Sets') + '</span><span style="width:60px">' + ((_lang==='he')?'חזרות':'Reps') + '</span><span style="width:60px">' + ((_lang==='he')?'מנוחה':'Rest') + '</span><span style="flex:1">' + ((_lang==='he')?'הערות':'Notes') + '</span><span style="width:32px"></span></div>' +
     '<div class="prog-ex-container" id="pex-' + dayId + '">' + exHTML + '</div>' +
     '<button class="btn btn-ghost btn-sm" data-dayid="' + dayId + '" onclick="addProgramExercise(this.dataset.dayid)" style="margin-top:6px"><i class="ti ti-plus"></i> Add Exercise</button>';
   container.appendChild(div);
@@ -5164,13 +5647,26 @@ function addProgramDay(dayData) {
 
 function programExerciseHTML(ex) {
   ex = ex || {};
+  var isHe = (typeof _lang !== 'undefined' && _lang === 'he');
   return '<div class="prog-ex-row">' +
-    '<input class="form-input" placeholder="Exercise name" value="' + (ex.name||'') + '">' +
-    '<input class="form-input" placeholder="Chest" value="' + (ex.muscle||'') + '" style="width:90px">' +
+    '<input class="form-input" placeholder="' + (isHe ? 'שם תרגיל' : 'Exercise name') + '" value="' + (ex.name||ex.title||'') + '" dir="' + (isHe?'rtl':'ltr') + '">' +
+    (isHe ?
+      '<select class="form-input" style="width:110px">' +
+        '<option value="">שריר...</option>' +
+        '<option value="חזה"' + (ex.muscle==='חזה'?' selected':'') + '>חזה</option>' +
+        '<option value="גב"' + (ex.muscle==='גב'?' selected':'') + '>גב</option>' +
+        '<option value="רגליים"' + (ex.muscle==='רגליים'?' selected':'') + '>רגליים</option>' +
+        '<option value="כתפיים"' + (ex.muscle==='כתפיים'?' selected':'') + '>כתפיים</option>' +
+        '<option value="ידיים"' + (ex.muscle==='ידיים'?' selected':'') + '>ידיים</option>' +
+        '<option value="בטן"' + (ex.muscle==='בטן'?' selected':'') + '>בטן</option>' +
+        '<option value="גוף מלא"' + (ex.muscle==='גוף מלא'?' selected':'') + '>גוף מלא</option>' +
+        '<option value="פיזיו"' + (ex.muscle==='פיזיו'?' selected':'') + '>פיזיו</option>' +
+      '</select>'
+      : '<input class="form-input" placeholder="Muscle" value="' + (ex.muscle||'') + '" style="width:90px">') +
     '<input class="form-input" type="number" placeholder="4" value="' + (ex.sets||'') + '" style="width:60px">' +
     '<input class="form-input" placeholder="8-12" value="' + (ex.reps||'') + '" style="width:70px">' +
-    '<input class="form-input" placeholder="90s" value="' + (ex.rest||'') + '" style="width:65px">' +
-    '<input class="form-input" placeholder="Notes..." value="' + (ex.notes||'') + '">' +
+    '<input class="form-input" placeholder="' + (isHe ? 'מנוחה' : '90s') + '" value="' + (ex.rest||'') + '" style="width:65px">' +
+    '<input class="form-input" placeholder="' + (isHe ? 'הערות' : 'Notes...') + '" value="' + (ex.notes||'') + '" dir="' + (isHe?'rtl':'ltr') + '">' +
     '<button class="admin-action-btn delete" onclick="this.parentElement.remove()" style="padding:5px 8px"><i class="ti ti-x"></i></button>' +
   '</div>';
 }
@@ -5301,6 +5797,15 @@ var recipeFilter = 'all';
 
 async function loadRecipes() {
   if (!window._firebase || !window._db) return;
+  // Clients: re-fetch only their assigned recipes
+  if (state.isClient && state.user) {
+    try {
+      var cp = await window._firebase.getDoc(window._firebase.doc(window._db, 'clientProfiles', state.user.uid));
+      if (cp.exists()) recipes = cp.data().assignedRecipes || [];
+    } catch(e) { console.warn('client loadRecipes:', e.message); }
+    renderRecipesView();
+    return;
+  }
   try {
     var snap = await window._firebase.getDocs(window._firebase.collection(window._db, col('recipes')));
     recipes = [];
@@ -5602,7 +6107,7 @@ function addProgExercise(dayData) {
       '<input class="form-input meal-name-input" value="' + (dayData.day||'Day 1') + '" placeholder="e.g. Monday — Chest & Triceps" style="flex:1">' +
       '<button class="admin-action-btn delete" onclick="this.closest(\'.meal-editor\').remove()"><i class="ti ti-trash"></i></button>' +
     '</div>' +
-    '<div class="prog-ex-header"><span>Exercise</span><span>Muscle</span><span>Sets</span><span>Reps</span><span>Rest</span><span>Notes</span><span></span></div>' +
+    '<div class="prog-ex-header"><span>' + ((_lang==='he')?'תרגיל':'Exercise') + '</span><span>' + ((_lang==='he')?'שריר':'Muscle') + '</span><span>' + ((_lang==='he')?'סטים':'Sets') + '</span><span>' + ((_lang==='he')?'חזרות':'Reps') + '</span><span>' + ((_lang==='he')?'מנוחה':'Rest') + '</span><span>' + ((_lang==='he')?'הערות':'Notes') + '</span><span></span></div>' +
     '<div id="exrows-' + dayId + '">' +
       ((dayData.exercises||[]).map(function(ex){ return progExRowHTML(dayId, ex); }).join('')) +
     '</div>' +
@@ -5615,23 +6120,28 @@ function addProgExercise(dayData) {
 function progExRowHTML(dayId, ex) {
   ex = ex || {};
   var exId = ex.exerciseId || ex.id || '';
-  var muscleOpts = ['','chest','back','legs','shoulders','arms','core','fullbody','physio'];
+  var isHe = (typeof _lang !== 'undefined' && _lang === 'he');
+  var muscleOpts = isHe
+    ? ['','חזה','גב','רגליים','כתפיים','ידיים','בטן','גוף מלא','פיזיו']
+    : ['','chest','back','legs','shoulders','arms','core','fullbody','physio'];
+  var allLabel = isHe ? 'כל השרירים' : 'All muscles';
+  var searchPlaceholder = isHe ? 'חפש תרגיל...' : 'Search exercise...';
   return '<div class="prog-ex-row" data-exid="' + exId + '">' +
     '<div class="prog-ex-pick">' +
       '<select class="form-input prog-ex-muscle-filter" onchange="filterProgExSearch(this.closest(\'.prog-ex-row\').querySelector(\'.prog-ex-name\'))" style="width:110px;flex-shrink:0">' +
-        muscleOpts.map(function(m){ return '<option value="' + m + '">' + (m||'All muscles') + '</option>'; }).join('') +
+        muscleOpts.map(function(m){ return '<option value="' + m + '"' + (m === (ex.muscle||'') ? ' selected' : '') + '>' + (m||allLabel) + '</option>'; }).join('') +
       '</select>' +
-      '<input class="form-input prog-ex-name" placeholder="Search exercise..." value="' + (ex.title||ex.name||'') + '" ' +
+      '<input class="form-input prog-ex-name" placeholder="' + searchPlaceholder + '" value="' + (ex.title||ex.name||'') + '" ' +
         'oninput="filterProgExSearch(this)" onfocus="showProgExDropdown(this)" style="flex:1;min-width:120px">' +
       '<input type="hidden" class="prog-ex-id"    value="' + exId + '">' +
       '<input type="hidden" class="prog-ex-url"   value="' + (ex.videoURL||'') + '">' +
       '<input type="hidden" class="prog-ex-muscle" value="' + (ex.muscle||'') + '">' +
       '<div class="prog-ex-dropdown" style="display:none"></div>' +
     '</div>' +
-    '<input class="form-input" placeholder="Sets"  value="' + (ex.sets||'')  + '" style="width:52px">' +
-    '<input class="form-input" placeholder="Reps"  value="' + (ex.reps||'')  + '" style="width:60px">' +
-    '<input class="form-input" placeholder="Rest"  value="' + (ex.rest||'')  + '" style="width:60px">' +
-    '<input class="form-input" placeholder="Notes" value="' + (ex.notes||'') + '" style="flex:1;min-width:70px">' +
+    '<input class="form-input" placeholder="' + (isHe?'סטים':'Sets')  + '" value="' + (ex.sets||'')  + '" style="width:52px">' +
+    '<input class="form-input" placeholder="' + (isHe?'חזרות':'Reps') + '" value="' + (ex.reps||'')  + '" style="width:60px">' +
+    '<input class="form-input" placeholder="' + (isHe?'מנוחה':'Rest') + '" value="' + (ex.rest||'')  + '" style="width:60px">' +
+    '<input class="form-input" placeholder="' + (isHe?'הערות':'Notes')+ '" value="' + (ex.notes||'') + '" style="flex:1;min-width:70px">' +
     '<button class="admin-action-btn delete" onclick="this.closest(\'.prog-ex-row\').remove()" style="padding:6px 8px"><i class="ti ti-x"></i></button>' +
   '</div>';
 }
@@ -5886,7 +6396,7 @@ function openProgramDetail(id) {
       '<table class="prog-ex-table">' +
         '<thead><tr>' +
           '<th style="width:36px"></th>' +
-          '<th>Exercise</th><th>Sets</th><th>Reps</th><th>Rest</th><th>Notes</th>' +
+          '<th>' + t('colExercise') + '</th><th>' + t('colSets') + '</th><th>' + t('colReps') + '</th><th>' + t('colRest') + '</th><th>' + t('colNotes') + '</th>' +
         '</tr></thead>' +
         '<tbody>' +
         exercises.map(function(ex, ei) {
@@ -6415,19 +6925,25 @@ function updateAdminMenusTopbar(lang) {
   }
 }
 function updateAdminProgramsTopbar(lang) {
-  var addBtn = document.querySelector('#admin-view-programs .btn-primary');
+  var addBtn  = document.querySelector('#admin-view-programs .btn-primary');
+  var bulkBtn = document.querySelector('#admin-view-programs .btn-ghost');
   if (lang === 'he') {
-    if (addBtn) { addBtn.onclick = function(){ openAdminProgramModalHe(); }; addBtn.innerHTML = '<i class="ti ti-plus"></i> הוסף תוכנית'; }
+    if (addBtn)  { addBtn.onclick  = function(){ openAdminProgramModalHe(); }; addBtn.innerHTML  = '<i class="ti ti-plus"></i> הוסף תוכנית'; }
+    if (bulkBtn) { bulkBtn.onclick = function(){ openModal('bulk-programs-he'); }; bulkBtn.innerHTML = '<i class="ti ti-file-import"></i> ייבוא עברית'; }
   } else {
-    if (addBtn) { addBtn.onclick = function(){ openAdminProgramModal(); }; addBtn.innerHTML = '<i class="ti ti-plus"></i> Add Program'; }
+    if (addBtn)  { addBtn.onclick  = function(){ openAdminProgramModal(); }; addBtn.innerHTML  = '<i class="ti ti-plus"></i> Add Program'; }
+    if (bulkBtn) { bulkBtn.onclick = function(){ openModal('bulk-programs'); }; bulkBtn.innerHTML = '<i class="ti ti-file-import"></i> Bulk Import'; }
   }
 }
 function updateAdminRecipesTopbar(lang) {
-  var addBtn = document.querySelector('#admin-view-recipes .btn-primary');
+  var addBtn  = document.querySelector('#admin-view-recipes .btn-primary');
+  var bulkBtn = document.querySelector('#admin-view-recipes .btn-ghost');
   if (lang === 'he') {
-    if (addBtn) { addBtn.onclick = function(){ openAdminRecipeModalHe(); }; addBtn.innerHTML = '<i class="ti ti-plus"></i> הוסף מתכון'; }
+    if (addBtn)  { addBtn.onclick  = function(){ openAdminRecipeModalHe(); }; addBtn.innerHTML  = '<i class="ti ti-plus"></i> הוסף מתכון'; }
+    if (bulkBtn) { bulkBtn.onclick = function(){ openModal('bulk-recipes-he'); }; bulkBtn.innerHTML = '<i class="ti ti-file-import"></i> ייבוא עברית'; }
   } else {
-    if (addBtn) { addBtn.onclick = function(){ openAdminRecipeModal(); }; addBtn.innerHTML = '<i class="ti ti-plus"></i> Add Recipe'; }
+    if (addBtn)  { addBtn.onclick  = function(){ openAdminRecipeModal(); }; addBtn.innerHTML  = '<i class="ti ti-plus"></i> Add Recipe'; }
+    if (bulkBtn) { bulkBtn.onclick = function(){ openModal('bulk-recipes'); }; bulkBtn.innerHTML = '<i class="ti ti-file-import"></i> Bulk Import'; }
   }
 }
 function updateAdminFoodsTopbar(lang) {
@@ -6461,14 +6977,35 @@ function renderHeExercisesList() {
     el.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="ti ti-language"></i></div><h3>No Hebrew exercises yet</h3><p>Add exercises or bulk import.</p></div>';
     return;
   }
-  el.innerHTML = _heExercises.map(function(ex) {
-    return '<div class="admin-menu-row"><div style="flex:1"><strong>' + (ex.title||ex.name||'') + '</strong>' +
-      '<div style="font-size:12px;color:var(--muted);margin-top:3px">' + (ex.muscle||'') + (ex.sub ? ' · ' + ex.sub : '') + '</div></div>' +
-      '<div class="admin-actions">' +
-        '<button class="admin-action-btn edit" onclick="openAdminModal(\'edit\',\''+ex.id+'\')" title="Edit"><i class="ti ti-edit"></i></button>' +
-        '<button class="admin-action-btn delete" onclick="deleteHeItem(\''+ex.id+'\',\'exercises\')" title="Delete"><i class="ti ti-trash"></i></button>' +
-      '</div></div>';
-  }).join('');
+  var muscleColors = {
+    'חזה':'#F472B6','גב':'#60A5FA','רגליים':'#7EE8A2','כתפיים':'#FBBF24',
+    'ידיים':'#A78BFA','בטן':'#FB923C','גוף מלא':'#3ECFCF','פיזיו':'#818CF8',
+    'chest':'#F472B6','back':'#60A5FA','legs':'#7EE8A2','shoulders':'#FBBF24',
+    'arms':'#A78BFA','core':'#FB923C','fullbody':'#3ECFCF','physio':'#818CF8'
+  };
+  el.innerHTML =
+    '<div style="display:grid;grid-template-columns:3fr 1fr 1fr 1fr 1fr auto;gap:12px;padding:8px 16px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border)">' +
+      '<span>Exercise</span><span>Muscle</span><span>Sub-Category</span><span>Difficulty</span><span>Tier</span><span>Actions</span>' +
+    '</div>' +
+    _heExercises.map(function(ex) {
+      var mc = muscleColors[ex.muscle] || '#888';
+      var tier = ex.premium ? 'Premium' : 'Free';
+      var tierColor = ex.premium ? '#FBBF24' : 'var(--muted)';
+      return '<div style="display:grid;grid-template-columns:3fr 1fr 1fr 1fr 1fr auto;gap:12px;padding:12px 16px;align-items:center;border-bottom:1px solid var(--border)" ' +
+        'onmouseenter="this.style.background=\'var(--surface2)\'" onmouseleave="this.style.background=\'\'">' +
+        '<div><div style="font-weight:600;font-size:14px">' + (ex.title||ex.name||'') + '</div>' +
+          (ex.desc ? '<div style="font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px">' + ex.desc.slice(0,60) + '...</div>' : '') +
+        '</div>' +
+        '<div><span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;background:' + mc + '22;color:' + mc + ';border:1px solid ' + mc + '44">' + (ex.muscle||'') + '</span></div>' +
+        '<div><span style="font-size:11px;padding:3px 8px;border-radius:20px;background:var(--surface2);color:var(--muted)">' + (ex.sub||'—') + '</span></div>' +
+        '<div style="font-size:13px;color:var(--muted)">' + (ex.diff||ex.difficulty||'—') + '</div>' +
+        '<div style="font-size:11px;font-weight:700;color:' + tierColor + '">' + tier + '</div>' +
+        '<div style="display:flex;gap:6px">' +
+          '<button class="admin-action-btn edit" onclick="openAdminExerciseModalHe(\'' + ex.id + '\')" title="Edit"><i class="ti ti-edit"></i></button>' +
+          '<button class="admin-action-btn delete" onclick="deleteHeItem(\'' + ex.id + '\',\'exercises\')" title="Delete"><i class="ti ti-trash"></i></button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
 }
 
 async function updateAdminExercisesTopbar(lang) {
@@ -6489,6 +7026,52 @@ async function updateAdminExercisesTopbar(lang) {
     if (addBtn) { addBtn.innerHTML = '<i class="ti ti-plus"></i> Add Exercise'; addBtn.onclick = function(){ window._addExToHe=false; openAdminModal('add'); }; }
     if (bulkBtn) { bulkBtn.innerHTML = '<i class="ti ti-file-import"></i> Bulk Import'; bulkBtn.onclick = function(){ openModal('bulk-import'); }; }
   }
+}
+
+/* ── Hebrew exercise edit modal ── */
+function openAdminExerciseModalHe(id) {
+  _editingHeId   = id || null;
+  _editingHeType = 'exercises';
+  window._saveExToHe = true;
+
+  var modal   = document.getElementById('modal-admin-exercise');
+  var titleEl = document.getElementById('admin-ex-modal-title');
+  var saveBtn = document.getElementById('admin-ex-save-btn');
+  if (!modal) return;
+
+  // Switch muscle dropdown to Hebrew options
+  switchExModalToHebrew();
+
+  // Reset form
+  document.getElementById('admin-edit-id').value        = '';
+  document.getElementById('admin-ex-title').value       = '';
+  document.getElementById('admin-ex-muscle').value      = '';
+  document.getElementById('admin-ex-diff').value        = 'Beginner';
+  document.getElementById('admin-ex-desc').value        = '';
+  document.getElementById('admin-ex-premium').checked   = false;
+  document.getElementById('admin-ex-video').value       = '';
+
+  if (id) {
+    var ex = _heExercises.find(function(e){ return e.id === id; });
+    if (!ex) { showToast('Exercise not found'); return; }
+    if (titleEl) titleEl.innerHTML = '<i class="ti ti-edit"></i> ערוך תרגיל (עברית)';
+    if (saveBtn) saveBtn.innerHTML = '<i class="ti ti-check"></i> שמור שינויים';
+    document.getElementById('admin-edit-id').value      = ex.id;
+    document.getElementById('admin-ex-title').value     = ex.title  || '';
+    document.getElementById('admin-ex-muscle').value    = ex.muscle || '';
+    document.getElementById('admin-ex-diff').value      = ex.diff   || 'בינוני';
+    document.getElementById('admin-ex-desc').value      = ex.desc   || '';
+    document.getElementById('admin-ex-premium').checked = !!ex.premium;
+    document.getElementById('admin-ex-video').value     = ex.videoURL || '';
+    // Populate sub dropdown
+    try { populateSubcats('admin-ex-muscle', 'admin-ex-subcat'); document.getElementById('admin-ex-subcat').value = ex.sub || ''; } catch(e){}
+  } else {
+    if (titleEl) titleEl.innerHTML = '<i class="ti ti-plus"></i> הוסף תרגיל (עברית)';
+    if (saveBtn) saveBtn.innerHTML = '<i class="ti ti-check"></i> שמור תרגיל';
+  }
+
+  document.getElementById('modal-backdrop').classList.add('open');
+  modal.classList.add('open');
 }
 
 /* ── Hebrew modal openers (reuse existing modals, just change save target) ── */
@@ -6646,15 +7229,17 @@ function patchHeSaves() {
 
 // Wire bulk import for Hebrew collections
 var _sectionRequiredHe = {
-  'menus-he':    ['name', 'meals'],
-  'programs-he': ['name', 'trainingDays'],
-  'recipes-he':  ['name', 'category', 'calories', 'ingredients', 'instructions'],
-  'foods-he':    ['name', 'category', 'calories']
+  'menus-he':      ['name', 'meals'],
+  'programs-he':   ['name', 'trainingDays'],
+  'recipes-he':    ['name', 'category', 'calories', 'ingredients', 'instructions'],
+  'foods-he':      ['name', 'category', 'calories'],
+  'exercises-he':  ['title', 'muscle']
 };
 
 var _heColMap = {
   'menus-he': 'menus_he', 'programs-he': 'programs_he',
-  'recipes-he': 'recipes_he', 'foods-he': 'foods_he'
+  'recipes-he': 'recipes_he', 'foods-he': 'foods_he',
+  'exercises-he': 'masterLibrary_he'
 };
 
 
@@ -6726,7 +7311,7 @@ function validateSectionBulk(type) {
     if (!Array.isArray(data)) throw new Error('Must be a JSON array: [ ... ]');
     if (!data.length)         throw new Error('Array is empty');
 
-    var req = _sectionRequired[type] || [];
+    var req = _sectionRequiredHe[type] || _sectionRequired[type] || [];
     data.forEach(function(item, i) {
       req.forEach(function(field) {
         if (item[field] === undefined || item[field] === null || item[field] === '')
@@ -6751,9 +7336,11 @@ async function runSectionBulkImport(type) {
   var data = validateSectionBulk(type);
   if (!data) return;
 
-  // For Hebrew types (e.g. 'menus-he'), use 'menus_he' collection
-  var colName = type.endsWith('-he') ? type.replace('-he','_he') : type;
-  var col = colName;
+  // Use _heColMap for Hebrew types (exercises-he → masterLibrary_he, not exercises_he)
+  var col = _heColMap[type] || (type.endsWith('-he') ? type.replace('-he','_he') : type);
+  // exercises-he: save each doc with its own id field as document ID
+  var useDocId = (type === 'exercises-he');
+
   var prog = document.getElementById('bulk-' + type + '-progress');
   var progText = document.getElementById('bulk-' + type + '-prog-text');
   var progBar  = document.getElementById('bulk-' + type + '-prog-bar');
@@ -6772,7 +7359,14 @@ async function runSectionBulkImport(type) {
         updatedAt:   new Date().toISOString(),
         importedAt:  new Date().toISOString()
       });
-      await window._firebase.addDoc(window._firebase.collection(window._db, col), item);
+      if (useDocId && item.id) {
+        // Use the item's own id as the Firestore document ID
+        await window._firebase.setDoc(
+          window._firebase.doc(window._db, col, String(item.id)), item
+        );
+      } else {
+        await window._firebase.addDoc(window._firebase.collection(window._db, col), item);
+      }
       success++;
     } catch(e) {
       errors.push('Item ' + (i+1) + ': ' + (e.code || e.message));
@@ -6920,10 +7514,16 @@ async function bootClientPortal(user, profile) {
   await bootClientApp();
 
   // Apply client-specific nav filtering (hide upload tabs + Clients tab)
+  // Use RAF to ensure DOM has settled after bootClientApp renders
   applyClientNav();
+  requestAnimationFrame(function() { applyClientNav(); });
 
-  // Load their assigned content from Firestore (overrides loadClients etc)
+  // Load their assigned content from Firestore
   await loadClientPortal(profile.linkedTrainer, user.uid);
+  // Load group workouts assigned to this client
+  loadClientGroupWorkouts().catch(function(){});
+  // Re-apply after content loads
+  applyClientNav();
 }
 
 /* Shared app boot for CLIENT — same as bootTrainerApp minus trainer-only loads */
@@ -6956,6 +7556,9 @@ async function bootClientApp() {
   // Load shared library content (exercises)
   await syncMasterLibraryFromFirestore();
 
+  // Load public trainer videos so they appear in the free log exercise search
+  loadPublicVideosFromFirestore();
+
   // Load research (clients can see all research)
   loadResearch();
 
@@ -6966,68 +7569,65 @@ async function bootClientApp() {
 function applyClientNav() {
   window._clientMode = true;
 
-  // ── Mobile bottom tab bar — hide Clients tab, show My Profile ──
-  var clientsTab = document.getElementById('mtab-clients');
-  if (clientsTab) clientsTab.style.display = 'none';
-
-  // Hide the trainer "Profile" (settings) tab for clients
-  var profileTab = document.getElementById('mtab-profile');
-  if (profileTab) profileTab.style.display = 'none';
-
-  // Show "My Profile" client tab
-  var cpTab = document.getElementById('mtab-client-profile');
-  if (cpTab) {
-    cpTab.style.display = 'flex';
-    cpTab.setAttribute('onclick', "mobileTab('client-profile',this)");
+  // Use a helper to force-hide elements reliably on native
+  function forceHide(id) {
+    var el = document.getElementById(id);
+    if (el) { el.style.setProperty('display', 'none', 'important'); }
+  }
+  function forceShow(id, disp) {
+    var el = document.getElementById(id);
+    if (el) { el.style.setProperty('display', disp || 'flex', 'important'); }
   }
 
-  // ── Top nav — hide Clients link, reroute Profile to client-profile ──
-  var tnav = document.getElementById('tnav-clients');
-  if (tnav) tnav.style.display = 'none';
+  // ── Mobile bottom tab bar ──
+  forceHide('mtab-clients');
+  forceHide('mtab-profile');
+  forceShow('mtab-client-profile', 'flex');
+  forceShow('mtab-group-workouts', 'flex');
+  var cpTab = document.getElementById('mtab-client-profile');
+  if (cpTab) cpTab.setAttribute('onclick', "mobileTab('client-profile',this)");
+
+  // ── Top nav ──
+  forceHide('tnav-clients');
+  forceHide('tnav-billing');
+  // Show Group Workouts nav for clients (their assigned workouts)
+  forceShow('tnav-group-workouts', 'flex');
+  // Update label for client context
+  var gwLabel = document.getElementById('tnav-group-workouts-label');
+  if (gwLabel) gwLabel.textContent = (_lang === 'he') ? 'אימוני קבוצה' : 'Group Workouts';
+
+  // Inject Today's Workout banner + Log Workout button into client profile view
+  var cpView = document.getElementById('view-client-profile');
+  if (cpView && !document.getElementById('client-group-workout-banner')) {
+    var bannerWrap = document.createElement('div');
+    bannerWrap.id = 'client-workout-top';
+    bannerWrap.style.cssText = 'padding:16px 16px 0';
+    bannerWrap.innerHTML =
+      '<div id="client-group-workout-banner" style="display:none;align-items:center;gap:12px;margin-bottom:12px;padding:14px 16px;background:var(--accent);color:#0a0c0f;border-radius:14px;cursor:pointer;box-shadow:0 4px 16px rgba(126,232,162,0.25)"></div>';
+    cpView.insertBefore(bannerWrap, cpView.firstChild);
+  }
 
   var tnavProfile = document.getElementById('tnav-profile');
-  if (tnavProfile) {
-    tnavProfile.setAttribute('onclick', "setView('client-profile',this)");
-  }
-  // The topnav-user avatar area also goes to trainer profile — reroute it
+  if (tnavProfile) tnavProfile.setAttribute('onclick', "setView('client-profile',this)");
   var topnavUser = document.querySelector('.topnav-user');
   if (topnavUser) topnavUser.setAttribute('onclick', "setView('client-profile', document.getElementById('tnav-profile'))");
 
-  // ── Library tabs — hide ALL trainer upload tabs ──
-  ['tab-custom', 'tab-myvideos', 'tab-myprograms', 'tab-mymenus', 'tab-myrecipes', 'tab-myresearch'].forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el) el.style.display = 'none';
-  });
+  // ── Library tabs — hide all upload/trainer tabs ──
+  ['tab-custom','tab-myvideos','tab-myprograms','tab-mymenus','tab-myrecipes','tab-myresearch'].forEach(forceHide);
+  forceHide('lib-upload-bar');
+  forceHide('upgrade-nudge-banner');
+  forceHide('trial-pill-top');
+  forceHide('recipes-add-btn');
 
-  // Hide upload bar
-  var uploadBar = document.getElementById('lib-upload-bar');
-  if (uploadBar) uploadBar.style.display = 'none';
-
-  // Hide billing tab for clients
-  var tnavBilling = document.getElementById('tnav-billing');
-  if (tnavBilling) tnavBilling.style.display = 'none';
-
-  // Hide trial/upgrade banner — clients have no trial
-  var nudgeBanner = document.getElementById('upgrade-nudge-banner');
-  if (nudgeBanner) nudgeBanner.style.display = 'none';
-  var trialPillTop = document.getElementById('trial-pill-top');
-  if (trialPillTop) trialPillTop.style.display = 'none';
-
-  // Hide Add Recipe button — clients don't create content
-  var addRecipeBtn = document.getElementById('recipes-add-btn');
-  if (addRecipeBtn) addRecipeBtn.style.display = 'none';
-
-  // Update name in topnav
+  // ── Name + avatar ──
   var nameEl = document.getElementById('topnav-name');
   if (nameEl && state.user) nameEl.textContent = state.user.fullName;
-
-  // Restore avatar if photoURL
   if (state.user && state.user.photoURL) {
     var av = document.getElementById('topnav-avatar');
-    if (av) { av.style.backgroundImage = 'url(' + state.user.photoURL + ')'; av.style.backgroundSize = 'cover'; av.textContent = ''; }
+    if (av) { av.style.backgroundImage='url('+state.user.photoURL+')'; av.style.backgroundSize='cover'; av.textContent=''; }
   } else if (state.user) {
     var av2 = document.getElementById('topnav-avatar');
-    if (av2) av2.textContent = (state.user.fullName || 'C')[0].toUpperCase();
+    if (av2) av2.textContent = (state.user.fullName||'C')[0].toUpperCase();
   }
 }
 
@@ -7040,10 +7640,19 @@ async function loadClientPortal(trainerUid, clientUid) {
     var data = snap.exists() ? snap.data() : {};
 
     // Populate main app arrays with client's assigned content
-    menus    = data.assignedMenus    || [];
-    programs = data.assignedPrograms || [];
-    recipes  = data.assignedRecipes  || [];
-    window._clientAssignedPrograms = data.assignedPrograms || [];
+    // Filter assigned items by the current language
+    // Items have a lang field ('he' or 'en'). If no lang field, treat as 'en'.
+    var langFilter = (typeof _lang !== 'undefined' ? _lang : 'en');
+    function matchLang(item) {
+      if (!item) return false;
+      var itemLang = item.lang || 'en';
+      return itemLang === langFilter;
+    }
+    // Strict language filter — Hebrew client sees ONLY Hebrew assignments, English sees only English
+    menus    = (data.assignedMenus    || []).filter(matchLang);
+    programs = (data.assignedPrograms || []).filter(matchLang);
+    recipes  = (data.assignedRecipes  || []).filter(matchLang);
+    window._clientAssignedPrograms = programs;
 
     // Enrich routines
     var rawRoutines = data.assignedRoutines || [];
@@ -7113,25 +7722,46 @@ async function renderClientProfileTab(data) {
     snap.forEach(function(d){ measurements.push(Object.assign({id:d.id}, d.data())); });
   } catch(e) { console.warn('client measurements:', e.code || e.message); }
 
-  // Fetch workout sessions for progress
+  // Fetch workout sessions for progress (no orderBy — avoids composite index, sort client-side)
   var sessions = [];
   try {
     var wsnap = await window._firebase.getDocs(
       window._firebase.query(
         window._firebase.collection(window._db, 'workoutSessions'),
         window._firebase.where('clientUid', '==', state.user.uid),
-        window._firebase.orderBy('date', 'desc'),
-        window._firebase.limit(30)
+        window._firebase.limit(100)
       )
     );
     wsnap.forEach(function(d){ sessions.push(Object.assign({id:d.id}, d.data())); });
+    sessions.sort(function(a,b){ return (b.date||'') > (a.date||'') ? 1 : -1; });
   } catch(e) { console.warn('client sessions:', e.code || e.message); }
 
   var latest = measurements.length ? measurements[measurements.length - 1] : null;
   var totalWorkouts = sessions.length;
 
+  // Build today's group workout banner HTML
+  var gwBannerHTML = '';
+  var todayGW = _groupWorkouts.find(function(gw){
+    return (gw.scheduledDate || (gw.createdAt||'').slice(0,10)) === new Date().toISOString().slice(0,10);
+  });
+  if (todayGW) {
+    gwBannerHTML = '<div id="client-group-workout-banner" onclick="openClientWorkoutLog(\'' + todayGW.id + '\')" ' +
+      'style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:14px 16px;background:var(--accent);color:#0a0c0f;border-radius:14px;cursor:pointer;box-shadow:0 4px 16px rgba(126,232,162,0.25)">' +
+      '<div style="width:40px;height:40px;border-radius:50%;background:rgba(10,12,15,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+        '<i class="ti ti-dumbbell" style="font-size:18px"></i></div>' +
+      '<div style="flex:1">' +
+        '<div style="font-size:11px;font-weight:700;opacity:0.7;text-transform:uppercase;letter-spacing:0.5px">Today\'s Workout</div>' +
+        '<div style="font-size:16px;font-weight:800">' + (todayGW.name||'Group Workout') + '</div>' +
+      '</div>' +
+      '<div style="font-size:13px;font-weight:700;white-space:nowrap"><i class="ti ti-play"></i> Start</div>' +
+    '</div>';
+  }
+
   el.innerHTML =
     '<div style="padding:20px;max-width:600px;margin:0 auto">' +
+
+    // Today's group workout banner (if any)
+    gwBannerHTML +
 
     // Compact greeting
     '<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">' +
@@ -7151,23 +7781,46 @@ async function renderClientProfileTab(data) {
       _clientStatCard('ti-barbell', totalWorkouts, 'Workouts', '#7EE8A2') +
     '</div>' +
 
-    // Progress graph
+    // BMR section (if trainer has set it)
+    (data.bmrData ? (function(b){
+      var goalColors = { cut:'#F472B6', maintain:'#60A5FA', bulk:'#7EE8A2' };
+      var gc = goalColors[b.goal] || 'var(--accent)';
+      return '<div style="background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:16px;margin-bottom:24px">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">' +
+          '<h3 style="font-size:14px;font-weight:700;margin:0">My Calorie Plan</h3>' +
+          (b.goal ? '<span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:' + gc + '18;color:' + gc + ';border:1px solid ' + gc + '30">' + b.goal + '</span>' : '') +
+        '</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center">' +
+          '<div style="background:var(--surface2);border-radius:10px;padding:12px">' +
+            '<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">BMR</div>' +
+            '<div style="font-size:20px;font-weight:800">' + (b.bmr||'-') + '</div>' +
+            '<div style="font-size:10px;color:var(--muted)">kcal at rest</div>' +
+          '</div>' +
+          '<div style="background:var(--surface2);border-radius:10px;padding:12px">' +
+            '<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Maintenance</div>' +
+            '<div style="font-size:20px;font-weight:800;color:#60A5FA">' + (b.tdee||'-') + '</div>' +
+            '<div style="font-size:10px;color:var(--muted)">kcal/day</div>' +
+          '</div>' +
+          '<div style="background:var(--surface2);border-radius:10px;padding:12px;border:1px solid ' + gc + '40">' +
+            '<div style="font-size:10px;font-weight:700;color:' + gc + ';text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">My Target</div>' +
+            '<div style="font-size:20px;font-weight:800;color:' + gc + '">' + (b.target||b.tdee||'-') + '</div>' +
+            '<div style="font-size:10px;color:var(--muted)">kcal/day</div>' +
+          '</div>' +
+        '</div>' +
+        (b.activityLabel ? '<div style="margin-top:10px;font-size:12px;color:var(--muted);text-align:center"><i class="ti ti-run" style="font-size:11px"></i> Activity: ' + b.activityLabel + '</div>' : '') +
+      '</div>';
+    })(data.bmrData) : '') +
+
+    // Progress graph (only shown when there are 2+ measurements)
     (measurements.length >= 2 ?
       '<h3 style="font-size:15px;font-weight:700;margin:0 0 12px">Weight & Body Fat Trend</h3>' +
       '<div style="background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:16px;margin-bottom:24px">' +
         renderProgressGraph(measurements) +
       '</div>'
-    : measurements.length === 1 ?
-      '<div style="background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:20px;margin-bottom:24px;text-align:center;color:var(--muted)">' +
-        '<i class="ti ti-chart-line" style="font-size:28px;opacity:0.4;display:block;margin-bottom:8px"></i>' +
-        '<div style="font-size:13px">One measurement so far. Your progress graph will appear after your next measurement.</div>' +
-      '</div>'
-    :
-      '<div style="background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:20px;margin-bottom:24px;text-align:center;color:var(--muted)">' +
-        '<i class="ti ti-ruler" style="font-size:28px;opacity:0.4;display:block;margin-bottom:8px"></i>' +
-        '<div style="font-size:13px">No measurements yet.<br>Your trainer will add your weight and body fat after your assessment.</div>' +
-      '</div>'
-    ) +
+    : '') +
+
+    // Exercise progress chart
+    renderExerciseProgressChart(sessions, '') +
 
     // Measurement history
     (measurements.length ?
@@ -7185,14 +7838,21 @@ async function renderClientProfileTab(data) {
 
     // Workout history summary
     (sessions.length ?
-      '<h3 style="font-size:15px;font-weight:700;margin:24px 0 12px">Recent Workouts</h3>' +
+      '<h3 style="font-size:15px;font-weight:700;margin:0 0 12px">Recent Workouts</h3>' +
       sessions.slice(0, 8).map(function(s) {
         var d = new Date(s.date);
         var dur = s.durationSeconds ? Math.floor(s.durationSeconds/60) + ' min' : '';
+        var isGroup = !!s.groupWorkoutId;
+        var label = isGroup ? (s.programName||'Group Workout') : (s.dayName||s.programName||'Workout');
         return '<div style="padding:12px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;margin-bottom:6px">' +
           '<div style="display:flex;justify-content:space-between;align-items:center">' +
-            '<div style="font-size:14px;font-weight:700">' + (s.dayName||s.programName||'Workout') + '</div>' +
-            '<div style="font-size:12px;color:var(--muted)">' + d.toLocaleDateString() + (dur ? ' · ' + dur : '') + '</div>' +
+            '<div style="font-size:14px;font-weight:700;display:flex;align-items:center;gap:7px">' + label +
+              (isGroup ? '<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba(126,232,162,0.12);color:var(--accent);border:1px solid rgba(126,232,162,0.3)"><i class="ti ti-users-group" style="font-size:9px"></i> Group</span>' : '') +
+            '</div>' +
+            '<div style="display:flex;align-items:center;gap:8px">' +
+              '<div style="font-size:12px;color:var(--muted)">' + d.toLocaleDateString() + (dur ? ' · ' + dur : '') + '</div>' +
+              '<button onclick="openEditWorkoutSession(\'' + s.id + '\')" style="padding:4px 8px;border-radius:7px;border:1px solid var(--border2);background:var(--surface2);color:var(--muted);font-size:11px;cursor:pointer;font-family:inherit"><i class="ti ti-edit" style="font-size:11px"></i></button>' +
+            '</div>' +
           '</div>' +
           '<div style="font-size:12px;color:var(--muted);margin-top:3px">' + (s.exercises||[]).length + ' exercises completed</div>' +
         '</div>';
@@ -7200,6 +7860,97 @@ async function renderClientProfileTab(data) {
     : '') +
 
   '</div>';
+}
+
+/* ── Client: Edit a logged workout session ─────────────────────────────── */
+var _editingSessionId = null;
+var _editingSessionExercises = [];
+
+async function openEditWorkoutSession(sessionId) {
+  _editingSessionId = sessionId;
+  try {
+    var snap = await window._firebase.getDoc(
+      window._firebase.doc(window._db, 'workoutSessions', sessionId)
+    );
+    if (!snap.exists()) { showToast('Session not found'); return; }
+    var data = snap.data();
+    _editingSessionExercises = JSON.parse(JSON.stringify(data.exercises || []));
+
+    var isHe = (_lang === 'he');
+    var label = data.groupWorkoutId ? (data.programName||'Group Workout') : (data.dayName||data.programName||'Workout');
+    var dateStr = data.date ? new Date(data.date).toLocaleDateString() : '';
+
+    // Build modal HTML
+    var html = '<div style="padding:16px">' +
+      '<div style="font-size:12px;color:var(--muted);margin-bottom:14px">' + dateStr + '</div>' +
+      '<div id="edit-session-exercises">' + _renderEditSessionExercises(_editingSessionExercises, isHe) + '</div>' +
+    '</div>';
+
+    // Use the existing client-workout-log modal but repurpose it
+    var modal = document.getElementById('modal-client-workout-log');
+    if (!modal) return;
+    modal.querySelector('#client-log-title').textContent = (isHe ? 'עריכת ' : 'Edit: ') + label;
+    // Hide search step, show only editor
+    var step1 = document.getElementById('client-log-step1');
+    var divider = step1 && step1.nextElementSibling;
+    if (step1) step1.style.display = 'none';
+    if (divider) divider.style.display = 'none';
+    var step2 = document.getElementById('client-log-step2');
+    if (step2) step2.innerHTML = html;
+    var footer = modal.querySelector('.modal-footer');
+    if (footer) footer.innerHTML =
+      '<button class="btn btn-ghost" onclick="closeAllModals()">' + (isHe ? 'ביטול' : 'Cancel') + '</button>' +
+      '<button class="btn btn-primary" onclick="saveEditWorkoutSession()"><i class="ti ti-check"></i> ' + (isHe ? 'שמור שינויים' : 'Save Changes') + '</button>';
+    openModal('client-workout-log');
+  } catch(e) { showToast('Error: ' + e.message); }
+}
+
+function _renderEditSessionExercises(exercises, isHe) {
+  if (!exercises.length) return '<div style="color:var(--muted);text-align:center;padding:20px">No exercises</div>';
+  return exercises.map(function(ex, ei) {
+    return '<div style="background:var(--surface2);border-radius:12px;padding:14px;margin-bottom:10px">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">' +
+        '<div><div style="font-size:14px;font-weight:700">' + (ex.title||ex.exerciseId||'Exercise') + '</div>' +
+          '<div style="font-size:11px;color:var(--muted)">' + (ex.muscle||'') + '</div></div>' +
+      '</div>' +
+      '<table style="width:100%;border-collapse:collapse;margin-bottom:8px">' +
+        '<thead><tr style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase">' +
+          '<th style="padding:4px;text-align:center;width:36px">' + (isHe?'סט':'Set') + '</th>' +
+          '<th style="padding:4px;text-align:center">' + (isHe?'משקל (ק"ג)':'Weight (kg)') + '</th>' +
+          '<th style="padding:4px;text-align:center">' + (isHe?'חזרות':'Reps') + '</th>' +
+        '</tr></thead><tbody>' +
+        (ex.sets||[]).map(function(set, si) {
+          return '<tr style="border-top:1px solid var(--border)">' +
+            '<td style="text-align:center;font-size:13px;font-weight:700;color:var(--muted);padding:6px">' + (set.setNum||si+1) + '</td>' +
+            '<td style="padding:4px"><input class="workout-set-input" type="number" min="0" step="0.5" value="' + (set.weight||'') + '" ' +
+              'oninput="_editSetChange(' + ei + ',' + si + ',\'weight\',this.value)" style="font-size:16px;width:100%"></td>' +
+            '<td style="padding:4px"><input class="workout-set-input" type="number" min="0" value="' + (set.reps||'') + '" ' +
+              'oninput="_editSetChange(' + ei + ',' + si + ',\'reps\',this.value)" style="font-size:16px;width:100%"></td>' +
+          '</tr>';
+        }).join('') +
+        '</tbody></table>' +
+    '</div>';
+  }).join('');
+}
+
+function _editSetChange(ei, si, field, val) {
+  if (_editingSessionExercises[ei] && _editingSessionExercises[ei].sets[si]) {
+    _editingSessionExercises[ei].sets[si][field] = val;
+  }
+}
+
+async function saveEditWorkoutSession() {
+  if (!_editingSessionId) return;
+  try {
+    await window._firebase.updateDoc(
+      window._firebase.doc(window._db, 'workoutSessions', _editingSessionId),
+      { exercises: _editingSessionExercises }
+    );
+    showToast('✓ Workout updated!');
+    closeAllModals();
+    // Refresh the profile
+    if (window._clientData) renderClientProfileTab(window._clientData);
+  } catch(e) { showToast('Error: ' + e.message); }
 }
 
 /* Simple SVG line graph of weight + body fat over time */
@@ -7253,6 +8004,145 @@ function renderProgressGraph(measurements) {
   return svg;
 }
 
+/* ── Exercise progress chart — shows max weight per session for a chosen exercise ── */
+function renderExerciseProgressChart(sessions, suffix) {
+  suffix = suffix || '';
+  if (!sessions || !sessions.length) return '';
+
+  // Collect all unique exercises the client has logged with at least one weight
+  var exMap = {}; // title → [{date, maxWeight, maxReps}]
+  sessions.forEach(function(s) {
+    var dateStr = (s.date||'').slice(0,10);
+    (s.exercises||[]).forEach(function(ex) {
+      if (!ex.title) return;
+      var sets = (ex.sets||[]).filter(function(st){ return parseFloat(st.weight) > 0; });
+      if (!sets.length) return;
+      var maxW = Math.max.apply(null, sets.map(function(st){ return parseFloat(st.weight)||0; }));
+      var maxReps = Math.max.apply(null, sets.map(function(st){ return parseInt(st.reps)||0; }));
+      if (!exMap[ex.title]) exMap[ex.title] = [];
+      exMap[ex.title].push({ date: dateStr, maxWeight: maxW, maxReps: maxReps });
+    });
+  });
+
+  var exNames = Object.keys(exMap).sort();
+  if (!exNames.length) return '';
+
+  var pickerId = 'ex-progress-picker' + suffix;
+  var chartId  = 'ex-progress-chart'  + suffix;
+  var dataKey  = '_exProgressData'     + suffix;
+
+  // Build HTML with a select + chart placeholder (chart drawn on select change)
+  var html = '<h3 style="font-size:15px;font-weight:700;margin:0 0 12px"><i class="ti ti-chart-line" style="color:var(--accent)"></i> Exercise Progress</h3>' +
+    '<div style="background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:16px;margin-bottom:24px">' +
+      '<select id="' + pickerId + '" onchange="renderExerciseChart(\'' + suffix + '\')" ' +
+        'style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border2);background:var(--surface2);color:var(--fg);font-size:14px;font-weight:600;margin-bottom:14px;font-family:inherit">' +
+        exNames.map(function(name) {
+          return '<option value="' + name.replace(/"/g,'&quot;') + '">' + name + '</option>';
+        }).join('') +
+      '</select>' +
+      '<div id="' + chartId + '"></div>' +
+    '</div>';
+
+  // Store data for chart rendering
+  window[dataKey] = exMap;
+
+  // Auto-render first exercise after DOM update
+  setTimeout(function(){ renderExerciseChart(suffix); }, 0);
+
+  return html;
+}
+
+function renderExerciseChart(suffix) {
+  suffix = suffix || '';
+  var picker = document.getElementById('ex-progress-picker' + suffix);
+  var container = document.getElementById('ex-progress-chart' + suffix);
+  var dataKey = '_exProgressData' + suffix;
+  if (!picker || !container || !window[dataKey]) return;
+
+  var name = picker.value;
+  var points = (window[dataKey][name] || []).slice().sort(function(a,b){ return a.date > b.date ? 1 : -1; });
+
+  if (points.length < 2) {
+    container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">' +
+      '<i class="ti ti-chart-dots" style="font-size:24px;display:block;margin-bottom:8px;opacity:0.4"></i>' +
+      (points.length === 1 ? 'Log this exercise at least twice to see progress.' : 'No data yet.') +
+    '</div>';
+    return;
+  }
+
+  var W = 460, H = 160, padL = 44, padR = 16, padT = 16, padB = 36;
+  var weights = points.map(function(p){ return p.maxWeight; });
+  var minW = Math.min.apply(null, weights);
+  var maxW = Math.max.apply(null, weights);
+  var range = (maxW - minW) || 1;
+
+  function xPos(i) { return padL + (i / (points.length - 1)) * (W - padL - padR); }
+  function yPos(w) { return padT + (1 - (w - minW) / range) * (H - padT - padB); }
+
+  var pathD = points.map(function(p, i){ return (i===0?'M':'L') + xPos(i).toFixed(1) + ',' + yPos(p.maxWeight).toFixed(1); }).join(' ');
+
+  // Area fill
+  var areaD = pathD + ' L' + xPos(points.length-1).toFixed(1) + ',' + (H-padB) + ' L' + padL.toFixed(1) + ',' + (H-padB) + ' Z';
+
+  // Y axis labels (min, max)
+  var yLabels = '';
+  [minW, maxW].forEach(function(v) {
+    var y = yPos(v);
+    yLabels += '<text x="' + (padL-6) + '" y="' + (y+4) + '" font-size="10" fill="var(--muted)" text-anchor="end">' + v + '</text>';
+    yLabels += '<line x1="' + padL + '" y1="' + y + '" x2="' + (W-padR) + '" y2="' + y + '" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,3"/>';
+  });
+
+  // X axis date labels (first, last, and middle if enough points)
+  var xLabels = '';
+  var labelIdxs = [0, points.length - 1];
+  if (points.length > 4) labelIdxs.splice(1, 0, Math.floor(points.length / 2));
+  labelIdxs.forEach(function(i) {
+    var d = points[i].date;
+    var label = d ? new Date(d + 'T00:00:00').toLocaleDateString(undefined, {month:'short', day:'numeric'}) : '';
+    var anchor = i === 0 ? 'start' : i === points.length - 1 ? 'end' : 'middle';
+    xLabels += '<text x="' + xPos(i).toFixed(1) + '" y="' + (H - padB + 18) + '" font-size="10" fill="var(--muted)" text-anchor="' + anchor + '">' + label + '</text>';
+  });
+
+  // Dots + tooltips (title attr)
+  var dots = points.map(function(p, i) {
+    return '<circle cx="' + xPos(i).toFixed(1) + '" cy="' + yPos(p.maxWeight).toFixed(1) + '" r="4" fill="var(--accent)" stroke="var(--surface)" stroke-width="2">' +
+      '<title>' + p.date + ': ' + p.maxWeight + 'kg × ' + p.maxReps + ' reps</title>' +
+    '</circle>';
+  }).join('');
+
+  var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:auto;overflow:visible">' +
+    '<defs><linearGradient id="exGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity="0.18"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>' +
+    yLabels +
+    '<path d="' + areaD + '" fill="url(#exGrad)"/>' +
+    '<path d="' + pathD + '" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>' +
+    dots +
+    xLabels +
+  '</svg>';
+
+  // Best / latest / improvement summary
+  var first = weights[0], last = weights[weights.length-1];
+  var diff = last - first;
+  var diffStr = (diff >= 0 ? '+' : '') + diff.toFixed(1) + 'kg';
+  var diffColor = diff > 0 ? 'var(--accent)' : diff < 0 ? 'var(--danger)' : 'var(--muted)';
+
+  var summary = '<div style="display:flex;gap:10px;margin-top:12px">' +
+    '<div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px;text-align:center">' +
+      '<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:3px">Best</div>' +
+      '<div style="font-size:17px;font-weight:800">' + maxW + '<span style="font-size:11px;font-weight:500;color:var(--muted)">kg</span></div>' +
+    '</div>' +
+    '<div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px;text-align:center">' +
+      '<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:3px">Latest</div>' +
+      '<div style="font-size:17px;font-weight:800">' + last + '<span style="font-size:11px;font-weight:500;color:var(--muted)">kg</span></div>' +
+    '</div>' +
+    '<div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px;text-align:center">' +
+      '<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:3px">Progress</div>' +
+      '<div style="font-size:17px;font-weight:800;color:' + diffColor + '">' + diffStr + '</div>' +
+    '</div>' +
+  '</div>';
+
+  container.innerHTML = svg + summary;
+}
+
 function _clientStatCard(icon, count, label, color) {
   return '<div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:16px;text-align:center">' +
     '<i class="ti ' + icon + '" style="font-size:22px;color:' + color + '"></i>' +
@@ -7297,9 +8187,9 @@ function renderClientPortal(data) {
   if (el) el.textContent = 'Welcome, ' + name.split(' ')[0] + '!';
 
   renderClientSection('client-routines-body',  data.assignedRoutines  || [], 'routines');
-  renderClientSection('client-menu-body',       data.assignedMenus     || [], 'menus');
-  renderClientSection('client-program-body',    data.assignedPrograms  || [], 'programs');
-  renderClientSection('client-recipes-body',    data.assignedRecipes   || [], 'recipes');
+  renderClientSection('client-menu-body',       menus,                        'menus');
+  renderClientSection('client-program-body',    programs,                     'programs');
+  renderClientSection('client-recipes-body',    recipes,                      'recipes');
 
   // BMR stats — full explained breakdown for client
   var bmrEl = document.getElementById('client-bmr-stats');
@@ -7750,13 +8640,41 @@ async function switchClientProfileTab(tab) {
 }
 
 function renderClientAssignTab(body, footer, client) {
+  var clientId = client.id;
   footer.innerHTML = '<button class="btn btn-ghost" onclick="closeAllModals()">Close</button>';
   var menus2   = (client.assignedMenus    || []);
   var progs    = (client.assignedPrograms || []);
   var routs    = (client.assignedRoutines || []);
   var recs     = (client.assignedRecipes  || []);
 
+  // Language badge helper
+  function langBadge(item) {
+    var l = (item && item.lang) ? item.lang : 'en';
+    return '<span style="font-size:10px;padding:1px 5px;border-radius:4px;background:var(--surface2);color:var(--muted);margin-left:6px">' + (l === 'he' ? '🇮🇱' : '🇺🇸') + '</span>';
+  }
+
   var html = '<div style="padding:16px">';
+
+  // BMR section
+  var b = client.bmrData;
+  if (b) {
+    html += '<div style="background:var(--surface2);border:1px solid var(--border2);border-radius:12px;padding:14px;margin-bottom:14px">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+        '<span style="font-size:13px;font-weight:700">BMR & Nutrition Targets</span>' +
+        '<button class="btn btn-ghost btn-sm" onclick="openEditClientBMR(\'' + clientId + '\')"><i class="ti ti-edit"></i> Edit</button>' +
+      '</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">' +
+        '<div style="text-align:center"><div style="font-size:18px;font-weight:800">' + (b.target||b.tdee||'-') + '</div><div style="font-size:11px;color:var(--muted)">Target kcal</div></div>' +
+        '<div style="text-align:center"><div style="font-size:18px;font-weight:800;color:#60A5FA">' + (b.proteinG||'-') + 'g</div><div style="font-size:11px;color:var(--muted)">Protein</div></div>' +
+        '<div style="text-align:center"><div style="font-size:18px;font-weight:800;color:var(--accent)">' + (b.carbsG||'-') + 'g</div><div style="font-size:11px;color:var(--muted)">Carbs</div></div>' +
+      '</div>' +
+    '</div>';
+  } else {
+    html += '<div style="margin-bottom:12px">' +
+      '<button class="btn btn-ghost btn-sm" onclick="openEditClientBMR(\'' + clientId + '\')">' +
+        '<i class="ti ti-calculator"></i> Set BMR & Nutrition Targets' +
+      '</button></div>';
+  }
 
   html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">';
   [['menus','ti-salad','Menus',menus2],['programs','ti-calendar','Programs',progs],
@@ -7780,7 +8698,7 @@ function renderClientAssignTab(body, footer, client) {
     html += '<h4 style="font-size:13px;font-weight:700;color:var(--muted);margin:12px 0 8px">PROGRAMS</h4>';
     progs.forEach(function(p) {
       html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;margin-bottom:6px">' +
-        '<span style="font-size:14px;font-weight:600">' + (p.name||'Program') + '</span>' +
+        '<span style="font-size:14px;font-weight:600">' + (p.name||'Program') + langBadge(p) + '</span>' +
         '<button class="btn btn-ghost btn-sm" onclick="unassignFromClient(\'' + client.id + '\',\'assignedPrograms\',\'' + p.id + '\')"><i class="ti ti-x"></i></button>' +
       '</div>';
     });
@@ -7789,7 +8707,7 @@ function renderClientAssignTab(body, footer, client) {
     html += '<h4 style="font-size:13px;font-weight:700;color:var(--muted);margin:12px 0 8px">MENUS</h4>';
     menus2.forEach(function(m) {
       html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;margin-bottom:6px">' +
-        '<span style="font-size:14px;font-weight:600">' + (m.name||'Menu') + '</span>' +
+        '<span style="font-size:14px;font-weight:600">' + (m.name||'Menu') + langBadge(m) + '</span>' +
         '<button class="btn btn-ghost btn-sm" onclick="unassignFromClient(\'' + client.id + '\',\'assignedMenus\',\'' + m.id + '\')"><i class="ti ti-x"></i></button>' +
       '</div>';
     });
@@ -7798,7 +8716,7 @@ function renderClientAssignTab(body, footer, client) {
     html += '<h4 style="font-size:13px;font-weight:700;color:var(--muted);margin:12px 0 8px">RECIPES</h4>';
     recs.forEach(function(rc) {
       html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;margin-bottom:6px">' +
-        '<span style="font-size:14px;font-weight:600">' + (rc.name||'Recipe') + '</span>' +
+        '<span style="font-size:14px;font-weight:600">' + (rc.name||'Recipe') + langBadge(rc) + '</span>' +
         '<button class="btn btn-ghost btn-sm" onclick="unassignFromClient(\'' + client.id + '\',\'assignedRecipes\',\'' + rc.id + '\')"><i class="ti ti-x"></i></button>' +
       '</div>';
     });
@@ -7817,16 +8735,18 @@ async function renderClientTrainingTab(body, footer, client) {
   body.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)"><i class="ti ti-loader" style="font-size:28px;animation:spin 1s linear infinite"></i><div style="margin-top:8px">Loading training log...</div></div>';
 
   try {
+    // Single where clause — no composite index needed. Sort client-side.
     var snap = await window._firebase.getDocs(
       window._firebase.query(
         window._firebase.collection(window._db, 'workoutSessions'),
         window._firebase.where('clientUid', '==', client.id),
-        window._firebase.orderBy('date', 'desc'),
-        window._firebase.limit(20)
+        window._firebase.limit(100)
       )
     );
     var sessions = [];
     snap.forEach(function(d){ sessions.push(Object.assign({id:d.id}, d.data())); });
+    // Sort newest first client-side
+    sessions.sort(function(a,b){ return (b.date||'') > (a.date||'') ? 1 : -1; });
 
     if (!sessions.length) {
       body.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted)"><i class="ti ti-chart-line" style="font-size:36px;opacity:0.3;display:block;margin-bottom:10px"></i><div>No workouts logged yet.</div></div>';
@@ -7846,25 +8766,50 @@ async function renderClientTrainingTab(body, footer, client) {
       _trainerStatCard(sessions.reduce(function(a,s){ return a + (s.durationSeconds||0); }, 0) > 0 ? Math.round(sessions.reduce(function(a,s){ return a + (s.durationSeconds||0); }, 0) / sessions.length / 60) + ' min' : '-', 'Avg Duration', 'ti-stopwatch', '#FBBF24') +
     '</div>';
 
+    // Exercise progress chart (trainer view uses suffix '-t' to avoid ID clash with client profile)
+    html += renderExerciseProgressChart(sessions, '-t');
+
     // Session list
-    html += '<h4 style="font-size:13px;font-weight:700;color:var(--muted);margin:0 0 10px">SESSION HISTORY</h4>';
+    html += '<h4 style="font-size:13px;font-weight:700;color:var(--muted);margin:16px 0 10px">SESSION HISTORY</h4>';
     sessions.forEach(function(s) {
       var d = new Date(s.date);
       var dur = s.durationSeconds ? Math.floor(s.durationSeconds/60) + ' min' : '';
-      html += '<div onclick="expandTrainerSession(\'' + s.id + '\')" style="padding:12px 16px;background:var(--surface);border:1px solid var(--border2);border-radius:12px;margin-bottom:8px;cursor:pointer">' +
+      var isGroup = !!s.groupWorkoutId;
+      var label = isGroup ? (s.programName||'Group Workout') : (s.dayName||s.programName||'Workout');
+      html += '<div onclick="expandTrainerSession(\'' + s.id + '\')" style="padding:14px 16px;background:var(--surface);border:1px solid var(--border2);border-radius:12px;margin-bottom:8px;cursor:pointer">' +
         '<div style="display:flex;justify-content:space-between;align-items:center">' +
           '<div>' +
-            '<div style="font-size:14px;font-weight:700">' + (s.dayName||s.programName||'Workout') + '</div>' +
-            '<div style="font-size:12px;color:var(--muted);margin-top:2px">' + d.toLocaleDateString() + (dur ? ' · ' + dur : '') + ' · ' + (s.exercises||[]).length + ' exercises</div>' +
+            '<div style="font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px">' + label +
+              (isGroup ? '<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:rgba(126,232,162,0.12);color:var(--accent);border:1px solid rgba(126,232,162,0.3)"><i class="ti ti-users-group" style="font-size:9px"></i> Group</span>' : '') +
+            '</div>' +
+            '<div style="font-size:12px;color:var(--muted);margin-top:2px">' + d.toLocaleDateString() + (dur ? ' · <i class="ti ti-clock" style="font-size:11px"></i> ' + dur : '') + ' · ' + (s.exercises||[]).length + ' exercises</div>' +
           '</div>' +
-          '<i class="ti ti-chevron-right" style="color:var(--muted)"></i>' +
+          '<i class="ti ti-chevron-down" id="session-chevron-' + s.id + '" style="color:var(--muted);font-size:18px;transition:transform 0.2s"></i>' +
         '</div>' +
-        '<div id="session-detail-' + s.id + '" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px">' +
+        '<div id="session-detail-' + s.id + '" style="display:none;margin-top:12px">' +
           (s.exercises||[]).map(function(ex) {
-            return '<div style="margin-bottom:8px"><div style="font-size:13px;font-weight:600">' + ex.title + '</div>' +
-              ex.sets.map(function(set) {
-                return '<span style="font-size:12px;color:var(--muted);margin-right:8px">Set ' + set.setNum + ': ' + (set.weight||'BW') + ' ' + (s.weightUnit||'kg') + ' × ' + (set.reps||'?') + ' reps</span>';
-              }).join('') + '</div>';
+            return '<div style="background:var(--surface2);border-radius:10px;margin-bottom:8px;overflow:hidden">' +
+              '<div style="padding:10px 12px;border-bottom:1px solid var(--border)">' +
+                '<div style="font-size:13px;font-weight:700">' + ex.title + (ex.swapped ? ' <span style="font-size:10px;color:var(--accent);background:rgba(126,232,162,0.1);padding:1px 5px;border-radius:4px">swapped</span>' : '') + '</div>' +
+                '<div style="font-size:11px;color:var(--muted)">' + (ex.muscle||'') + '</div>' +
+              '</div>' +
+              '<table style="width:100%;border-collapse:collapse">' +
+                '<thead><tr style="background:var(--surface)">' +
+                  '<th style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;padding:6px 12px;text-align:center">Set</th>' +
+                  '<th style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;padding:6px 12px;text-align:center">' + (s.weightUnit||'kg') + '</th>' +
+                  '<th style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;padding:6px 12px;text-align:center">Reps</th>' +
+                '</tr></thead>' +
+                '<tbody>' +
+                (ex.sets||[]).map(function(set) {
+                  return '<tr style="border-top:1px solid var(--border);background:rgba(126,232,162,0.04)">' +
+                    '<td style="padding:8px;text-align:center;font-size:13px;font-weight:700;color:var(--muted)">' + set.setNum + '</td>' +
+                    '<td style="padding:8px;text-align:center;font-size:15px;font-weight:700">' + (set.weight||'—') + '</td>' +
+                    '<td style="padding:8px;text-align:center;font-size:15px;font-weight:700">' + (set.reps||'—') + '</td>' +
+                  '</tr>';
+                }).join('') +
+                '</tbody>' +
+              '</table>' +
+            '</div>';
           }).join('') +
         '</div>' +
       '</div>';
@@ -7880,7 +8825,11 @@ async function renderClientTrainingTab(body, footer, client) {
 
 function expandTrainerSession(sessionId) {
   var el = document.getElementById('session-detail-' + sessionId);
-  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  var chevron = document.getElementById('session-chevron-' + sessionId);
+  if (!el) return;
+  var isOpen = el.style.display !== 'none';
+  el.style.display = isOpen ? 'none' : 'block';
+  if (chevron) chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
 }
 
 function _trainerStatCard(value, label, icon, color) {
@@ -8106,10 +9055,12 @@ function openAssignModal(clientId, type) {
   if (!client) return;
   _assignAlready = (client[_typeToKey(type)] || []).map(function(x){ return x.id || x.shareToken; });
 
+  // Use the currently loaded arrays (already language-filtered by loadMenus/loadPrograms/loadRecipes)
+  // For routines: always from sentRoutines regardless of language
   _assignPool = [];
-  if (type === 'menus')    _assignPool = menus;
-  if (type === 'programs') _assignPool = programs;
-  if (type === 'recipes')  _assignPool = recipes;
+  if (type === 'menus')    _assignPool = menus.length    ? menus    : window._heMenusCache    || menus;
+  if (type === 'programs') _assignPool = programs.length ? programs : window._heProgramsCache || programs;
+  if (type === 'recipes')  _assignPool = recipes.length  ? recipes  : window._heRecipesCache  || recipes;
   if (type === 'routines') _assignPool = sentRoutines || [];
   _assignType2 = type;
 
@@ -8242,7 +9193,31 @@ function openEditClientBMR(clientId) {
   if (bulkEl)    bulkEl.value          = String(b.bulkFactor || 1.10);
   if (previewEl) previewEl.innerHTML   = '';
 
-  openModal('edit-bmr');
+  // Open BMR modal properly on top of everything
+  // First add a second backdrop layer behind BMR but above client profile modal
+  var bmrBackdrop = document.getElementById('bmr-extra-backdrop');
+  if (!bmrBackdrop) {
+    bmrBackdrop = document.createElement('div');
+    bmrBackdrop.id = 'bmr-extra-backdrop';
+    bmrBackdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;';
+    bmrBackdrop.onclick = function() { closeBmrEditModal(); };
+    document.body.appendChild(bmrBackdrop);
+  }
+  bmrBackdrop.style.display = 'block';
+
+  var bmrModal = document.getElementById('modal-edit-bmr');
+  if (bmrModal) {
+    // Remove !important override by forcing via style attribute
+    // Then add .open class which has display:flex !important
+    bmrModal.setAttribute('style', 'z-index:310 !important; display:flex !important;');
+    bmrModal.classList.add('open');
+    // Also ensure it's positioned correctly for native (override bottom-sheet to center)
+    if (document.documentElement.classList.contains('is-native')) {
+      bmrModal.style.cssText = 'z-index:310;display:flex;position:fixed;top:50%;left:50%;' +
+        'transform:translate(-50%,-50%);width:92%;max-width:520px;max-height:88vh;' +
+        'background:var(--surface);border-radius:18px;flex-direction:column;opacity:1;pointer-events:auto;overflow:hidden;';
+    }
+  }
   // Auto-preview if data exists
   if (client.age && client.weight && client.height) {
     setTimeout(previewEditBMR, 100);
@@ -8250,9 +9225,14 @@ function openEditClientBMR(clientId) {
 }
 
 function closeEditBMR() {
-  // Only close the BMR modal, reopen client profile
   var bmrModal = document.getElementById('modal-edit-bmr');
-  if (bmrModal) bmrModal.classList.remove('open');
+  if (bmrModal) {
+    bmrModal.classList.remove('open');
+    bmrModal.removeAttribute('style'); // clear the forced display:flex !important
+  }
+  // Hide the extra backdrop
+  var bmrBackdrop = document.getElementById('bmr-extra-backdrop');
+  if (bmrBackdrop) bmrBackdrop.style.display = 'none';
   // Reopen client profile if we have a client
   if (_bmrEditClientId) {
     openClientProfile(_bmrEditClientId);
@@ -8261,6 +9241,7 @@ function closeEditBMR() {
   }
   _bmrEditClientId = null;
 }
+function closeBmrEditModal() { closeEditBMR(); }
 
 function previewEditBMR() {
   var gender   = (document.getElementById('ebmr-gender')  ||{}).value || 'male';
@@ -8333,10 +9314,8 @@ async function saveEditClientBMR(cid) {
   client.bmrData = { bmr, tdee, target, proteinG, carbsG, fatG, goal, gender, activity, cutFactor: cutF, bulkFactor: bulkF };
 
   await _saveClientProfile(clientId, client);
-  // Close BMR modal and reopen client profile
-  var bmrModal = document.getElementById('modal-edit-bmr');
-  if (bmrModal) bmrModal.classList.remove('open');
-  _bmrEditClientId = null;
+  // Close BMR modal cleanly
+  closeBmrEditModal();
   openClientProfile(clientId);
   showToast('BMR updated!');
 }
@@ -8375,7 +9354,12 @@ function toggleAssign(itemId) {
   var exists  = arr.findIndex(function(x){ return (x.id||x.shareToken) === itemId; });
 
   if (exists > -1) arr.splice(exists, 1);
-  else arr.push(item);
+  else {
+    // Tag the item with current language so client portal can filter by lang
+    var itemWithLang = Object.assign({}, item, { lang: (typeof _lang !== 'undefined' ? _lang : 'en') });
+    arr.push(itemWithLang);
+    item = itemWithLang; // update local ref too
+  }
   client[key] = arr;
 
   // Update the already-assigned set and re-render list WITHOUT resetting search/filter
@@ -8629,7 +9613,10 @@ function mobileTab(viewId, btn) {
   document.querySelectorAll('.mobile-tab-btn').forEach(function(b){ b.classList.remove('active'); });
   if (btn) btn.classList.add('active');
 
-  // Handle client-profile tab specially
+  // Clients: redirect 'profile' to 'client-profile'
+  if (state.isClient && viewId === 'profile') viewId = 'client-profile';
+
+  // Handle client-profile tab
   if (viewId === 'client-profile') {
     setView('client-profile', null);
     return;
@@ -8794,3 +9781,889 @@ setView = function(viewId, navEl) {
    } else {
      window.addEventListener('firebaseReady', _initAuthPersistence);
    }
+/* ══════════════════════════════════════════════════════════
+   GROUP WORKOUTS — Trainer creates, clients log sessions
+══════════════════════════════════════════════════════════ */
+
+var _groupWorkouts      = [];   // loaded group workouts
+var _groupWorkoutSessions = []; // sessions submitted for a viewed workout
+var _editingGroupWorkoutId = null;
+var _groupWorkoutExercises = []; // exercises being built in the modal
+var _freeLogExercises   = [];   // exercises in the free-form log modal
+
+// ── Load ────────────────────────────────────────────────
+async function loadGroupWorkouts() {
+  if (!window._firebase || !window._db || !state.user) return;
+  try {
+    var q = window._firebase.query(
+      window._firebase.collection(window._db, 'groupWorkouts'),
+      window._firebase.where('trainerUid', '==', state.user.uid),
+      window._firebase.orderBy('createdAt', 'desc')
+    );
+    var snap = await window._firebase.getDocs(q);
+    _groupWorkouts = [];
+    snap.forEach(function(d){ _groupWorkouts.push(Object.assign({ id: d.id }, d.data())); });
+    renderGroupWorkoutsView();
+  } catch(e) { console.warn('loadGroupWorkouts:', e.message); }
+}
+
+async function loadClientGroupWorkouts() {
+  if (!window._firebase || !window._db || !state.user) return;
+  try {
+    // Simple query without orderBy to avoid needing a composite Firestore index.
+    // We sort client-side after fetching.
+    var q = window._firebase.query(
+      window._firebase.collection(window._db, 'groupWorkouts'),
+      window._firebase.where('assignedClientIds', 'array-contains', state.user.uid)
+    );
+    var snap = await window._firebase.getDocs(q);
+    _groupWorkouts = [];
+    snap.forEach(function(d){ _groupWorkouts.push(Object.assign({ id: d.id }, d.data())); });
+    // Sort by scheduledDate desc client-side
+    _groupWorkouts.sort(function(a, b){
+      var da = a.scheduledDate || (a.createdAt||'').slice(0,10);
+      var db2 = b.scheduledDate || (b.createdAt||'').slice(0,10);
+      return da < db2 ? 1 : da > db2 ? -1 : 0;
+    });
+    checkTodaysGroupWorkout();
+    renderClientGroupWorkoutsList();
+    renderGroupWorkoutsView(); // update the group workouts tab view too
+  } catch(e) { console.warn('loadClientGroupWorkouts:', e.message); }
+}
+
+// ── Check if there's a workout assigned today ────────────
+function checkTodaysGroupWorkout() {
+  var today = new Date().toISOString().slice(0, 10);
+  var todaysWorkout = _groupWorkouts.find(function(gw) {
+    return (gw.scheduledDate || (gw.createdAt||'').slice(0,10)) === today;
+  });
+  var banner = document.getElementById('client-group-workout-banner');
+  if (!banner) return;
+  if (todaysWorkout) {
+    banner.style.display = 'flex';
+    banner.innerHTML =
+      '<div style="display:flex;align-items:center;gap:12px;flex:1">' +
+        '<div style="width:40px;height:40px;border-radius:50%;background:rgba(10,12,15,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+          '<i class="ti ti-dumbbell" style="font-size:18px"></i></div>' +
+        '<div>' +
+          '<div style="font-size:12px;font-weight:700;opacity:0.8;text-transform:uppercase;letter-spacing:0.5px">' + t('todaysWorkout') + '</div>' +
+          '<div style="font-size:16px;font-weight:800">' + (todaysWorkout.name||'Group Workout') + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<button onclick="startGroupWorkoutSession(\'' + todaysWorkout.id + '\')" ' +
+        'style="padding:10px 18px;border-radius:10px;border:none;background:rgba(10,12,15,0.2);color:#0a0c0f;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap">' +
+        '<i class="ti ti-play"></i> Start</button>';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+// ── Client: Render all assigned group workouts list ──────
+function renderClientGroupWorkoutsList() {
+  // Update any rendered client profile tab with upcoming workouts section
+  var el = document.getElementById('client-assigned-workouts-list');
+  if (!el) return; // not rendered yet — renderClientProfileTab will call this
+  var today = new Date().toISOString().slice(0, 10);
+  var isHe = (_lang === 'he');
+
+  if (!_groupWorkouts.length) {
+    el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">' +
+      '<i class="ti ti-calendar-off" style="font-size:28px;opacity:0.4;display:block;margin-bottom:8px"></i>' +
+      (isHe ? 'אין אימונים מתוזמנים' : 'No scheduled workouts') + '</div>';
+    return;
+  }
+
+  el.innerHTML = _groupWorkouts.map(function(gw) {
+    var gwDate = gw.scheduledDate || (gw.createdAt||'').slice(0,10);
+    var isToday = gwDate === today;
+    var isPast  = gwDate < today;
+    var dateLabel = gwDate ? new Date(gwDate + 'T00:00:00').toLocaleDateString(isHe ? 'he-IL' : 'en-US', { weekday:'short', month:'short', day:'numeric' }) : '';
+    var exCount = (gw.exercises||[]).length;
+    var statusColor = isToday ? 'var(--accent)' : isPast ? 'var(--muted)' : '#60A5FA';
+    var statusLabel = isToday ? (isHe ? 'היום' : 'Today') : isPast ? (isHe ? 'הסתיים' : 'Past') : (isHe ? 'קרוב' : 'Upcoming');
+
+    return '<div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:12px">' +
+      '<div style="width:40px;height:40px;border-radius:10px;background:' + statusColor + '18;display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+        '<i class="ti ti-dumbbell" style="font-size:18px;color:' + statusColor + '"></i>' +
+      '</div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + (gw.name||'Group Workout') + '</div>' +
+        '<div style="font-size:12px;color:var(--muted);margin-top:2px">' + dateLabel + (exCount ? ' · ' + exCount + (isHe ? ' תרגילים' : ' exercises') : '') + '</div>' +
+      '</div>' +
+      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">' +
+        '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:' + statusColor + '18;color:' + statusColor + ';white-space:nowrap">' + statusLabel + '</span>' +
+        (!isPast ? '<button onclick="openClientWorkoutLog(\'' + gw.id + '\')" style="padding:5px 12px;border-radius:8px;border:none;background:' + (isToday ? 'var(--accent)' : 'var(--surface2)') + ';color:' + (isToday ? '#0a0c0f' : 'var(--fg)') + ';font-weight:700;font-size:12px;cursor:pointer;white-space:nowrap">' +
+          '<i class="ti ti-play" style="font-size:11px"></i> ' + (isHe ? 'התחל' : 'Start') + '</button>' : '') +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+// ── Trainer: Render group workouts list ──────────────────
+function renderGroupWorkoutsView() {
+  var el = document.getElementById('group-workouts-body');
+  if (!el) return;
+
+  // ── CLIENT VIEW: clean read-only list of assigned workouts ──
+  if (state.isClient) {
+    // Hide the "Create Workout" trainer button
+    var createBtn = document.querySelector('#view-group-workouts .topbar-right');
+    if (createBtn) createBtn.style.display = 'none';
+
+    var today = new Date().toISOString().slice(0, 10);
+    var isHe = (_lang === 'he');
+
+    if (!_groupWorkouts.length) {
+      el.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="ti ti-dumbbell"></i></div>' +
+        '<h3>' + (isHe ? 'אין אימונים מתוזמנים' : 'No Workouts Assigned') + '</h3>' +
+        '<p>' + (isHe ? 'המאמן שלך יקצה אימונים כאן' : 'Your trainer will assign workouts here') + '</p></div>';
+      return;
+    }
+
+    el.innerHTML = '<div style="display:flex;flex-direction:column;gap:10px;padding:0 0 80px">' +
+      _groupWorkouts.map(function(gw) {
+        var gwDate = gw.scheduledDate || (gw.createdAt||'').slice(0,10);
+        var isToday = gwDate === today;
+        var isPast  = gwDate < today;
+        var dateLabel = gwDate ? new Date(gwDate + 'T00:00:00').toLocaleDateString(isHe ? 'he-IL' : 'en-US', { weekday:'long', month:'short', day:'numeric' }) : '';
+        var statusColor = isToday ? 'var(--accent)' : isPast ? 'var(--muted)' : '#60A5FA';
+        var statusLabel = isToday ? (isHe ? 'היום!' : 'Today!') : isPast ? (isHe ? 'הסתיים' : 'Past') : (isHe ? 'קרוב' : 'Upcoming');
+        var exCount = (gw.exercises||[]).length;
+
+        return '<div style="background:var(--surface);border:1px solid ' + (isToday ? 'var(--accent)' : 'var(--border2)') + ';border-radius:14px;overflow:hidden' + (isToday ? ';box-shadow:0 4px 20px rgba(126,232,162,0.15)' : '') + '">' +
+          '<div style="padding:16px;display:flex;align-items:center;gap:14px">' +
+            '<div style="width:48px;height:48px;border-radius:12px;background:' + statusColor + '18;display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+              '<i class="ti ti-dumbbell" style="font-size:22px;color:' + statusColor + '"></i></div>' +
+            '<div style="flex:1;min-width:0">' +
+              '<div style="font-size:15px;font-weight:700">' + (gw.name||'Group Workout') + '</div>' +
+              '<div style="font-size:12px;color:var(--muted);margin-top:3px">' + dateLabel + (exCount ? ' · ' + exCount + (isHe ? ' תרגילים' : ' exercises') : '') + '</div>' +
+              (gw.notes ? '<div style="font-size:12px;color:var(--muted2);margin-top:4px;font-style:italic">' + gw.notes + '</div>' : '') +
+            '</div>' +
+            '<span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:' + statusColor + '18;color:' + statusColor + ';white-space:nowrap;flex-shrink:0">' + statusLabel + '</span>' +
+          '</div>' +
+          (!isPast ?
+            '<div style="padding:0 16px 14px">' +
+              '<button onclick="openClientWorkoutLog(\'' + gw.id + '\')" style="width:100%;padding:11px;border-radius:10px;border:none;background:' + (isToday ? 'var(--accent)' : 'var(--surface2)') + ';color:' + (isToday ? '#0a0c0f' : 'var(--fg)') + ';font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">' +
+                '<i class="ti ti-play"></i> ' + (isHe ? 'התחל אימון' : 'Start Workout') +
+              '</button>' +
+            '</div>'
+          : '') +
+        '</div>';
+      }).join('') +
+    '</div>';
+    return;
+  }
+  if (!_groupWorkouts.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="ti ti-dumbbell"></i></div>' +
+      '<h3>No Group Workouts Yet</h3><p>Create one to assign to your clients for their next session.</p></div>';
+    return;
+  }
+  el.innerHTML = '<div style="display:flex;flex-direction:column;gap:10px;padding:0 0 80px">' +
+    _groupWorkouts.map(function(gw) {
+      var d = gw.scheduledDate || (gw.createdAt||'').slice(0,10) || '—';
+      var exCount = (gw.exercises||[]).length;
+      var clientCount = (gw.assignedClientIds||[]).length;
+      var subCount = gw.submissionCount || 0;
+      return '<div style="background:var(--surface);border:1px solid var(--border2);border-radius:14px;overflow:hidden">' +
+        '<div style="padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer" onclick="openGroupWorkoutDetail(\'' + gw.id + '\')">' +
+          '<div style="width:46px;height:46px;border-radius:12px;background:var(--accent)18;border:1px solid var(--accent)40;display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+            '<i class="ti ti-dumbbell" style="font-size:20px;color:var(--accent)"></i></div>' +
+          '<div style="flex:1;min-width:0">' +
+            '<div style="font-size:15px;font-weight:700">' + (gw.name||'Group Workout') + '</div>' +
+            '<div style="font-size:12px;color:var(--muted);margin-top:3px">' + d + ' · ' + exCount + ' exercises · ' + clientCount + ' clients</div>' +
+          '</div>' +
+          '<div style="text-align:right;flex-shrink:0">' +
+            '<div style="font-size:20px;font-weight:800;color:var(--accent)">' + subCount + '</div>' +
+            '<div style="font-size:11px;color:var(--muted)">submitted</div>' +
+          '</div>' +
+        '</div>' +
+        '<div style="padding:8px 16px 12px;display:flex;gap:8px;border-top:1px solid var(--border)">' +
+          '<button class="btn btn-ghost btn-sm" onclick="openEditGroupWorkout(\'' + gw.id + '\')"><i class="ti ti-edit"></i> Edit</button>' +
+          '<button class="btn btn-ghost btn-sm" onclick="openGroupWorkoutDetail(\'' + gw.id + '\')"><i class="ti ti-chart-bar"></i> Results</button>' +
+          '<button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="deleteGroupWorkout(\'' + gw.id + '\')"><i class="ti ti-trash"></i></button>' +
+        '</div>' +
+      '</div>';
+    }).join('') +
+  '</div>';
+}
+
+// ── Trainer: Open create/edit modal ─────────────────────
+function openCreateGroupWorkout() {
+  _editingGroupWorkoutId = null;
+  _groupWorkoutExercises = [{ title:'', muscle:'', sets:'3', reps:'10', rest:'2', notes:'' }];
+  document.getElementById('gw-name').value = '';
+  document.getElementById('gw-date').value = new Date().toISOString().slice(0,10);
+  document.getElementById('gw-notes').value = '';
+  renderGWExercises();
+  renderGWClientPicker();
+  openModal('group-workout-modal');
+}
+
+function openEditGroupWorkout(id) {
+  var gw = _groupWorkouts.find(function(g){ return g.id === id; });
+  if (!gw) return;
+  _editingGroupWorkoutId = id;
+  _groupWorkoutExercises = JSON.parse(JSON.stringify(gw.exercises || []));
+  document.getElementById('gw-name').value = gw.name || '';
+  document.getElementById('gw-date').value = gw.scheduledDate || new Date().toISOString().slice(0,10);
+  document.getElementById('gw-notes').value = gw.notes || '';
+  renderGWExercises();
+  renderGWClientPicker(gw.assignedClientIds || []);
+  openModal('group-workout-modal');
+}
+
+function renderGWExercises() {
+  var el = document.getElementById('gw-exercises-body');
+  if (!el) return;
+  var isHe = (_lang === 'he');
+  var muscleOpts = isHe
+    ? ['','חזה','גב','רגליים','כתפיים','ידיים','בטן','גוף מלא','פיזיו']
+    : ['','chest','back','legs','shoulders','arms','core','fullbody','physio'];
+  var allLabel = isHe ? 'כל השרירים' : 'All muscles';
+  el.innerHTML = _groupWorkoutExercises.map(function(ex, i) {
+    return '<div class="prog-ex-row" data-exid="' + (ex.id||'') + '">' +
+      '<div class="prog-ex-pick">' +
+        '<select class="form-input prog-ex-muscle-filter" onchange="filterProgExSearch(this.closest(\'.prog-ex-row\').querySelector(\'.prog-ex-name\'))" style="width:110px;flex-shrink:0">' +
+          muscleOpts.map(function(m){ return '<option value="'+m+'"'+(ex.muscle===m?' selected':'')+'>'+(m||allLabel)+'</option>'; }).join('') +
+        '</select>' +
+        '<input class="form-input prog-ex-name" placeholder="' + (isHe?'חפש תרגיל...':'Search exercise...') + '" value="' + (ex.title||ex.name||'') + '" ' +
+          'oninput="filterProgExSearch(this)" onfocus="showProgExDropdown(this)" style="flex:1;min-width:120px">' +
+        '<input type="hidden" class="prog-ex-id"    value="' + (ex.id||'') + '">' +
+        '<input type="hidden" class="prog-ex-url"   value="' + (ex.videoURL||'') + '">' +
+        '<input type="hidden" class="prog-ex-muscle" value="' + (ex.muscle||'') + '">' +
+        '<div class="prog-ex-dropdown" style="display:none"></div>' +
+      '</div>' +
+      '<input class="form-input" placeholder="' + (isHe?'סטים':'Sets') + '" value="' + (ex.sets||'3') + '" style="width:52px">' +
+      '<input class="form-input" placeholder="' + (isHe?'חזרות':'Reps') + '" value="' + (ex.reps||'') + '" style="width:60px">' +
+      '<input class="form-input" placeholder="' + (isHe?'מנוחה':'Rest') + '" value="' + (ex.rest||'2') + '" style="width:60px">' +
+      '<input class="form-input" placeholder="' + (isHe?'הערות':'Notes') + '" value="' + (ex.notes||'') + '" style="flex:1;min-width:60px">' +
+      '<button class="admin-action-btn delete" onclick="this.closest(\'.prog-ex-row\').remove()" style="padding:6px 8px"><i class="ti ti-x"></i></button>' +
+    '</div>';
+  }).join('');
+}
+
+function _gwExChange(idx, field, val) { if (_groupWorkoutExercises[idx]) _groupWorkoutExercises[idx][field] = val; }
+function _gwSyncFromDOM() {
+  // Read current values from DOM into _groupWorkoutExercises before any re-render
+  var rows = document.querySelectorAll('#gw-exercises-body .prog-ex-row');
+  rows.forEach(function(row, i) {
+    if (!_groupWorkoutExercises[i]) return;
+    var name   = row.querySelector('.prog-ex-name');
+    var muscle = row.querySelector('.prog-ex-muscle');
+    var mfilt  = row.querySelector('.prog-ex-muscle-filter');
+    var inputs = row.querySelectorAll('input.form-input:not(.prog-ex-name)');
+    if (name)   _groupWorkoutExercises[i].title  = name.value;
+    if (muscle) _groupWorkoutExercises[i].muscle = muscle.value || (mfilt ? mfilt.value : '');
+    if (inputs[0]) _groupWorkoutExercises[i].sets  = inputs[0].value;
+    if (inputs[1]) _groupWorkoutExercises[i].reps  = inputs[1].value;
+    if (inputs[2]) _groupWorkoutExercises[i].rest  = inputs[2].value;
+    if (inputs[3]) _groupWorkoutExercises[i].notes = inputs[3].value;
+  });
+}
+
+function _gwExRemove(idx) {
+  _gwSyncFromDOM();
+  _groupWorkoutExercises.splice(idx, 1);
+  renderGWExercises();
+}
+
+function addGWExercise() {
+  _gwSyncFromDOM();
+  _groupWorkoutExercises.push({ title:'', muscle:'', sets:'3', reps:'10', rest:'2', notes:'' });
+  renderGWExercises();
+}
+
+function renderGWClientPicker(selectedIds) {
+  selectedIds = selectedIds || [];
+  var el = document.getElementById('gw-client-picker');
+  if (!el) return;
+  if (!clientsList || !clientsList.length) {
+    el.innerHTML = '<p style="color:var(--muted);font-size:13px">No clients found</p>';
+    return;
+  }
+  el.innerHTML = clientsList.map(function(c) {
+    var checked = selectedIds.indexOf(c.id) > -1;
+    var cbId = 'gwcb-' + c.id;
+    return '<div onclick="toggleGWClient(\'' + c.id + '\')" ' +
+      'style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface2);border-radius:10px;cursor:pointer;margin-bottom:6px;-webkit-tap-highlight-color:rgba(126,232,162,0.2);user-select:none;touch-action:manipulation">' +
+      '<div style="width:22px;height:22px;border-radius:6px;border:2px solid var(--border2);background:' + (checked?'var(--accent)':'transparent') + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.15s" id="gwcb-box-' + c.id + '">' +
+        (checked ? '<i class="ti ti-check" style="font-size:13px;color:#0a0c0f;font-weight:900"></i>' : '') +
+      '</div>' +
+      '<input type="checkbox" id="' + cbId + '" value="' + c.id + '"' + (checked?' checked':'') + ' style="display:none">' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-weight:600;font-size:14px">' + (c.name||c.email) + '</div>' +
+        '<div style="font-size:12px;color:var(--muted)">' + (c.email||'') + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function toggleGWClient(clientId) {
+  var cb = document.getElementById('gwcb-' + clientId);
+  var box = document.getElementById('gwcb-box-' + clientId);
+  if (!cb || !box) return;
+  cb.checked = !cb.checked;
+  if (cb.checked) {
+    box.style.background = 'var(--accent)';
+    box.innerHTML = '<i class="ti ti-check" style="font-size:13px;color:#0a0c0f;font-weight:900"></i>';
+  } else {
+    box.style.background = 'transparent';
+    box.innerHTML = '';
+  }
+}
+
+async function saveGroupWorkout() {
+  var name = document.getElementById('gw-name').value.trim();
+  if (!name) { showToast('Please add a workout name'); return; }
+  // Read exercises from DOM (prog-ex-row structure)
+  var exRows = document.querySelectorAll('#gw-exercises-body .prog-ex-row');
+  _groupWorkoutExercises = [];
+  exRows.forEach(function(row) {
+    var title  = (row.querySelector('.prog-ex-name')||{}).value || '';
+    var muscle = (row.querySelector('.prog-ex-muscle')||{}).value ||
+                 (row.querySelector('.prog-ex-muscle-filter')||{}).value || '';
+    var inputs = row.querySelectorAll('input.form-input:not(.prog-ex-name)');
+    var sets   = inputs[0] ? inputs[0].value : '3';
+    var reps   = inputs[1] ? inputs[1].value : '';
+    var rest   = inputs[2] ? inputs[2].value : '2';
+    var notes  = inputs[3] ? inputs[3].value : '';
+    if (title.trim()) _groupWorkoutExercises.push({ title:title, muscle:muscle, sets:sets, reps:reps, rest:rest, notes:notes });
+  });
+  var exercises = _groupWorkoutExercises;
+  if (!exercises.length) { showToast('Please add at least one exercise'); return; }
+
+  var selectedIds = Array.from(document.querySelectorAll('#gw-client-picker input[type=checkbox]:checked'))
+    .map(function(cb){ return cb.value; });
+
+  var data = {
+    name: name,
+    scheduledDate: document.getElementById('gw-date').value,
+    notes: document.getElementById('gw-notes').value,
+    exercises: exercises,
+    assignedClientIds: selectedIds,
+    trainerUid: state.user.uid,
+    trainerName: state.user.fullName || '',
+    lang: _lang,
+    submissionCount: 0,
+    createdAt: new Date().toISOString()
+  };
+
+  try {
+    if (_editingGroupWorkoutId) {
+      await window._firebase.setDoc(
+        window._firebase.doc(window._db, 'groupWorkouts', _editingGroupWorkoutId), data, { merge: true }
+      );
+      showToast('✓ Group workout updated!');
+    } else {
+      await window._firebase.addDoc(window._firebase.collection(window._db, 'groupWorkouts'), data);
+      showToast('✓ Group workout created & assigned!');
+    }
+    closeAllModals();
+    await loadGroupWorkouts();
+  } catch(e) { showToast('Error: ' + e.message); }
+}
+
+async function deleteGroupWorkout(id) {
+  if (!confirm('Delete this group workout?')) return;
+  try {
+    await window._firebase.deleteDoc(window._firebase.doc(window._db, 'groupWorkouts', id));
+    showToast('Deleted');
+    await loadGroupWorkouts();
+  } catch(e) { showToast('Error: ' + e.message); }
+}
+
+// ── Trainer: Results detail ──────────────────────────────
+async function openGroupWorkoutDetail(id) {
+  var gw = _groupWorkouts.find(function(g){ return g.id === id; });
+  if (!gw) return;
+
+  // Fetch all sessions submitted for this group workout.
+  // We query by trainerUid (single field — no composite index needed) and filter
+  // groupWorkoutId client-side so Firestore rules pass for the trainer.
+  try {
+    var q = window._firebase.query(
+      window._firebase.collection(window._db, 'workoutSessions'),
+      window._firebase.where('trainerUid', '==', state.user.uid)
+    );
+    var snap = await window._firebase.getDocs(q);
+    _groupWorkoutSessions = [];
+    snap.forEach(function(d){
+      var data = d.data();
+      if (data.groupWorkoutId === id) {
+        _groupWorkoutSessions.push(Object.assign({ id: d.id }, data));
+      }
+    });
+  } catch(e) {
+    console.error('openGroupWorkoutDetail sessions query failed:', e.code, e.message);
+    _groupWorkoutSessions = [];
+  }
+
+  var modal = document.getElementById('modal-gw-detail');
+  var body  = document.getElementById('gw-detail-body');
+  if (!modal || !body) return;
+
+  document.getElementById('gw-detail-title').textContent = gw.name || 'Group Workout';
+  document.getElementById('gw-detail-date').textContent  = gw.scheduledDate || gw.createdAt.slice(0,10);
+
+  // Render exercises with per-client results
+  body.innerHTML = (gw.exercises||[]).map(function(ex) {
+    var sessions = _groupWorkoutSessions.filter(function(s){
+      return s.exercises && s.exercises.some(function(se){ return (se.title||se.exerciseId) === ex.title; });
+    });
+    return '<div style="background:var(--surface2);border-radius:12px;padding:14px;margin-bottom:12px">' +
+      '<div style="font-weight:700;font-size:15px;margin-bottom:8px">' + ex.title +
+        '<span style="font-size:12px;color:var(--muted);font-weight:400;margin-left:8px">' + (ex.sets||'?') + '×' + (ex.reps||'?') + (ex.muscle?' · '+ex.muscle:'') + '</span></div>' +
+      (sessions.length ? sessions.map(function(s) {
+        var clientEx = s.exercises.find(function(se){ return (se.title||se.exerciseId) === ex.title; });
+        if (!clientEx) return '';
+        return '<div style="padding:8px 12px;background:var(--surface);border-radius:8px;margin-bottom:6px">' +
+          '<div style="font-weight:600;font-size:13px;color:var(--accent)">' + (s.clientName||s.clientUid||'Client') + '</div>' +
+          '<div style="font-size:12px;color:var(--muted);margin-top:4px">' +
+            (clientEx.sets||[]).map(function(set, si) {
+              return 'Set ' + (si+1) + ': <strong>' + (set.weight||'BW') + ' ' + (s.weightUnit||'kg') + ' × ' + (set.reps||'?') + ' reps</strong>';
+            }).join(' &nbsp;·&nbsp; ') +
+          '</div></div>';
+      }).join('') : '<p style="font-size:13px;color:var(--muted)">No submissions yet</p>') +
+    '</div>';
+  }).join('');
+
+  document.getElementById('modal-backdrop').classList.add('open');
+  modal.classList.add('open');
+}
+
+// ── Client: Start group workout session ──────────────────
+function startGroupWorkoutSession(groupWorkoutId) {
+  var gw = _groupWorkouts.find(function(g){ return g.id === groupWorkoutId; });
+  if (!gw) return;
+
+  _workout = {
+    startTime:      Date.now(),
+    programId:      null,
+    groupWorkoutId: groupWorkoutId,
+    programName:    gw.name || 'Group Workout',
+    dayName:        gw.name || 'Group Workout',
+    weightUnit:     'kg',
+    exercises:      (gw.exercises || []).map(function(ex) {
+      return {
+        exerciseId:  ex.title,
+        title:       ex.title,
+        muscle:      ex.muscle || '',
+        restSeconds: parseRestToSeconds(ex.rest),
+        targetSets:  parseInt(ex.sets) || 3,
+        targetReps:  ex.reps || '',
+        swapped:     false,
+        sets:        Array.from({ length: parseInt(ex.sets)||3 }, function(_, s) {
+          return { setNum: s+1, weight: '', reps: ex.reps||'', completed: false };
+        })
+      };
+    })
+  };
+
+  renderWorkoutScreen();
+  var modal = document.getElementById('modal-workout-tracking');
+  if (modal) modal.style.display = 'flex';
+  startWorkoutTimer();
+}
+
+// ── Client: Free-form workout log ────────────────────────
+var _freeLogExercises = [];
+
+function openClientWorkoutLog(groupWorkoutId) {
+  _clientLogExercises = [];
+  _clientLogGroupId   = groupWorkoutId || null;
+
+  // If it's a group workout, pre-fill exercises from it
+  if (groupWorkoutId) {
+    var gw = _groupWorkouts.find(function(g){ return g.id === groupWorkoutId; });
+    if (gw) {
+      _clientLogExercises = (gw.exercises||[]).map(function(ex) {
+        return {
+          title: ex.title, muscle: ex.muscle,
+          targetSets: parseInt(ex.sets)||3, targetReps: ex.reps||'',
+          sets: Array.from({length: parseInt(ex.sets)||3}, function(_,i){
+            return {setNum:i+1, weight:'', reps: ex.reps||'', completed:false};
+          })
+        };
+      });
+      document.getElementById('client-log-title').textContent = gw.name || 'Log Workout';
+    }
+  } else {
+    document.getElementById('client-log-title').textContent = 'Log a Workout';
+  }
+
+  // Build muscle filter pills
+  var isHe = (_lang === 'he');
+  var muscles = isHe
+    ? ['חזה','גב','רגליים','כתפיים','ידיים','בטן','גוף מלא','פיזיו']
+    : ['Chest','Back','Legs','Shoulders','Arms','Core','Full Body','Physio'];
+  var muscleVals = isHe
+    ? ['חזה','גב','רגליים','כתפיים','ידיים','בטן','גוף מלא','פיזיו']
+    : ['chest','back','legs','shoulders','arms','core','fullbody','physio'];
+  var filterEl = document.getElementById('client-log-muscle-filter');
+  if (filterEl) {
+    filterEl.innerHTML = muscles.map(function(m, i){
+      return '<button onclick="filterClientLogMuscle(\'' + muscleVals[i] + '\',this)" ' +
+        'style="padding:5px 12px;border-radius:20px;border:1px solid var(--border2);background:var(--surface2);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer">' +
+        m + '</button>';
+    }).join('');
+  }
+
+  _clientLogMuscleFilter = '';
+  var searchEl = document.getElementById('client-log-search');
+  if (searchEl) { searchEl.value = ''; searchEl.placeholder = isHe ? 'חפש תרגיל...' : 'Search exercises...'; }
+  // Hide search step when pre-filled from group workout; show it for free log
+  var step1 = document.getElementById('client-log-step1');
+  var divider = step1 && step1.nextElementSibling;
+  if (groupWorkoutId) {
+    if (step1) step1.style.display = 'none';
+    if (divider) divider.style.display = 'none';
+  } else {
+    if (step1) step1.style.display = '';
+    if (divider) divider.style.display = '';
+    filterClientLogSearch('');
+  }
+  renderClientLogExercises();
+  openModal('client-workout-log');
+}
+
+// Also keep the old name as alias for the "Log a Workout" button
+function openFreeWorkoutLog() { openClientWorkoutLog(); }
+
+var _clientLogExercises = [];
+var _clientLogGroupId   = null;
+var _clientLogMuscleFilter = '';
+
+function filterClientLogMuscle(muscle, btn) {
+  _clientLogMuscleFilter = (_clientLogMuscleFilter === muscle) ? '' : muscle;
+  // Reset button styles
+  document.querySelectorAll('#client-log-muscle-filter button').forEach(function(b){
+    b.style.background = 'var(--surface2)'; b.style.color = 'var(--muted)'; b.style.borderColor = 'var(--border2)';
+  });
+  if (_clientLogMuscleFilter && btn) {
+    btn.style.background = 'var(--accent)'; btn.style.color = '#0a0c0f'; btn.style.borderColor = 'var(--accent)';
+  }
+  filterClientLogSearch(document.getElementById('client-log-search').value);
+}
+
+function filterClientLogSearch(q) {
+  var results = document.getElementById('client-log-results');
+  if (!results) return;
+  q = (q||'').toLowerCase().trim();
+  var all = MASTER_EXERCISES.concat(publicVideos||[]).concat(customExercises||[]);
+  var hits = all.filter(function(e){
+    var matchQ = !q || (e.title||'').toLowerCase().includes(q) || (e.sub||'').toLowerCase().includes(q);
+    var matchM = !_clientLogMuscleFilter || (e.muscle||'').toLowerCase() === _clientLogMuscleFilter.toLowerCase();
+    return matchQ && matchM;
+  }).slice(0, 15);
+
+  if (!hits.length) {
+    results.innerHTML = '<div style="text-align:center;color:var(--muted);padding:20px;font-size:13px">' +
+      (q ? 'No exercises found' : 'Type to search...') + '</div>';
+    return;
+  }
+  results.innerHTML = hits.map(function(e){
+    var alreadyAdded = _clientLogExercises.some(function(x){ return x.title === e.title; });
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;cursor:pointer;' + (alreadyAdded?'opacity:0.5':'') + '"' +
+      ' data-title="' + (e.title||'').replace(/"/g,'&quot;') + '" data-muscle="' + (e.muscle||'') + '"' +
+      (alreadyAdded ? '' : ' onclick="addClientLogExercise(this)"') + '>' +
+      '<div style="flex:1"><div style="font-weight:600;font-size:14px">'+(e.title||'')+'</div>' +
+        '<div style="font-size:11px;color:var(--muted)">'+(e.muscle||'')+(e.sub?' · '+e.sub:'')+'</div></div>' +
+      '<span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:'+(alreadyAdded?'var(--surface2)':'var(--accent)18')+';color:'+(alreadyAdded?'var(--muted)':'var(--accent)')+'">'+
+        (alreadyAdded ? '✓ Added' : '+ Add') + '</span>' +
+    '</div>';
+  }).join('');
+}
+
+function addClientLogExercise(el) {
+  var title  = el.getAttribute('data-title')  || '';
+  var muscle = el.getAttribute('data-muscle') || '';
+  _clientLogExercises.push({
+    title: title, muscle: muscle,
+    sets: [{setNum:1, weight:'', reps:'', completed:false}]
+  });
+  filterClientLogSearch(document.getElementById('client-log-search').value);
+  renderClientLogExercises();
+}
+
+function renderClientLogExercises() {
+  var el = document.getElementById('client-log-exercises');
+  var empty = document.getElementById('client-log-empty');
+  if (!el) return;
+  var isHe = (_lang === 'he');
+  if (!_clientLogExercises.length) {
+    el.innerHTML = '';
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+  el.innerHTML = _clientLogExercises.map(function(ex, ei) {
+    return '<div style="background:var(--surface2);border-radius:12px;padding:14px;margin-bottom:10px">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">' +
+        '<div><div style="font-weight:700;font-size:15px">' + ex.title + '</div>' +
+          '<div style="font-size:11px;color:var(--muted)">' + (ex.muscle||'') + '</div></div>' +
+        '<button onclick="_clientLogRemoveEx('+ei+')" style="background:none;border:none;color:var(--muted);cursor:pointer;padding:4px"><i class="ti ti-x"></i></button>' +
+      '</div>' +
+      '<table style="width:100%;border-collapse:collapse;margin-bottom:8px">' +
+        '<thead><tr style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase">' +
+          '<th style="padding:4px;text-align:center;width:40px">' + (isHe?'סט':'Set') + '</th>' +
+          '<th style="padding:4px;text-align:center">' + (isHe?'משקל (ק"ג)':'Weight (kg)') + '</th>' +
+          '<th style="padding:4px;text-align:center">' + (isHe?'חזרות':'Reps') + '</th>' +
+          '<th style="width:30px"></th>' +
+        '</tr></thead><tbody>' +
+        ex.sets.map(function(set, si) {
+          return '<tr style="border-top:1px solid var(--border)">' +
+            '<td style="text-align:center;font-size:13px;font-weight:700;color:var(--muted);padding:6px">' + set.setNum + '</td>' +
+            '<td style="padding:4px"><input class="workout-set-input" type="number" min="0" step="0.5" placeholder="0" value="' + (set.weight||'') + '" oninput="_cliSetChange(' + ei + ',' + si + ',\'weight\',this.value)" style="font-size:16px;width:100%"></td>' +
+            '<td style="padding:4px"><input class="workout-set-input" placeholder="0" value="' + (set.reps||'') + '" oninput="_cliSetChange(' + ei + ',' + si + ',\'reps\',this.value)" style="font-size:16px;width:100%"></td>' +
+            '<td style="text-align:center"><button onclick="_cliSetRemove(' + ei + ',' + si + ')" style="background:none;border:none;color:var(--muted);cursor:pointer"><i class="ti ti-x" style="font-size:11px"></i></button></td>' +
+          '</tr>';
+        }).join('') +
+        '</tbody></table>' +
+      '<button onclick="_cliAddSet('+ei+')" style="width:100%;padding:7px;border:1px dashed var(--border2);background:none;color:var(--accent);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600">' +
+        '<i class="ti ti-plus"></i> ' + (isHe?'הוסף סט':'Add Set') +
+      '</button></div>';
+  }).join('');
+}
+
+function _clientLogRemoveEx(ei) { _clientLogExercises.splice(ei,1); renderClientLogExercises(); filterClientLogSearch(document.getElementById('client-log-search').value); }
+function _cliSetChange(ei,si,f,v){ if(_clientLogExercises[ei]&&_clientLogExercises[ei].sets[si]) _clientLogExercises[ei].sets[si][f]=v; }
+function _cliSetRemove(ei,si){ _clientLogExercises[ei].sets.splice(si,1); _clientLogExercises[ei].sets.forEach(function(s,i){s.setNum=i+1;}); renderClientLogExercises(); }
+function _cliAddSet(ei){ var n=_clientLogExercises[ei].sets.length+1; _clientLogExercises[ei].sets.push({setNum:n,weight:'',reps:'',completed:false}); renderClientLogExercises(); }
+
+async function saveClientWorkoutLog() {
+  var valid = _clientLogExercises.filter(function(ex){ return ex.sets.some(function(s){ return s.weight||s.reps; }); });
+  if (!valid.length) { showToast('Please log at least one set'); return; }
+  var session = {
+    clientUid:      state.user.uid,
+    clientName:     state.user.fullName || '',
+    trainerUid:     state.user.linkedTrainer || '',
+    programId:      null,
+    groupWorkoutId: _clientLogGroupId || null,
+    programName:    _clientLogGroupId ? 'Group Workout' : 'Free Workout',
+    dayName:        'Free Workout',
+    date:           new Date().toISOString(),
+    durationSeconds: 0,
+    weightUnit:     'kg',
+    exercises:      valid.map(function(ex){
+      return { exerciseId:ex.title, title:ex.title, muscle:ex.muscle||'',
+               sets: ex.sets.filter(function(s){return s.weight||s.reps;}) };
+    })
+  };
+  try {
+    await window._firebase.addDoc(window._firebase.collection(window._db, 'workoutSessions'), session);
+    // Update group workout submission count (firebase.increment not available in this bundle)
+    if (_clientLogGroupId) {
+      try {
+        var gwRef = window._firebase.doc(window._db, 'groupWorkouts', _clientLogGroupId);
+        var gwSnap = await window._firebase.getDoc(gwRef);
+        var currentCount = (gwSnap.exists() ? (gwSnap.data().submissionCount || 0) : 0);
+        await window._firebase.updateDoc(gwRef, { submissionCount: currentCount + 1 });
+      } catch(e2) { /* non-critical — ignore */ }
+    }
+    showToast('✓ Workout saved!');
+    if (state.isClient) { state.cart.clear(); updateCartBar(); }
+    closeAllModals();
+  } catch(e) { showToast('Error: ' + e.message); }
+}
+
+function renderFreeLogExercises() {
+  var el = document.getElementById('free-log-body');
+  if (!el) return;
+  var isHe = (_lang === 'he');
+  var muscleOpts = isHe
+    ? ['','חזה','גב','רגליים','כתפיים','ידיים','בטן','גוף מלא','פיזיו']
+    : ['','chest','back','legs','shoulders','arms','core','fullbody','physio'];
+
+  el.innerHTML = _freeLogExercises.map(function(ex, ei) {
+    return '<div style="background:var(--surface2);border-radius:12px;padding:14px;margin-bottom:10px">' +
+      '<div class="prog-ex-row" data-freeslot="' + ei + '" data-exid="' + (ex.id||'') + '" style="margin-bottom:10px">' +
+        '<div class="prog-ex-pick">' +
+          '<select class="form-input prog-ex-muscle-filter" onchange="filterProgExSearch(this.closest(\'.prog-ex-row\').querySelector(\'.prog-ex-name\'))" style="width:110px;flex-shrink:0">' +
+            muscleOpts.map(function(m){ return '<option value="'+m+'"'+(ex.muscle===m?' selected':'')+'>'+(m||(isHe?'כל השרירים':'All muscles'))+'</option>'; }).join('') +
+          '</select>' +
+          '<input class="form-input prog-ex-name" placeholder="' + (isHe?'חפש תרגיל...':'Search exercise...') + '" value="' + (ex.title||'') + '" ' +
+            'oninput="_freeExNameChange(this,' + ei + ')" onfocus="_freeExNameChange(this,' + ei + ')" style="flex:1;min-width:120px">' +
+          '<input type="hidden" class="prog-ex-id"    value="' + (ex.id||'') + '">' +
+          '<input type="hidden" class="prog-ex-url"   value="' + (ex.videoURL||'') + '">' +
+          '<input type="hidden" class="prog-ex-muscle" value="' + (ex.muscle||'') + '">' +
+          '<div class="prog-ex-dropdown" style="display:none"></div>' +
+        '</div>' +
+        '<button class="admin-action-btn delete" onclick="_freeExRemove(' + ei + ')" style="padding:6px 8px;flex-shrink:0"><i class="ti ti-x"></i></button>' +
+      '</div>' +
+      '<table style="width:100%;border-collapse:collapse;margin-bottom:8px">' +
+        '<thead><tr style="background:var(--surface)">' +
+          '<th style="font-size:10px;font-weight:700;color:var(--muted);padding:6px;text-align:center">' + (isHe?'סט':'Set') + '</th>' +
+          '<th style="font-size:10px;font-weight:700;color:var(--muted);padding:6px;text-align:center">' + (isHe?'משקל':'Weight') + '</th>' +
+          '<th style="font-size:10px;font-weight:700;color:var(--muted);padding:6px;text-align:center">' + (isHe?'חזרות':'Reps') + '</th>' +
+          '<th style="width:30px"></th>' +
+        '</tr></thead>' +
+        '<tbody>' +
+        ex.sets.map(function(set, si) {
+          return '<tr style="border-top:1px solid var(--border)">' +
+            '<td style="text-align:center;font-size:13px;font-weight:700;color:var(--muted);padding:6px">' + set.setNum + '</td>' +
+            '<td style="padding:4px"><input class="workout-set-input" type="number" placeholder="kg" value="' + (set.weight||'') + '" oninput="_freeSetChange(' + ei + ',' + si + ',\'weight\',this.value)" style="font-size:16px"></td>' +
+            '<td style="padding:4px"><input class="workout-set-input" placeholder="reps" value="' + (set.reps||'') + '" oninput="_freeSetChange(' + ei + ',' + si + ',\'reps\',this.value)" style="font-size:16px"></td>' +
+            '<td style="text-align:center"><button onclick="_freeSetRemove(' + ei + ',' + si + ')" style="background:none;border:none;color:var(--muted);cursor:pointer;padding:4px"><i class="ti ti-x" style="font-size:12px"></i></button></td>' +
+          '</tr>';
+        }).join('') +
+        '</tbody>' +
+      '</table>' +
+      '<button onclick="_freeAddSet(' + ei + ')" style="width:100%;padding:8px;border:1px dashed var(--border2);background:none;color:var(--accent);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600">' +
+        '<i class="ti ti-plus"></i> ' + (isHe?'הוסף סט':'Add Set') +
+      '</button>' +
+    '</div>';
+  }).join('') +
+  '<button onclick="_freeAddExercise()" style="width:100%;padding:12px;border:2px dashed var(--border2);background:none;color:var(--muted);border-radius:12px;cursor:pointer;font-size:14px;font-weight:600;margin-top:4px">' +
+    '<i class="ti ti-plus"></i> ' + (isHe?'הוסף תרגיל':'Add Exercise') +
+  '</button>';
+}
+
+function _freeExNameChange(input, ei) {
+  if (_freeLogExercises[ei]) _freeLogExercises[ei].title = input.value;
+  filterProgExSearch(input);
+}
+
+function filterFreeExSearch(input, ei) {
+  // Update the backing array when user types
+  if (_freeLogExercises[ei]) _freeLogExercises[ei].title = input.value;
+  // Also trigger the standard search dropdown
+  filterProgExSearch(input);
+}
+
+function selectFreeEx(el) {
+  // When user picks from dropdown, also update _freeLogExercises
+  var row = el.closest('.prog-ex-row');
+  var slot = parseInt(row.getAttribute('data-freeslot'));
+  var title  = el.getAttribute('data-title')  || '';
+  var muscle = el.getAttribute('data-muscle') || '';
+  if (!isNaN(slot) && _freeLogExercises[slot]) {
+    _freeLogExercises[slot].title  = title;
+    _freeLogExercises[slot].muscle = muscle;
+  }
+  pickProgEx(el); // use standard select logic
+}
+
+function _freeSyncFromDOM() {
+  document.querySelectorAll('#free-log-body .free-ex-slot').forEach(function(row, ei) {
+    if (!_freeLogExercises[ei]) return;
+    var name   = row.querySelector('.prog-ex-name');
+    var muscle = row.querySelector('.prog-ex-muscle');
+    var mfilt  = row.querySelector('.prog-ex-muscle-filter');
+    if (name)   _freeLogExercises[ei].title  = name.value;
+    if (muscle) _freeLogExercises[ei].muscle = muscle.value || (mfilt ? mfilt.value : '');
+  });
+}
+
+function _freeExChange(ei, field, val) { if (_freeLogExercises[ei]) _freeLogExercises[ei][field] = val; }
+function _freeExRemove(ei) {
+  _freeSyncFromDOM();
+  _freeLogExercises.splice(ei, 1);
+  if (!_freeLogExercises.length) _freeAddExercise(); else renderFreeLogExercises();
+}
+function _freeSetChange(ei, si, field, val) { if (_freeLogExercises[ei] && _freeLogExercises[ei].sets[si]) _freeLogExercises[ei].sets[si][field] = val; }
+function _freeSetRemove(ei, si) {
+  _freeLogExercises[ei].sets.splice(si, 1);
+  _freeLogExercises[ei].sets.forEach(function(s,i){ s.setNum = i+1; });
+  renderFreeLogExercises();
+}
+function _freeAddSet(ei) {
+  var n = _freeLogExercises[ei].sets.length + 1;
+  _freeLogExercises[ei].sets.push({ setNum: n, weight:'', reps:'', completed: false });
+  renderFreeLogExercises();
+}
+function _freeAddExercise() {
+  _freeSyncFromDOM();
+  _freeLogExercises.push({ title:'', muscle:'', sets:[{ setNum:1, weight:'', reps:'', completed:false }] });
+  renderFreeLogExercises();
+}
+
+async function saveFreeWorkoutLog() {
+  // Sync DOM values back to _freeLogExercises before saving
+  document.querySelectorAll('#free-log-body .free-ex-slot').forEach(function(row, ei) {
+    if (!_freeLogExercises[ei]) return;
+    _freeLogExercises[ei].title  = (row.querySelector('.prog-ex-name')||{}).value  || _freeLogExercises[ei].title;
+    _freeLogExercises[ei].muscle = (row.querySelector('.prog-ex-muscle')||{}).value || _freeLogExercises[ei].muscle;
+  });
+  var validExercises = _freeLogExercises.filter(function(ex){
+    return (ex.title||'').trim() && ex.sets.some(function(s){ return s.weight || s.reps; });
+  });
+  if (!validExercises.length) { showToast('Please log at least one exercise with sets'); return; }
+
+  var session = {
+    clientUid:    state.user.uid,
+    clientName:   state.user.fullName || '',
+    trainerUid:   state.user.linkedTrainer || '',
+    programId:    null,
+    groupWorkoutId: null,
+    programName:  'Free Workout',
+    dayName:      'Free Workout',
+    date:         new Date().toISOString(),
+    durationSeconds: 0,
+    weightUnit:   'kg',
+    exercises:    validExercises.map(function(ex) {
+      return {
+        exerciseId: ex.title,
+        title:      ex.title,
+        muscle:     ex.muscle || '',
+        swapped:    false,
+        sets:       ex.sets.filter(function(s){ return s.weight || s.reps; })
+      };
+    })
+  };
+
+  try {
+    await window._firebase.addDoc(window._firebase.collection(window._db, 'workoutSessions'), session);
+    showToast('✓ Workout logged!');
+    closeAllModals();
+  } catch(e) { showToast('Error saving: ' + e.message); }
+}
+
+// ── Progress chart per exercise (trainer view) ───────────
+async function showExerciseProgress(clientId, exerciseTitle) {
+  try {
+    var q = window._firebase.query(
+      window._firebase.collection(window._db, 'workoutSessions'),
+      window._firebase.where('clientUid', '==', clientId),
+      window._firebase.orderBy('date', 'asc')
+    );
+    var snap = await window._firebase.getDocs(q);
+    var points = [];
+    snap.forEach(function(d) {
+      var s = d.data();
+      var ex = (s.exercises||[]).find(function(e){ return e.title === exerciseTitle; });
+      if (!ex) return;
+      var maxWeight = Math.max.apply(null, (ex.sets||[]).map(function(set){ return parseFloat(set.weight)||0; }));
+      if (maxWeight > 0) points.push({ date: s.date.slice(0,10), weight: maxWeight, unit: s.weightUnit||'kg' });
+    });
+    renderProgressChart(exerciseTitle, points);
+  } catch(e) { console.warn('showExerciseProgress:', e.message); }
+}
+
+function renderProgressChart(title, points) {
+  var el = document.getElementById('gw-progress-chart');
+  if (!el || !points.length) return;
+  var max = Math.max.apply(null, points.map(function(p){ return p.weight; }));
+  var min = Math.min.apply(null, points.map(function(p){ return p.weight; }));
+  var range = max - min || 1;
+  var w = 400, h = 120, pad = 20;
+  var xStep = (w - pad*2) / Math.max(points.length - 1, 1);
+  var pts = points.map(function(p, i) {
+    var x = pad + i * xStep;
+    var y = pad + (1 - (p.weight - min) / range) * (h - pad*2);
+    return { x: Math.round(x), y: Math.round(y), weight: p.weight, date: p.date, unit: p.unit };
+  });
+  var pathD = pts.map(function(p, i){ return (i===0?'M':'L') + p.x + ',' + p.y; }).join(' ');
+  el.innerHTML = '<div style="font-weight:700;font-size:14px;margin-bottom:8px">' + title + ' — Max Weight Progress</div>' +
+    '<svg width="' + w + '" height="' + h + '" style="width:100%;max-width:' + w + 'px">' +
+      '<polyline points="' + pts.map(function(p){return p.x+','+p.y;}).join(' ') + '" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"/>' +
+      pts.map(function(p) {
+        return '<circle cx="' + p.x + '" cy="' + p.y + '" r="4" fill="var(--accent)"/>' +
+          '<text x="' + p.x + '" y="' + (p.y - 8) + '" text-anchor="middle" font-size="10" fill="var(--muted)">' + p.weight + p.unit + '</text>' +
+          '<text x="' + p.x + '" y="' + (h - 4) + '" text-anchor="middle" font-size="9" fill="var(--muted)">' + p.date.slice(5) + '</text>';
+      }).join('') +
+    '</svg>';
+}
+
+/* ══════════════════════════════════════════════════════════
+   END GROUP WORKOUTS
+══════════════════════════════════════════════════════════ */

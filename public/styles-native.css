@@ -4727,3 +4727,179 @@ button, a, [onclick] {
   padding: 4px 10px !important;
   border-radius: 8px !important;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   NATIVE — CLIENT PROFILE TABS  (phone-optimized)
+═══════════════════════════════════════════════════════════ */
+.client-profile-tab {
+  flex: 1;
+  padding: 12px 8px;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  white-space: nowrap;
+  transition: color 0.15s;
+}
+.client-profile-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.client-profile-tab i { font-size: 15px; }
+
+/* ═══════════════════════════════════════════════════════════
+   NATIVE — WORKOUT TRACKING  (phone-optimized)
+═══════════════════════════════════════════════════════════ */
+.workout-exercise-card {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.workout-ex-header {
+  padding: 14px 14px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.workout-ex-title { font-size: 15px; font-weight: 700; line-height: 1.2; }
+.workout-ex-muscle { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.workout-sets-table { width: 100%; border-collapse: collapse; }
+.workout-sets-table th {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 6px 4px;
+  text-align: center;
+  background: var(--surface2);
+}
+.workout-set-row td {
+  padding: 8px 4px;
+  text-align: center;
+  border-top: 1px solid var(--border);
+}
+.workout-set-row.completed { background: rgba(126,232,162,0.06); }
+.workout-set-input {
+  width: 100%;
+  max-width: 72px;
+  padding: 10px 6px;
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  background: var(--surface2);
+  color: var(--text);
+  font-size: 16px;           /* 16px prevents iOS zoom on focus */
+  font-weight: 700;
+  text-align: center;
+  font-family: inherit;
+  -webkit-appearance: none;
+}
+.workout-set-input:focus { border-color: var(--accent); outline: none; }
+.workout-check-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--border2);
+  background: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: var(--muted);
+  transition: all 0.15s;
+  touch-action: manipulation;
+}
+.workout-check-btn.done {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #0a0c0f;
+}
+.workout-add-set-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-top: 1px solid var(--border);
+  background: none;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  touch-action: manipulation;
+}
+.workout-swap-btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: none;
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  flex-shrink: 0;
+  touch-action: manipulation;
+}
+
+/* Workout screen header buttons — bigger tap targets on phone */
+#modal-workout-tracking { padding-bottom: env(safe-area-inset-bottom); }
+#workout-exercises-body { padding-bottom: 120px !important; }
+
+/* Rest timer bar — sits above bottom nav, respects safe area */
+#rest-timer-bar {
+  padding-bottom: calc(16px + env(safe-area-inset-bottom)) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FLOATING WORKOUT PILL (minimized workout)
+═══════════════════════════════════════════════════════════ */
+#workout-floating-pill {
+  position: fixed;
+  top: env(safe-area-inset-top, 0);
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 8px;
+  width: calc(100% - 24px);
+  max-width: 560px;
+  z-index: 99998;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--accent);
+  color: #0a0c0f;
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+  cursor: pointer;
+  animation: pillSlideDown 0.25s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+@keyframes pillSlideDown {
+  from { opacity: 0; transform: translateX(-50%) translateY(-12px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+#workout-floating-pill:active { transform: translateX(-50%) scale(0.98); }
+
+
+
+/* ═══════════════════════════════════════════════════════════
+   RTL — Native Hebrew: ONLY tables are RTL
+═══════════════════════════════════════════════════════════ */
+html[lang="he"] .food-table,
+html[lang="he"] .menu-table            { direction: rtl; }
+html[lang="he"] .food-table th,
+html[lang="he"] .food-table td         { text-align: right; }
+html[lang="he"] .menu-item-row         { direction: rtl; text-align: right; }
