@@ -69,3 +69,4 @@ node_modules/
 .dataconnect
 # Android Firebase config (contains API keys)
 android/app/google-services.json
+android/app/*.json
