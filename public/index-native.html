@@ -1374,7 +1374,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <input type="hidden" id="upload-visibility" value="private">
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
     <button class="btn btn-primary" onclick="submitUpload()"><i class="ti ti-cloud-upload"></i> Save to My Videos</button>
   </div>
 </div>
@@ -1513,7 +1513,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
     <button class="btn btn-primary" id="admin-modal-save-btn" onclick="saveAdminExercise()">
       <i class="ti ti-check"></i> Save Exercise
     </button>
@@ -1615,7 +1615,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     <div id="bulk-error" class="bulk-error" style="display:none"></div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
     <button class="btn btn-ghost" onclick="previewBulkImport()">
       <i class="ti ti-eye"></i> Preview
     </button>
@@ -1633,7 +1633,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
   </div>
   <div class="modal-body" id="menu-detail-body"></div>
   <div class="modal-footer">
-    <button class="btn btn-primary" onclick="closeAllModals()">Close</button>
+    <button class="btn btn-primary" onclick="closeAllModals()" data-i18n="btnClose">Close</button>
   </div>
 </div>
 
@@ -1663,15 +1663,15 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Goal *</label>
+        <label class="form-label" data-i18n="fldMenuGoal">Goal</label>
         <select class="form-input" id="admin-menu-goal">
-          <option value="cut">Cut</option>
-          <option value="maintain">Maintain</option>
-          <option value="bulk">Bulk</option>
+          <option value="cut" data-i18n-opt="goalCut">Cut</option>
+          <option value="maintain" data-i18n-opt="goalMaintain">Maintain</option>
+          <option value="bulk" data-i18n-opt="goalBulk">Bulk</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Target Calories</label>
+        <label class="form-label" data-i18n="fldMenuCal">Target Calories</label>
         <input class="form-input" id="admin-menu-calories" type="number" placeholder="1800">
       </div>
     </div>
@@ -1693,7 +1693,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </button>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
     <button class="btn btn-primary" onclick="saveAdminMenu()">
       <i class="ti ti-check"></i> Save Menu
     </button>
@@ -1708,7 +1708,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
   </div>
   <div class="modal-body" id="program-detail-body"></div>
   <div class="modal-footer">
-    <button class="btn btn-primary" onclick="closeAllModals()">Close</button>
+    <button class="btn btn-primary" onclick="closeAllModals()" data-i18n="btnClose">Close</button>
   </div>
 </div>
 
@@ -1730,11 +1730,11 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
         <input class="form-input" id="prog-name-he" placeholder="לדוג׳ תוכנית כוח 12 שבועות" dir="auto">
       </div>
       <div class="form-group">
-        <label class="form-label">Duration (weeks)</label>
+        <label class="form-label" data-i18n="fldProgWeeks">Duration (weeks)</label>
         <input class="form-input" id="prog-weeks" type="number" min="1" max="52" placeholder="12">
       </div>
       <div class="form-group">
-        <label class="form-label">Days/week</label>
+        <label class="form-label" data-i18n="fldProgDays">Days/week</label>
         <input class="form-input" id="prog-days" type="number" min="1" max="7" placeholder="4">
       </div>
     </div>
@@ -1748,21 +1748,21 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Goal</label>
+        <label class="form-label" data-i18n="fldProgGoal">Goal</label>
         <select class="form-input" id="prog-goal">
-          <option value="strength">Strength</option>
-          <option value="hypertrophy">Hypertrophy</option>
-          <option value="fat-loss">Fat Loss</option>
-          <option value="endurance">Endurance</option>
-          <option value="rehab">Rehabilitation</option>
+          <option value="strength" data-i18n-opt="goalStrength">Strength</option>
+          <option value="hypertrophy" data-i18n-opt="goalHypertrophy">Hypertrophy</option>
+          <option value="fat-loss" data-i18n-opt="goalFatLoss">Fat Loss</option>
+          <option value="endurance" data-i18n-opt="goalEndurance">Endurance</option>
+          <option value="rehab" data-i18n-opt="goalRehab">Rehabilitation</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Level</label>
+        <label class="form-label" data-i18n="fldProgLevel">Level</label>
         <select class="form-input" id="prog-level">
-          <option value="Beginner">Beginner</option>
-          <option value="Intermediate">Intermediate</option>
-          <option value="Advanced">Advanced</option>
+          <option value="Beginner" data-i18n-opt="lvlBeginner">Beginner</option>
+          <option value="Intermediate" data-i18n-opt="lvlIntermediate">Intermediate</option>
+          <option value="Advanced" data-i18n-opt="lvlAdvanced">Advanced</option>
         </select>
       </div>
     </div>
@@ -1797,7 +1797,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </button>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
     <button class="btn btn-primary" onclick="saveAdminProgram()"><i class="ti ti-check"></i> Save Program</button>
   </div>
 </div>
@@ -1885,7 +1885,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
     <button class="btn btn-primary" onclick="saveAdminRecipe()"><i class="ti ti-check"></i> Save Recipe</button>
   </div>
 </div>
@@ -1955,7 +1955,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
     <button class="btn btn-primary" onclick="saveAdminResearch()"><i class="ti ti-check"></i> Save Study</button>
   </div>
 </div>
@@ -2005,7 +2005,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Goal</label>
+        <label class="form-label" data-i18n="fldProgGoal">Goal</label>
         <select class="form-input" id="client-goal">
           <option value="cut">Cut</option>
           <option value="maintain" selected>Maintain</option>
@@ -2069,7 +2069,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
     <button class="btn btn-primary" onclick="saveNewClient()">
       <i class="ti ti-user-plus"></i> Add Client
     </button>
@@ -2117,11 +2117,11 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Goal</label>
+        <label class="form-label" data-i18n="fldProgGoal">Goal</label>
         <select class="form-input" id="ebmr-goal" onchange="previewEditBMR()">
-          <option value="cut">Cut</option>
-          <option value="maintain">Maintain</option>
-          <option value="bulk">Bulk</option>
+          <option value="cut" data-i18n-opt="goalCut">Cut</option>
+          <option value="maintain" data-i18n-opt="goalMaintain">Maintain</option>
+          <option value="bulk" data-i18n-opt="goalBulk">Bulk</option>
         </select>
       </div>
     </div>
@@ -2195,7 +2195,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     <p style="color:var(--muted);font-size:13.5px" id="delete-confirm-text">This exercise will be permanently removed from the master library.</p>
   </div>
   <div class="modal-footer" style="justify-content:center;gap:12px">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
     <button class="btn btn-danger-solid" id="confirm-delete-btn" onclick="confirmDeleteExercise()">
       <i class="ti ti-trash"></i> Yes, Delete
     </button>
@@ -2310,7 +2310,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
 
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
     <button class="btn btn-primary" onclick="handleGrowPaymentChecked()" id="pay-btn" style="min-width:200px">
       <i class="ti ti-lock"></i> Proceed to Secure Payment
     </button>
@@ -2408,6 +2408,8 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
   window.dispatchEvent(new Event('firebaseReady'));
 </script>
 
+<script src="i18n.en.js" defer></script>
+<script src="i18n.he.js" defer></script>
 <script src="app.js?v=1781872092" defer></script>
 <script>
 /* ── Accessibility Widget ─────────────────────────────────────── */
@@ -2692,7 +2694,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
     <button class="btn btn-primary" onclick="sendPasswordReset()">
       <i class="ti ti-send"></i> Send Reset Link
     </button>
@@ -2750,7 +2752,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
     <button class="btn btn-primary" onclick="saveAdminFood()"><i class="ti ti-check"></i> Save Food</button>
   </div>
 </div>
@@ -2813,7 +2815,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
     <button class="btn btn-ghost" onclick="validateSectionBulk('foods')"><i class="ti ti-check"></i> Validate</button>
     <button class="btn btn-primary" onclick="runSectionBulkImport('foods')"><i class="ti ti-file-import"></i> Import Foods</button>
   </div>
@@ -3057,7 +3059,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
     <button class="btn btn-primary" onclick="saveGroupWorkout()"><i class="ti ti-check"></i> Save & Assign</button>
   </div>
 </div>
@@ -3115,7 +3117,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
     <button class="btn btn-primary" onclick="saveClientWorkoutLog()"><i class="ti ti-check"></i> Save Workout</button>
   </div>
 </div>

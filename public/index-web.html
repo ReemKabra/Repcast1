@@ -416,29 +416,29 @@
         <p class="auth-subtitle">Create your account and get started</p>
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Full Name</label>
+            <label class="form-label" id="reg-label-name"></label>
             <input class="form-input" type="text" placeholder="Jordan Davis" id="reg-name">
           </div>
           <div class="form-group">
-            <label class="form-label">Business Name</label>
+            <label class="form-label" id="reg-label-biz"></label>
             <input class="form-input" type="text" placeholder="Peak Performance" id="reg-biz">
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label">Email</label>
+          <label class="form-label" id="reg-label-email"></label>
           <input class="form-input" type="email" placeholder="trainer@studio.com" id="reg-email">
         </div>
         <div class="form-group">
-          <label class="form-label">Password</label>
+          <label class="form-label" id="reg-label-pass"></label>
           <input class="form-input" type="password" placeholder="Min 8 characters" id="reg-pass">
         </div>
         <div class="form-group">
-          <label class="form-label">Specialty</label>
+          <label class="form-label" id="reg-label-specialty"></label>
           <select class="form-select" id="reg-specialty">
-            <option>Personal Trainer</option>
-            <option>Physiotherapist</option>
-            <option>Sports Therapist</option>
-            <option>Rehab Specialist</option>
+            <option data-i18n-opt="specPT">Personal Trainer</option>
+            <option data-i18n-opt="specPhysio">Physiotherapist</option>
+            <option data-i18n-opt="specSports">Sports Therapist</option>
+            <option data-i18n-opt="specRehab">Rehab Specialist</option>
           </select>
         </div>
         <div class="trial-info-box" style="background:rgba(96,165,250,0.07);border-color:rgba(96,165,250,0.18)">
@@ -500,7 +500,7 @@
         <i class="ti ti-layout-grid"></i> <span id="tnav-library-label">Library</span>
       </a>
       <a class="topnav-link" id="tnav-routines" onclick="setView('routines',this)" href="#">
-        <i class="ti ti-list-check"></i> Routines
+        <i class="ti ti-list-check"></i> <span data-i18n="sectionRoutines">Routines</span>
         <span class="tnav-badge" id="tnav-routines-badge">0</span>
       </a>
       <a class="topnav-link" id="tnav-profile" onclick="setView('profile',this)" href="#">
@@ -525,7 +525,7 @@
         <i class="ti ti-users"></i> <span id="tnav-clients-label">Clients</span>
       </a>
       <a class="topnav-link" id="tnav-billing" onclick="setView('billing',this)" href="#">
-        <i class="ti ti-credit-card"></i> Billing
+        <i class="ti ti-credit-card"></i> <span data-i18n="navBilling">Billing</span>
       </a>
     </div>
     <div class="topnav-right">
@@ -573,7 +573,7 @@
     <!-- Sidebar (muscle filters only) -->
     <aside class="sidebar" id="sidebar">
       <div class="muscle-filter-panel" id="muscle-panel">
-        <div class="nav-section-label" style="padding:0 8px;margin-bottom:10px">Filter by Muscle</div>
+        <div class="nav-section-label" style="padding:0 8px;margin-bottom:10px"><span data-i18n="filterByMuscle">Filter by Muscle</span></div>
         <div id="muscle-filter-list"></div>
         <button class="clear-filter-btn" id="clear-filter-btn" onclick="clearFilters()" style="display:none">
           <i class="ti ti-x"></i> Clear filters
@@ -590,24 +590,24 @@
           <div class="topbar-left">
             <div class="lib-tabs">
               <button class="lib-tab active" id="tab-master" onclick="switchLibTab('master', this)">
-                <i class="ti ti-database"></i> Master Library
+                <i class="ti ti-database"></i> <span data-i18n="libMasterLib">Master Library</span>
                 <span class="tab-count" id="master-count">30</span>
               </button>
               <button class="lib-tab" id="tab-custom" onclick="switchLibTab('custom', this)">
-                <i class="ti ti-cloud-upload"></i> My Videos
+                <i class="ti ti-cloud-upload"></i> <span data-i18n="libMyVideos">My Videos</span>
                 <span class="tab-count" id="custom-count">0</span>
               </button>
               <button class="lib-tab" id="tab-mymenus" onclick="switchLibTab('mymenus', this)">
-                <i class="ti ti-salad"></i> My Menus
+                <i class="ti ti-salad"></i> <span data-i18n="libMyMenus">My Menus</span>
               </button>
               <button class="lib-tab" id="tab-myprograms" onclick="switchLibTab('myprograms', this)">
-                <i class="ti ti-calendar"></i> My Programs
+                <i class="ti ti-calendar"></i> <span data-i18n="libMyPrograms">My Programs</span>
               </button>
               <button class="lib-tab" id="tab-myrecipes" onclick="switchLibTab('myrecipes', this)">
-                <i class="ti ti-chef-hat"></i> My Recipes
+                <i class="ti ti-chef-hat"></i> <span data-i18n="libMyRecipes">My Recipes</span>
               </button>
               <button class="lib-tab" id="tab-myresearch" onclick="switchLibTab('myresearch', this)">
-                <i class="ti ti-book"></i> My Research
+                <i class="ti ti-book"></i> <span data-i18n="libMyResearch">My Research</span>
               </button>
             </div>
           </div>
@@ -622,10 +622,10 @@
             <div id="lib-upload-bar" style="display:flex;gap:6px;align-items:center">
               <button class="btn btn-ghost btn-sm" onclick="reloadMyVideos()" id="reload-videos-btn"
                 title="Videos not showing? Click to reload from Firebase">
-                <i class="ti ti-refresh"></i> Reload Videos
+                <i class="ti ti-refresh"></i> <span data-i18n="btnReloadVideos">Reload Videos</span>
               </button>
               <button class="btn btn-primary" onclick="openModal('upload')">
-                <i class="ti ti-upload"></i> Upload Video
+                <i class="ti ti-upload"></i> <span data-i18n="btnUploadVideo">Upload Video</span>
               </button>
             </div>
           </div>
@@ -636,7 +636,7 @@
       <!-- ROUTINES VIEW -->
       <div class="view" id="view-routines">
         <div class="view-topbar">
-          <div class="topbar-left"><h2 class="view-title">Sent Routines</h2></div>
+          <div class="topbar-left"><h2 class="view-title"><span data-i18n="titleSentRoutines">Sent Routines</span></h2></div>
         </div>
         <div class="routines-body" id="routines-body">
           <div class="empty-state">
@@ -657,14 +657,14 @@
         <div class="nutrition-section" style="margin-top:24px">
           <div class="view-topbar">
             <div class="topbar-left">
-              <h2 class="view-title"><i class="ti ti-book" style="color:var(--accent)"></i> Menu Library</h2>
+              <h2 class="view-title"><i class="ti ti-book" style="color:var(--accent)"></i><span data-i18n="menuLibrary">Menu Library</span> </h2>
             </div>
             <div class="topbar-right">
               <div class="lib-tabs" style="margin:0">
-                <button class="lib-tab active" id="menu-tab-all" onclick="filterMenus('all',this)">All</button>
-                <button class="lib-tab" id="menu-tab-cut" onclick="filterMenus('cut',this)">Cut</button>
-                <button class="lib-tab" id="menu-tab-maintain" onclick="filterMenus('maintain',this)">Maintain</button>
-                <button class="lib-tab" id="menu-tab-bulk" onclick="filterMenus('bulk',this)">Bulk</button>
+                <button class="lib-tab active" id="menu-tab-all" onclick="filterMenus('all',this)" id="meal-tab-all">All</button>
+                <button class="lib-tab" id="menu-tab-cut" onclick="filterMenus('cut',this)"><span data-i18n="tabCut">Cut</span></button>
+                <button class="lib-tab" id="menu-tab-maintain" onclick="filterMenus('maintain',this)"><span data-i18n="tabMaintain">Maintain</span></button>
+                <button class="lib-tab" id="menu-tab-bulk" onclick="filterMenus('bulk',this)"><span data-i18n="tabBulk">Bulk</span></button>
               </div>
             </div>
           </div>
@@ -682,7 +682,7 @@
       <!-- PROGRAMS VIEW -->
       <div class="view" id="view-programs">
         <div class="view-topbar">
-          <div class="topbar-left"><h2 class="view-title"><i class="ti ti-calendar" style="color:var(--accent)"></i> Training Programs</h2></div>
+          <div class="topbar-left"><h2 class="view-title"><i class="ti ti-calendar" style="color:var(--accent)"></i><span data-i18n="trainingPrograms">Training Programs</span></h2></div>
         </div>
         <div id="programs-body">
           <div class="empty-state">
@@ -696,16 +696,16 @@
       <!-- RECIPES VIEW -->
       <div class="view" id="view-recipes">
         <div class="view-topbar">
-          <div class="topbar-left"><h2 class="view-title"><i class="ti ti-chef-hat" style="color:var(--accent)"></i> Recipe Library</h2></div>
+          <div class="topbar-left"><h2 class="view-title"><i class="ti ti-chef-hat" style="color:var(--accent)"></i><span data-i18n="recipeLibrary">Recipe Library</span></h2></div>
           <div class="topbar-right">
             <div class="lib-tabs" style="margin:0">
               <button class="lib-tab active" id="recipe-tab-all" onclick="filterRecipes('all',this)">All</button>
-              <button class="lib-tab" onclick="filterRecipes('breakfast',this)">Breakfast</button>
-              <button class="lib-tab" onclick="filterRecipes('lunch',this)">Lunch</button>
-              <button class="lib-tab" onclick="filterRecipes('dinner',this)">Dinner</button>
-              <button class="lib-tab" onclick="filterRecipes('snack',this)">Snacks</button>
-              <button class="lib-tab" onclick="filterRecipes('post-workout',this)">Post-Workout</button>
-              <button class="lib-tab" onclick="filterRecipes('protein-dessert',this)">Protein Desserts</button>
+              <button class="lib-tab" onclick="filterRecipes('breakfast',this)" id="meal-tab-breakfast">Breakfast</button>
+              <button class="lib-tab" onclick="filterRecipes('lunch',this)" id="meal-tab-lunch">Lunch</button>
+              <button class="lib-tab" onclick="filterRecipes('dinner',this)" id="meal-tab-dinner">Dinner</button>
+              <button class="lib-tab" onclick="filterRecipes('snack',this)" id="meal-tab-snacks">Snacks</button>
+              <button class="lib-tab" onclick="filterRecipes('post-workout',this)" id="meal-tab-post-workout">Post-Workout</button>
+              <button class="lib-tab" onclick="filterRecipes('protein-dessert',this)" id="meal-tab-protein-desserts">Protein Desserts</button>
             </div>
             <button class="btn btn-ghost btn-sm" id="recipes-add-btn" onclick="openTrainerRecipeModal()">
               <i class="ti ti-plus"></i> Add Recipe
@@ -730,7 +730,7 @@
           </div>
           <div class="topbar-right">
             <button class="btn btn-primary" onclick="openCreateGroupWorkout()">
-              <i class="ti ti-plus"></i> Create Workout
+              <i class="ti ti-plus"></i> <span data-i18n="btnCreateWorkout">Create Workout</span>
             </button>
           </div>
         </div>
@@ -741,7 +741,7 @@
 
             <div class="view" id="view-research">
         <div class="view-topbar">
-          <div class="topbar-left"><h2 class="view-title"><i class="ti ti-microscope" style="color:var(--accent)"></i> Research Library</h2></div>
+          <div class="topbar-left"><h2 class="view-title"><i class="ti ti-microscope" style="color:var(--accent)"></i><span data-i18n="researchLibrary">Research Library</span></h2></div>
           <div class="topbar-right">
             <input class="search-input" id="research-search" placeholder="Search studies..." oninput="filterResearch(this.value)" style="width:180px">
             <button class="btn btn-ghost btn-sm" onclick="openTrainerResearchModal()">
@@ -762,17 +762,17 @@
       <div class="view" id="view-clients" style="overflow-y:auto">
         <div class="view-topbar" style="flex-wrap:wrap;gap:10px">
           <div class="topbar-left">
-            <h2 class="view-title"><i class="ti ti-users" style="color:var(--accent)"></i> My Clients</h2>
+            <h2 class="view-title"><i class="ti ti-users" style="color:var(--accent)"></i> <span id="view-clients-title">My Clients</span></h2>
             <span id="clients-count" style="font-size:13px;color:var(--muted)"></span>
           </div>
           <div class="topbar-right">
             <button class="btn btn-primary" onclick="openAddClientModal()">
-              <i class="ti ti-user-plus"></i> Add Client
+              <i class="ti ti-user-plus"></i> <span data-i18n="btnAddClient">Add Client</span>
             </button>
           </div>
           <div class="search-wrap" style="width:100%;margin-top:4px">
             <i class="ti ti-search"></i>
-            <input type="text" placeholder="Search clients by name or email..." oninput="searchClients(this.value)" style="width:100%">
+            <input type="text" placeholder="Search clients by name or email..." oninput="searchClients(this.value)" style="width:100%" data-i18n="searchClientsPlaceholder" data-i18n-attr="placeholder">
           </div>
         </div>
         <div id="clients-list-body" style="padding:0 24px 24px">
@@ -783,9 +783,9 @@
       <!-- PROFILE VIEW -->
       <div class="view" id="view-profile">
         <div class="view-topbar">
-          <div class="topbar-left"><h2 class="view-title">Profile &amp; Settings</h2></div>
+          <div class="topbar-left"><h2 class="view-title"><span data-i18n="titleProfile">Profile &amp; Settings</span></h2></div>
           <div class="topbar-right">
-            <button class="btn btn-primary" onclick="saveProfile()"><i class="ti ti-check"></i> Save Changes</button>
+            <button class="btn btn-primary" onclick="saveProfile()"><i class="ti ti-check"></i> <span data-i18n="btnSaveChanges">Save Changes</span></button>
           </div>
         </div>
         <div class="profile-body">
@@ -799,9 +799,9 @@
               <h3 id="profile-display-name">Jordan Davis, PT</h3>
               <p id="profile-display-biz">Peak Performance Physio</p>
               <div class="profile-stats">
-                <div class="pstat"><span id="pstat-videos">0</span><em>Custom Videos</em></div>
-                <div class="pstat"><span id="pstat-routines">0</span><em>Routines Sent</em></div>
-                <div class="pstat"><span id="pstat-clients">0</span><em>Clients Reached</em></div>
+                <div class="pstat"><span id="pstat-videos">0</span><em data-i18n="pstatVideos">Custom Videos</em></div>
+                <div class="pstat"><span id="pstat-routines">0</span><em data-i18n="pstatRoutines">Routines Sent</em></div>
+                <div class="pstat"><span id="pstat-clients">0</span><em data-i18n="pstatClients">Clients Reached</em></div>
               </div>
             </div>
           </div>
@@ -816,20 +816,20 @@
             </button>
           </div>
           <div class="profile-form-grid">
-            <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="pf-name" value="Jordan Davis"></div>
-            <div class="form-group"><label class="form-label">Phone Number</label><input class="form-input" id="pf-phone" value="+972 50 123 4567"></div>
-            <div class="form-group"><label class="form-label">Business Name</label><input class="form-input" id="pf-biz" value="Peak Performance Physio"></div>
+            <div class="form-group"><label class="form-label" id="pf-label-name"></label><input class="form-input" id="pf-name" value="Jordan Davis"></div>
+            <div class="form-group"><label class="form-label" id="pf-label-phone"></label><input class="form-input" id="pf-phone" value="+972 50 123 4567"></div>
+            <div class="form-group"><label class="form-label" id="pf-label-biz"></label><input class="form-input" id="pf-biz" value="Peak Performance Physio"></div>
             <div class="form-group">
-              <label class="form-label">Specialty</label>
+              <label class="form-label" id="pf-label-specialty"></label>
               <select class="form-select" id="pf-specialty">
-                <option selected>Physiotherapist</option>
-                <option>Personal Trainer</option>
-                <option>Sports Therapist</option>
-                <option>Rehab Specialist</option>
+                <option selected data-i18n-opt="specPhysio">Physiotherapist</option>
+                <option data-i18n-opt="specPT">Personal Trainer</option>
+                <option data-i18n-opt="specSports">Sports Therapist</option>
+                <option data-i18n-opt="specRehab">Rehab Specialist</option>
               </select>
             </div>
             <div class="form-group full-span">
-              <label class="form-label">Professional Bio</label>
+              <label class="form-label" id="pf-label-bio"></label>
               <textarea class="form-textarea" id="pf-bio" rows="3">Helping athletes recover faster and perform better. Specialising in sports rehabilitation and corrective exercise programming.</textarea>
             </div>
           </div>
@@ -931,10 +931,10 @@
       <div class="cart-badge-wrap">
         <div class="cart-badge" id="cart-count">0</div>
       </div>
-      <span id="cart-label">exercises selected</span>
+      <span id="cart-label"></span>
     </div>
     <div class="cart-actions">
-      <button class="btn btn-ghost-sm" onclick="clearCart()"><i class="ti ti-trash"></i> Clear</button>
+      <button class="btn btn-ghost-sm" onclick="clearCart()"><i class="ti ti-trash"></i> <span data-i18n="btnClear">Clear</span></button>
       <button class="btn btn-accent" onclick="openModal('checkout');renderCheckout()"><i class="ti ti-clipboard-list"></i> Review &amp; Assign <i class="ti ti-arrow-right"></i></button>
     </div>
   </div>
@@ -1376,8 +1376,8 @@
     <input type="hidden" id="upload-visibility" value="private">
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
-    <button class="btn btn-primary" onclick="submitUpload()"><i class="ti ti-cloud-upload"></i> Save to My Videos</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
+    <button class="btn btn-primary" onclick="submitUpload()"><i class="ti ti-cloud-upload"></i> <span data-i18n="btnSaveVideos">Save to My Videos</span></button>
   </div>
 </div>
 
@@ -1399,11 +1399,11 @@
     <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px">
       <div style="font-size:13px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px">
         <i class="ti ti-bookmark" style="color:#60A5FA"></i>
-        Step 1 — Name &amp; Save Routine
+        <span data-i18n="routineStep1">Step 1 — Name &amp; Save Routine</span>
       </div>
       <input class="form-input" id="checkout-routine-name" placeholder="e.g. Upper Body Day A" style="margin-bottom:10px">
       <button class="btn btn-full" onclick="saveAsRoutine()" style="background:rgba(96,165,250,0.12);border:1px solid rgba(96,165,250,0.4);color:#60A5FA;font-weight:700">
-        <i class="ti ti-bookmark"></i> Save Routine
+        <i class="ti ti-bookmark"></i> <span data-i18n="btnSaveRoutine">Save Routine</span>
       </button>
     </div>
 
@@ -1411,13 +1411,13 @@
     <div id="checkout-assign-section" style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;opacity:0.4;pointer-events:none">
       <div style="font-size:13px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px">
         <i class="ti ti-user-check" style="color:var(--accent)"></i>
-        Step 2 — Assign to Client (optional)
+        <span data-i18n="routineStep2">Step 2 — Assign to Client (optional)</span>
       </div>
       <select class="form-select" id="checkout-client-select" style="margin-bottom:10px">
         <option value="">— Choose client —</option>
       </select>
       <button class="btn btn-primary btn-full" onclick="assignRoutineToClient()">
-        <i class="ti ti-user-check"></i> Assign to Client
+        <i class="ti ti-user-check"></i> <span data-i18n="btnAssignClient">Assign to Client</span>
       </button>
     </div>
 
@@ -1515,9 +1515,9 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
     <button class="btn btn-primary" id="admin-modal-save-btn" onclick="saveAdminExercise()">
-      <i class="ti ti-check"></i> Save Exercise
+      <i class="ti ti-check"></i> <span data-i18n="btnSaveExercise">Save Exercise</span>
     </button>
   </div>
 </div>
@@ -1533,13 +1533,13 @@
     <!-- Format tabs -->
     <div class="bulk-tabs">
       <button class="bulk-tab active" id="bulk-tab-json" onclick="switchBulkTab('json',this)">
-        <i class="ti ti-code"></i> JSON Paste
+        <i class="ti ti-code"></i> <span data-i18n="btnJsonPaste">JSON Paste</span>
       </button>
       <button class="bulk-tab" id="bulk-tab-csv" onclick="switchBulkTab('csv',this)">
-        <i class="ti ti-table"></i> CSV Paste
+        <i class="ti ti-table"></i> <span data-i18n="btnCsvPaste">CSV Paste</span>
       </button>
       <button class="bulk-tab" id="bulk-tab-simple" onclick="switchBulkTab('simple',this)">
-        <i class="ti ti-list"></i> Simple List
+        <i class="ti ti-list"></i> <span data-i18n="btnSimpleList">Simple List</span>
       </button>
     </div>
 
@@ -1617,12 +1617,12 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     <div id="bulk-error" class="bulk-error" style="display:none"></div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
     <button class="btn btn-ghost" onclick="previewBulkImport()">
       <i class="ti ti-eye"></i> Preview
     </button>
     <button class="btn btn-primary" id="bulk-import-btn" onclick="executeBulkImport()">
-      <i class="ti ti-file-import"></i> Import to Library
+      <i class="ti ti-file-import"></i> <span data-i18n="btnImportLib">Import to Library</span>
     </button>
   </div>
 </div>
@@ -1635,51 +1635,46 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
   </div>
   <div class="modal-body" id="menu-detail-body"></div>
   <div class="modal-footer">
-    <button class="btn btn-primary" onclick="closeAllModals()">Close</button>
+    <button class="btn btn-primary" onclick="closeAllModals()" data-i18n="btnClose">Close</button>
   </div>
 </div>
 
 <!-- Admin Menu Editor Modal -->
 <div class="modal modal-wide" id="modal-admin-menu">
   <div class="modal-header">
-    <h3 id="admin-menu-modal-title"><i class="ti ti-salad"></i> Add Menu Plan</h3>
+    <h3 id="admin-menu-modal-title"><i class="ti ti-salad"></i> <span data-i18n="addMenuPlan">Add Menu Plan</span></h3>
     <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
   </div>
   <div class="modal-body">
     <input type="hidden" id="admin-menu-edit-id">
+    <input type="hidden" id="admin-menu-lang">
     <div class="form-row">
-      <div class="form-group" style="flex:2">
-        <label class="form-label">Menu Name * <span style="color:var(--muted);font-weight:400">(EN)</span></label>
-        <input class="form-input" id="admin-menu-name" placeholder="e.g. High Protein Cut — 1800 kcal">
+      <!-- EN name: visible in English mode only -->
+      <div class="form-group lang-field-en" style="flex:2">
+        <label class="form-label">Menu Name *</label>
+        <input class="form-input" id="admin-menu-name" placeholder="e.g. High Protein Cut — 1800 kcal" data-i18n="menuNamePlaceholder" data-i18n-attr="placeholder">
       </div>
-      <div class="form-group" style="flex:2">
-        <label class="form-label">שם תפריט <span style="color:var(--muted);font-weight:400">(עב)</span></label>
-        <input class="form-input" id="admin-menu-name-he" placeholder="לדוג׳ תפריט חיטוב עתיר חלבון" dir="auto">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Language</label>
-        <select class="form-select" id="admin-menu-lang">
-          <option value="en">🇺🇸 English</option>
-          <option value="he">🇮🇱 Hebrew</option>
-          <option value="both">🌐 Both</option>
-        </select>
+      <!-- HE name: visible in Hebrew mode only -->
+      <div class="form-group lang-field-he" style="flex:2;display:none">
+        <label class="form-label">שם תפריט *</label>
+        <input class="form-input" id="admin-menu-name-he" placeholder="לדוג׳ תפריט חיטוב עתיר חלבון" dir="rtl">
       </div>
       <div class="form-group">
-        <label class="form-label">Goal *</label>
+        <label class="form-label" data-i18n="fldMenuGoal">Goal</label>
         <select class="form-input" id="admin-menu-goal">
-          <option value="cut">Cut</option>
-          <option value="maintain">Maintain</option>
-          <option value="bulk">Bulk</option>
+          <option value="cut" data-i18n-opt="goalCut">Cut</option>
+          <option value="maintain" data-i18n-opt="goalMaintain">Maintain</option>
+          <option value="bulk" data-i18n-opt="goalBulk">Bulk</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Target Calories</label>
+        <label class="form-label" data-i18n="fldMenuCal">Target Calories</label>
         <input class="form-input" id="admin-menu-calories" type="number" placeholder="1800">
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Description</label>
-      <textarea class="form-textarea" id="admin-menu-desc" rows="2" placeholder="Brief description of this menu plan..."></textarea>
+      <label class="form-label" data-i18n="fldMenuDesc">Description</label>
+      <textarea class="form-textarea" id="admin-menu-desc" rows="2" placeholder="Brief description of this menu plan..." data-i18n="menuDescPlaceholder" data-i18n-attr="placeholder"></textarea>
     </div>
 
     <!-- Live macro preview -->
@@ -1691,13 +1686,13 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
       <!-- Meals added dynamically -->
     </div>
     <button class="btn btn-ghost btn-full" onclick="addMealToEditor();updateAdminMenuPreview()" style="margin-top:10px">
-      <i class="ti ti-plus"></i> Add Meal
+      <i class="ti ti-plus"></i> <span data-i18n="btnAddMeal">Add Meal</span>
     </button>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
     <button class="btn btn-primary" onclick="saveAdminMenu()">
-      <i class="ti ti-check"></i> Save Menu
+      <i class="ti ti-check"></i> <span data-i18n="btnSaveMenu">Save Menu</span>
     </button>
   </div>
 </div>
@@ -1710,7 +1705,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
   </div>
   <div class="modal-body" id="program-detail-body"></div>
   <div class="modal-footer">
-    <button class="btn btn-primary" onclick="closeAllModals()">Close</button>
+    <button class="btn btn-primary" onclick="closeAllModals()" data-i18n="btnClose">Close</button>
   </div>
 </div>
 
@@ -1722,82 +1717,77 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
   </div>
   <div class="modal-body">
     <input type="hidden" id="admin-program-id">
+    <input type="hidden" id="admin-prog-lang">
     <div class="form-row">
-      <div class="form-group" style="flex:2">
-        <label class="form-label">Program Name * <span style="color:var(--muted);font-weight:400">(EN)</span></label>
-        <input class="form-input" id="prog-name" placeholder="e.g. 12-Week Strength Builder">
+      <!-- EN name: visible in English mode -->
+      <div class="form-group lang-field-en" style="flex:2">
+        <label class="form-label">Program Name *</label>
+        <input class="form-input" id="prog-name" placeholder="e.g. 12-Week Strength Builder" data-i18n="progPlaceholderName" data-i18n-attr="placeholder">
       </div>
-      <div class="form-group" style="flex:2">
-        <label class="form-label">שם התוכנית <span style="color:var(--muted);font-weight:400">(עב)</span></label>
-        <input class="form-input" id="prog-name-he" placeholder="לדוג׳ תוכנית כוח 12 שבועות" dir="auto">
+      <!-- HE name: visible in Hebrew mode -->
+      <div class="form-group lang-field-he" style="flex:2;display:none">
+        <label class="form-label">שם התוכנית *</label>
+        <input class="form-input" id="prog-name-he" placeholder="לדוג׳ תוכנית כוח 12 שבועות" dir="rtl">
       </div>
       <div class="form-group">
-        <label class="form-label">Duration (weeks)</label>
+        <label class="form-label" data-i18n="fldProgWeeks">Duration (weeks)</label>
         <input class="form-input" id="prog-weeks" type="number" min="1" max="52" placeholder="12">
       </div>
       <div class="form-group">
-        <label class="form-label">Days/week</label>
+        <label class="form-label" data-i18n="fldProgDays">Days/week</label>
         <input class="form-input" id="prog-days" type="number" min="1" max="7" placeholder="4">
       </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Language</label>
-      <select class="form-select" id="admin-prog-lang">
-        <option value="en">🇺🇸 English</option>
-        <option value="he">🇮🇱 Hebrew</option>
-        <option value="both">🌐 Both</option>
-      </select>
-    </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Goal</label>
+        <label class="form-label" data-i18n="fldProgGoal">Goal</label>
         <select class="form-input" id="prog-goal">
-          <option value="strength">Strength</option>
-          <option value="hypertrophy">Hypertrophy</option>
-          <option value="fat-loss">Fat Loss</option>
-          <option value="endurance">Endurance</option>
-          <option value="rehab">Rehabilitation</option>
+          <option value="strength" data-i18n-opt="goalStrength">Strength</option>
+          <option value="hypertrophy" data-i18n-opt="goalHypertrophy">Hypertrophy</option>
+          <option value="fat-loss" data-i18n-opt="goalFatLoss">Fat Loss</option>
+          <option value="endurance" data-i18n-opt="goalEndurance">Endurance</option>
+          <option value="rehab" data-i18n-opt="goalRehab">Rehabilitation</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Level</label>
+        <label class="form-label" data-i18n="fldProgLevel">Level</label>
         <select class="form-input" id="prog-level">
-          <option value="Beginner">Beginner</option>
-          <option value="Intermediate">Intermediate</option>
-          <option value="Advanced">Advanced</option>
+          <option value="Beginner" data-i18n-opt="lvlBeginner">Beginner</option>
+          <option value="Intermediate" data-i18n-opt="lvlIntermediate">Intermediate</option>
+          <option value="Advanced" data-i18n-opt="lvlAdvanced">Advanced</option>
         </select>
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Description *</label>
-      <textarea class="form-textarea" id="prog-desc" rows="3" placeholder="Describe the program, who it's for, what results to expect..."></textarea>
+      <label class="form-label" data-i18n="fldProgDesc">Description</label>
+      <textarea class="form-textarea" id="prog-desc" data-i18n="progPlaceholderDesc" data-i18n-attr="placeholder" rows="3" placeholder="Describe the program..."></textarea>
     </div>
     <div class="form-group">
-      <label class="form-label">Weekly Schedule (one day per line, e.g. "Monday: Chest & Triceps")</label>
-      <textarea class="form-textarea" id="prog-schedule" rows="5" placeholder="Monday: Chest &amp; Triceps&#10;Tuesday: Rest&#10;Wednesday: Back &amp; Biceps&#10;Thursday: Rest&#10;Friday: Legs&#10;Saturday: Shoulders &amp; Core&#10;Sunday: Rest"></textarea>
+      <label class="form-label" data-i18n="progWeeklySchedule">Weekly Schedule</label>
+      <textarea class="form-textarea" id="prog-schedule" data-i18n="progPlaceholderSchedule" data-i18n-attr="placeholder" rows="5" placeholder="Monday: Chest &amp; Triceps&#10;Tuesday: Rest&#10;Wednesday: Back &amp; Biceps&#10;Thursday: Rest&#10;Friday: Legs&#10;Saturday: Shoulders &amp; Core&#10;Sunday: Rest"></textarea>
     </div>
     <div class="form-row">
       <div class="form-group" style="flex:2">
-        <label class="form-label">Notes / Progression Rules</label>
-        <textarea class="form-textarea" id="prog-notes" rows="2" placeholder="Progressive overload guidelines, warm-up instructions, etc."></textarea>
+        <label class="form-label" data-i18n="progNotes">Notes / Progression Rules</label>
+        <textarea class="form-textarea" id="prog-notes" data-i18n="progPlaceholderNotes" data-i18n-attr="placeholder" rows="2" placeholder="Progressive overload guidelines, warm-up instructions, etc."></textarea>
       </div>
       <div class="form-group" style="flex:0;min-width:140px">
-        <label class="form-label">Visibility</label>
+        <label class="form-label" data-i18n="progVisibility">Visibility</label>
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 0">
           <input type="checkbox" id="prog-is-public" checked style="width:16px;height:16px;accent-color:var(--accent)">
-          <span style="font-size:13px;color:var(--muted)">Public to all trainers</span>
+          <span style="font-size:13px;color:var(--muted)" data-i18n="progPublic">Public to all trainers</span>
         </label>
       </div>
     </div>
 
     <div class="admin-menu-meals" id="prog-exercises-container"></div>
     <button class="btn btn-ghost btn-full" onclick="addProgExercise()" style="margin-top:8px">
-      <i class="ti ti-plus"></i> Add Exercise Day
+      <i class="ti ti-plus"></i> <span data-i18n="btnAddExerciseDay">Add Exercise Day</span>
     </button>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
-    <button class="btn btn-primary" onclick="saveAdminProgram()"><i class="ti ti-check"></i> Save Program</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
+    <button class="btn btn-primary" onclick="saveAdminProgram()"><i class="ti ti-check"></i> <span data-i18n="btnSaveProgram">Save Program</span></button>
   </div>
 </div>
 
@@ -1823,69 +1813,69 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     <input type="hidden" id="admin-recipe-id">
     <div class="form-row">
       <div class="form-group" style="flex:2">
-        <label class="form-label">Recipe Name * <span style="color:var(--muted);font-weight:400">(EN)</span></label>
-        <input class="form-input" id="recipe-name" placeholder="e.g. High Protein Overnight Oats">
+        <label class="form-label" data-i18n="recipeNameEn">Recipe Name * (EN)</label>
+        <input class="form-input" id="recipe-name" placeholder="e.g. High Protein Overnight Oats" data-i18n="recipePlaceholderName" data-i18n-attr="placeholder">
       </div>
       <div class="form-group" style="flex:2">
         <label class="form-label">שם מתכון <span style="color:var(--muted);font-weight:400">(עב)</span></label>
         <input class="form-input" id="recipe-name-he" placeholder="לדוג׳ שיבולת שועל לילה עתיר חלבון" dir="auto">
       </div>
       <div class="form-group">
-        <label class="form-label">Language</label>
+        <label class="form-label" data-i18n="fldLanguage">Language</label>
         <select class="form-select" id="admin-recipe-lang">
-          <option value="en">🇺🇸 English</option>
-          <option value="he">🇮🇱 Hebrew</option>
-          <option value="both">🌐 Both</option>
+          <option value="en" data-i18n-opt="langEn">🇺🇸 English</option>
+          <option value="he" data-i18n-opt="langHe">🇮🇱 Hebrew</option>
+          <option value="both" data-i18n-opt="langBoth">🌐 Both</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Category</label>
+        <label class="form-label" data-i18n="recipeCategory">Category</label>
         <select class="form-input" id="recipe-category">
-          <option value="breakfast">Breakfast</option>
-          <option value="lunch">Lunch</option>
-          <option value="dinner">Dinner</option>
-          <option value="snack">Snack</option>
-          <option value="post-workout">Post-Workout</option>
-          <option value="protein-dessert">Protein Desserts</option>
+          <option value="breakfast" data-i18n-opt="recipeCatBreakfast">Breakfast</option>
+          <option value="lunch" data-i18n-opt="recipeCatLunch">Lunch</option>
+          <option value="dinner" data-i18n-opt="recipeCatDinner">Dinner</option>
+          <option value="snack" data-i18n-opt="recipeCatSnack">Snack</option>
+          <option value="post-workout" data-i18n-opt="recipeCatPostWorkout">Post-Workout</option>
+          <option value="protein-dessert" data-i18n-opt="recipeCatProteinDesserts">Protein Desserts</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Prep Time (min)</label>
+        <label class="form-label" data-i18n="recipePrepTime">Prep Time (min)</label>
         <input class="form-input" id="recipe-time" type="number" placeholder="15">
       </div>
     </div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Calories</label><input class="form-input" id="recipe-cal" type="number" placeholder="450"></div>
-      <div class="form-group"><label class="form-label">Protein (g)</label><input class="form-input" id="recipe-pro" type="number" placeholder="35"></div>
-      <div class="form-group"><label class="form-label">Carbs (g)</label><input class="form-input" id="recipe-car" type="number" placeholder="45"></div>
-      <div class="form-group"><label class="form-label">Fat (g)</label><input class="form-input" id="recipe-fat" type="number" placeholder="12"></div>
+      <div class="form-group"><label class="form-label" data-i18n="recipeProteinG">Protein (g)</label><input class="form-input" id="recipe-pro" type="number" placeholder="35"></div>
+      <div class="form-group"><label class="form-label" data-i18n="recipeCarbsG">Carbs (g)</label><input class="form-input" id="recipe-car" type="number" placeholder="45"></div>
+      <div class="form-group"><label class="form-label" data-i18n="recipeFatG">Fat (g)</label><input class="form-input" id="recipe-fat" type="number" placeholder="12"></div>
     </div>
     <div class="form-group">
-      <label class="form-label">Ingredients (one per line, e.g. "100g oats")</label>
+      <label class="form-label" data-i18n="recipeIngredients">Ingredients</label>
       <textarea class="form-textarea" id="recipe-ingredients" rows="5" placeholder="100g rolled oats&#10;200ml almond milk&#10;1 scoop whey protein&#10;1 tbsp peanut butter&#10;1 banana"></textarea>
     </div>
     <div class="form-group">
-      <label class="form-label">Instructions *</label>
+      <label class="form-label" data-i18n="recipeInstructions">Instructions *</label>
       <textarea class="form-textarea" id="recipe-instructions" rows="6" placeholder="Step 1: ...&#10;Step 2: ...&#10;Step 3: ..."></textarea>
     </div>
     <div class="form-group">
-      <label class="form-label">Tips (optional)</label>
+      <label class="form-label" data-i18n="recipeTips">Tips (optional)</label>
       <textarea class="form-textarea" id="recipe-tips" rows="2" placeholder="Meal prep tips, variations, storage instructions..."></textarea>
     </div>
     <div class="form-row">
       <div class="form-group" style="flex:2">
-        <label class="form-label"><i class="ti ti-photo"></i> Photo URL (optional)</label>
+        <label class="form-label"><i class="ti ti-photo"></i> <span data-i18n="recipePhotoUrl">Photo URL (optional)</span></label>
         <input class="form-input" id="recipe-photo" type="url" placeholder="https://... or paste an image URL">
       </div>
       <div class="form-group" style="flex:2">
-        <label class="form-label"><i class="ti ti-brand-youtube"></i> Video URL (optional — YouTube or direct)</label>
+        <label class="form-label"><i class="ti ti-brand-youtube"></i> <span data-i18n="recipeVideoUrl">Video URL (optional)</span></label>
         <input class="form-input" id="recipe-video" type="url" placeholder="https://youtube.com/watch?v=...">
       </div>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
-    <button class="btn btn-primary" onclick="saveAdminRecipe()"><i class="ti ti-check"></i> Save Recipe</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
+    <button class="btn btn-primary" onclick="saveAdminRecipe()"><i class="ti ti-check"></i> <span data-i18n="btnSaveRecipe">Save Recipe</span></button>
   </div>
 </div>
 
@@ -1922,9 +1912,9 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     <div class="form-group">
       <label class="form-label" data-i18n="langField">Language</label>
       <select class="form-select" id="admin-research-lang">
-        <option value="en">🇺🇸 English</option>
-        <option value="he">🇮🇱 Hebrew</option>
-        <option value="both">🌐 Both</option>
+        <option value="en" data-i18n-opt="langEn">🇺🇸 English</option>
+        <option value="he" data-i18n-opt="langHe">🇮🇱 Hebrew</option>
+        <option value="both" data-i18n-opt="langBoth">🌐 Both</option>
       </select>
     </div>
     <div class="form-group">
@@ -1954,8 +1944,8 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
-    <button class="btn btn-primary" onclick="saveAdminResearch()"><i class="ti ti-check"></i> Save Study</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
+    <button class="btn btn-primary" onclick="saveAdminResearch()"><i class="ti ti-check"></i> <span data-i18n="btnSaveStudy">Save Study</span></button>
   </div>
 </div>
 
@@ -1993,84 +1983,84 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
   <div class="modal-body">
     <div class="form-row">
       <div class="form-group" style="flex:2">
-        <label class="form-label">Full Name *</label>
+        <label class="form-label" data-i18n="fldFullName">Full Name *</label>
         <input class="form-input" id="client-name" placeholder="David Cohen">
       </div>
       <div class="form-group">
-        <label class="form-label">Gender</label>
+        <label class="form-label" data-i18n="fldGender">Gender</label>
         <select class="form-input" id="client-gender">
-          <option value="male">Male</option>
-          <option value="female">Female</option>
+          <option value="male" data-i18n-opt="ebmrMale">Male</option>
+          <option value="female" data-i18n-opt="ebmrFemale">Female</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Goal</label>
+        <label class="form-label" data-i18n="fldMenuGoal">Goal</label>
         <select class="form-input" id="client-goal">
-          <option value="cut">Cut</option>
-          <option value="maintain" selected>Maintain</option>
-          <option value="bulk">Bulk</option>
+          <option value="cut" data-i18n-opt="goalCutTag">Cut</option>
+          <option value="maintain" selected data-i18n-opt="goalMaintainTag">Maintain</option>
+          <option value="bulk" data-i18n-opt="goalBulkTag">Bulk</option>
         </select>
       </div>
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Email</label>
+        <label class="form-label" data-i18n="fldEmail">Email</label>
         <input class="form-input" id="client-email" type="email" placeholder="david@email.com">
       </div>
       <div class="form-group">
-        <label class="form-label">Phone</label>
+        <label class="form-label" data-i18n="fldPhone">Phone</label>
         <input class="form-input" id="client-phone" placeholder="+972-50-...">
       </div>
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Age</label>
+        <label class="form-label" data-i18n="ebmrAge">Age</label>
         <input class="form-input" id="client-age" type="number" placeholder="30">
       </div>
       <div class="form-group">
-        <label class="form-label">Weight (kg)</label>
+        <label class="form-label" data-i18n="ebmrWeight">Weight (kg)</label>
         <input class="form-input" id="client-weight" type="number" placeholder="80">
       </div>
       <div class="form-group">
-        <label class="form-label">Height (cm)</label>
+        <label class="form-label" data-i18n="ebmrHeight">Height (cm)</label>
         <input class="form-input" id="client-height" type="number" placeholder="175">
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Activity Level</label>
+      <label class="form-label" data-i18n="ebmrActivity">Activity Level</label>
       <select class="form-input" id="client-activity">
-        <option value="1.2">Sedentary (desk job, no exercise)</option>
-        <option value="1.375">Lightly Active (1–3 days/week)</option>
-        <option value="1.55" selected>Moderately Active (3–5 days/week)</option>
-        <option value="1.725">Very Active (6–7 days/week)</option>
-        <option value="1.9">Athlete (twice daily / physical job)</option>
+        <option value="1.2" data-i18n-opt="actSedentary">Sedentary (desk job, no exercise)</option>
+        <option value="1.375" data-i18n-opt="actLight">Lightly Active (1–3 days/week)</option>
+        <option value="1.55" selected data-i18n-opt="actModerate">Moderately Active (3–5 days/week)</option>
+        <option value="1.725" data-i18n-opt="actVery">Very Active (6–7 days/week)</option>
+        <option value="1.9" data-i18n-opt="actAthlete">Athlete (twice daily / physical job)</option>
       </select>
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Cut Intensity</label>
+        <label class="form-label" data-i18n="ebmrCutInt">Cut Intensity</label>
         <select class="form-input" id="client-cut-intensity">
-          <option value="0.85">Moderate Cut (−15%)</option>
-          <option value="0.80">Aggressive Cut (−20%)</option>
+          <option value="0.85" data-i18n-opt="cutModerate">Moderate Cut (−15%)</option>
+          <option value="0.80" data-i18n-opt="cutAggressive">Aggressive Cut (−20%)</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Bulk Intensity</label>
+        <label class="form-label" data-i18n="ebmrBulkInt">Bulk Intensity</label>
         <select class="form-input" id="client-bulk-intensity">
-          <option value="1.10">Lean Bulk (+10%)</option>
-          <option value="1.20">Aggressive Bulk (+20%)</option>
+          <option value="1.10" data-i18n-opt="bulkLean">Lean Bulk (+10%)</option>
+          <option value="1.20" data-i18n-opt="bulkAggressive">Aggressive Bulk (+20%)</option>
         </select>
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Trainer Notes <small style="color:var(--muted2)">(private — client cannot see)</small></label>
-      <textarea class="form-textarea" id="client-notes" rows="2" placeholder="Injury history, preferences, goals..."></textarea>
+      <label class="form-label" data-i18n="trainerNotesLabel">Trainer Notes <small style="color:var(--muted2)"><span data-i18n="clientPrivateNote">private — client cannot see</span></small></label>
+      <textarea class="form-textarea" id="client-notes" rows="2" placeholder="Injury history, preferences, goals..." data-i18n="clientNotesPlaceholder" data-i18n-attr="placeholder"></textarea>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
     <button class="btn btn-primary" onclick="saveNewClient()">
-      <i class="ti ti-user-plus"></i> Add Client
+      <i class="ti ti-user-plus"></i> <span data-i18n="btnAddClient">Add Client</span>
     </button>
   </div>
 </div>
@@ -2098,7 +2088,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
   <div id="assign-modal-body" style="max-height:50vh;overflow-y:auto;padding:0 16px 16px;-webkit-overflow-scrolling:touch"></div>
   <div class="modal-footer">
     <button class="btn btn-ghost" onclick="closeAssignModal()">Cancel</button>
-    <button class="btn btn-primary" onclick="confirmAssign()"><i class="ti ti-check"></i> Save Assignment</button>
+    <button class="btn btn-primary" onclick="confirmAssign()"><i class="ti ti-check"></i> <span data-i18n="btnSaveAssignment">Save Assignment</span></button>
   </div>
 </div>
 
@@ -2111,18 +2101,18 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
   <div class="modal-body">
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Gender</label>
+        <label class="form-label" data-i18n="fldGender">Gender</label>
         <select class="form-input" id="ebmr-gender" onchange="previewEditBMR()">
-          <option value="male">Male</option>
-          <option value="female">Female</option>
+          <option value="male" data-i18n-opt="ebmrMale">Male</option>
+          <option value="female" data-i18n-opt="ebmrFemale">Female</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Goal</label>
+        <label class="form-label" data-i18n="fldMenuGoal">Goal</label>
         <select class="form-input" id="ebmr-goal" onchange="previewEditBMR()">
-          <option value="cut">Cut</option>
-          <option value="maintain">Maintain</option>
-          <option value="bulk">Bulk</option>
+          <option value="cut" data-i18n-opt="goalCut">Cut</option>
+          <option value="maintain" data-i18n-opt="goalMaintain">Maintain</option>
+          <option value="bulk" data-i18n-opt="goalBulk">Bulk</option>
         </select>
       </div>
     </div>
@@ -2143,16 +2133,16 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     <div class="form-group">
       <label class="form-label">Activity Level</label>
       <select class="form-input" id="ebmr-activity" onchange="previewEditBMR()">
-        <option value="1.2">Sedentary (desk job, no exercise)</option>
-        <option value="1.375">Lightly Active (1–3 days/week)</option>
-        <option value="1.55" selected>Moderately Active (3–5 days/week)</option>
-        <option value="1.725">Very Active (6–7 days/week)</option>
-        <option value="1.9">Athlete (twice daily / physical job)</option>
+        <option value="1.2" data-i18n-opt="actSedentary">Sedentary (desk job, no exercise)</option>
+        <option value="1.375" data-i18n-opt="actLight">Lightly Active (1–3 days/week)</option>
+        <option value="1.55" selected data-i18n-opt="actModerate">Moderately Active (3–5 days/week)</option>
+        <option value="1.725" data-i18n-opt="actVery">Very Active (6–7 days/week)</option>
+        <option value="1.9" data-i18n-opt="actAthlete">Athlete (twice daily / physical job)</option>
       </select>
       <div class="recipe-tips" style="margin-top:8px;font-size:12px">
         <i class="ti ti-info-circle"></i>
         <span>
-          <strong>BMR</strong> = calories burned at rest (just to stay alive).<br>
+          <strong>BMR</strong> = <span data-i18n="bmrTooltip">calories your body burns at rest</span>.<br>
           <strong>TDEE</strong> = BMR × activity factor = total daily calories burned including exercise.<br>
           Target = TDEE adjusted for your goal.
         </span>
@@ -2162,24 +2152,24 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
       <div class="form-group">
         <label class="form-label">Cut Intensity</label>
         <select class="form-input" id="ebmr-cut" onchange="previewEditBMR()">
-          <option value="0.85">Moderate Cut (−15%)</option>
-          <option value="0.80">Aggressive Cut (−20%)</option>
+          <option value="0.85" data-i18n-opt="cutModerate">Moderate Cut (−15%)</option>
+          <option value="0.80" data-i18n-opt="cutAggressive">Aggressive Cut (−20%)</option>
         </select>
       </div>
       <div class="form-group">
         <label class="form-label">Bulk Intensity</label>
         <select class="form-input" id="ebmr-bulk" onchange="previewEditBMR()">
-          <option value="1.10">Lean Bulk (+10%)</option>
-          <option value="1.20">Aggressive Bulk (+20%)</option>
+          <option value="1.10" data-i18n-opt="bulkLean">Lean Bulk (+10%)</option>
+          <option value="1.20" data-i18n-opt="bulkAggressive">Aggressive Bulk (+20%)</option>
         </select>
       </div>
     </div>
     <div id="ebmr-preview" style="margin-top:16px"></div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeBmrEditModal()">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeBmrEditModal()" data-i18n="btnCancel">Cancel</button>
     <button class="btn btn-primary" onclick="saveEditClientBMR()">
-      <i class="ti ti-check"></i> Save
+      <i class="ti ti-check"></i> <span data-i18n="btnSave">Save</span>
     </button>
   </div>
 </div>
@@ -2196,9 +2186,9 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     <p style="color:var(--muted);font-size:13.5px" id="delete-confirm-text">This exercise will be permanently removed from the master library.</p>
   </div>
   <div class="modal-footer" style="justify-content:center;gap:12px">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
     <button class="btn btn-danger-solid" id="confirm-delete-btn" onclick="confirmDeleteExercise()">
-      <i class="ti ti-trash"></i> Yes, Delete
+      <i class="ti ti-trash"></i> <span data-i18n="btnYesDelete">Yes, Delete</span>
     </button>
   </div>
 </div>
@@ -2311,7 +2301,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
 
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
     <button class="btn btn-primary" onclick="handleGrowPaymentChecked()" id="pay-btn" style="min-width:200px">
       <i class="ti ti-lock"></i> Proceed to Secure Payment
     </button>
@@ -2409,6 +2399,9 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
   window.dispatchEvent(new Event('firebaseReady'));
 </script>
 
+<script src="i18n.en.js" defer></script>
+<script src="i18n.he.js" defer></script>
+<script src="i18n.js" defer></script>
 <script src="app.js?v=1781872092" defer></script>
 <script>
 /* ── Accessibility Widget ─────────────────────────────────────── */
@@ -2642,7 +2635,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     <i class="ti ti-layout-grid"></i>Library
   </button>
   <button class="mobile-tab-btn" id="mtab-routines" onclick="mobileTab('routines',this)">
-    <i class="ti ti-list-check"></i>Routines
+    <i class="ti ti-list-check"></i><span data-i18n="sectionRoutines">Routines</span>
   </button>
   <button class="mobile-tab-btn" id="mtab-nutrition" onclick="mobileTab('nutrition',this)">
     <i class="ti ti-salad"></i>Nutrition
@@ -2694,9 +2687,9 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
     <button class="btn btn-primary" onclick="sendPasswordReset()">
-      <i class="ti ti-send"></i> Send Reset Link
+      <i class="ti ti-send"></i> <span data-i18n="btnSendReset">Send Reset Link</span>
     </button>
   </div>
 </div>
@@ -2713,8 +2706,8 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
       Required fields: <code>name</code>, <code>goal</code> (cut/bulk/maintain), <code>meals</code> (array of meal objects)
     </div>
     <div style="display:flex;gap:8px;margin-bottom:10px">
-      <button class="btn btn-ghost btn-sm" onclick="downloadBulkTemplate('menus')"><i class="ti ti-download"></i> Template JSON</button>
-      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bulk-file-menus').click()"><i class="ti ti-upload"></i> Upload File</button>
+      <button class="btn btn-ghost btn-sm" onclick="downloadBulkTemplate('menus')"><i class="ti ti-download"></i> <span data-i18n="btnTemplate">Template JSON</span></button>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bulk-file-menus').click()"><i class="ti ti-upload"></i> <span data-i18n="btnUploadFile">Upload File</span></button>
       <input type="file" id="bulk-file-menus" accept=".json" style="display:none" onchange="loadBulkFile(this,'menus-textarea')">
     </div>
     <textarea id="menus-textarea" class="form-textarea" style="font-family:monospace;font-size:12px;min-height:220px;resize:vertical" placeholder='[{"name":"High Protein Cut","goal":"cut","desc":"...","isPublic":true,"meals":[{"name":"Breakfast","items":[{"name":"Oats","qty":80,"unit":"g","calories":300,"protein":10,"carbs":55,"fat":5}]}]}]'></textarea>
@@ -2725,8 +2718,8 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
-    <button class="btn btn-ghost" onclick="validateSectionBulk('menus')"><i class="ti ti-check"></i> Validate</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
+    <button class="btn btn-ghost" onclick="validateSectionBulk('menus')"><i class="ti ti-check"></i> <span data-i18n="btnValidate">Validate</span></button>
     <button class="btn btn-primary" onclick="runSectionBulkImport('menus')"><i class="ti ti-file-import"></i> Import Menus</button>
   </div>
 </div>
@@ -2742,8 +2735,8 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
       Required fields: <code>name</code>, <code>goal</code>, <code>level</code>, <code>trainingDays</code> (array of day objects with exercises)
     </div>
     <div style="display:flex;gap:8px;margin-bottom:10px">
-      <button class="btn btn-ghost btn-sm" onclick="downloadBulkTemplate('programs')"><i class="ti ti-download"></i> Template JSON</button>
-      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bulk-file-programs').click()"><i class="ti ti-upload"></i> Upload File</button>
+      <button class="btn btn-ghost btn-sm" onclick="downloadBulkTemplate('programs')"><i class="ti ti-download"></i> <span data-i18n="btnTemplate">Template JSON</span></button>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bulk-file-programs').click()"><i class="ti ti-upload"></i> <span data-i18n="btnUploadFile">Upload File</span></button>
       <input type="file" id="bulk-file-programs" accept=".json" style="display:none" onchange="loadBulkFile(this,'programs-textarea')">
     </div>
     <textarea id="programs-textarea" class="form-textarea" style="font-family:monospace;font-size:12px;min-height:220px;resize:vertical" placeholder='[{"name":"12-Week Hypertrophy","goal":"hypertrophy","level":"Intermediate","weeks":12,"days":4,"desc":"...","isPublic":true,"trainingDays":[{"day":"Day 1 - Chest","exercises":[{"title":"Incline Dumbbell Press","muscle":"chest","sets":"4","reps":"10","rest":"90","notes":""}]}]}]'></textarea>
@@ -2754,8 +2747,8 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
-    <button class="btn btn-ghost" onclick="validateSectionBulk('programs')"><i class="ti ti-check"></i> Validate</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
+    <button class="btn btn-ghost" onclick="validateSectionBulk('programs')"><i class="ti ti-check"></i> <span data-i18n="btnValidate">Validate</span></button>
     <button class="btn btn-primary" onclick="runSectionBulkImport('programs')"><i class="ti ti-file-import"></i> Import Programs</button>
   </div>
 </div>
@@ -2771,8 +2764,8 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
       Required fields: <code>name</code>, <code>category</code>, <code>calories</code>, <code>ingredients</code>, <code>instructions</code>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:10px">
-      <button class="btn btn-ghost btn-sm" onclick="downloadBulkTemplate('recipes')"><i class="ti ti-download"></i> Template JSON</button>
-      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bulk-file-recipes').click()"><i class="ti ti-upload"></i> Upload File</button>
+      <button class="btn btn-ghost btn-sm" onclick="downloadBulkTemplate('recipes')"><i class="ti ti-download"></i> <span data-i18n="btnTemplate">Template JSON</span></button>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bulk-file-recipes').click()"><i class="ti ti-upload"></i> <span data-i18n="btnUploadFile">Upload File</span></button>
       <input type="file" id="bulk-file-recipes" accept=".json" style="display:none" onchange="loadBulkFile(this,'recipes-textarea')">
     </div>
     <textarea id="recipes-textarea" class="form-textarea" style="font-family:monospace;font-size:12px;min-height:220px;resize:vertical" placeholder='[{"name":"Protein Pancakes","category":"breakfast","prepTime":15,"calories":380,"protein":35,"carbs":40,"fat":8,"ingredients":"2 scoops whey\n2 eggs","instructions":"Mix and cook.","tips":"","photoURL":"","videoURL":"","isPublic":true}]'></textarea>
@@ -2783,8 +2776,8 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
-    <button class="btn btn-ghost" onclick="validateSectionBulk('recipes')"><i class="ti ti-check"></i> Validate</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
+    <button class="btn btn-ghost" onclick="validateSectionBulk('recipes')"><i class="ti ti-check"></i> <span data-i18n="btnValidate">Validate</span></button>
     <button class="btn btn-primary" onclick="runSectionBulkImport('recipes')"><i class="ti ti-file-import"></i> Import Recipes</button>
   </div>
 </div>
@@ -2800,8 +2793,8 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
       Required fields: <code>title</code>, <code>summary</code>, <code>category</code>. Optional: <code>authors</code>, <code>year</code>, <code>journal</code>, <code>url</code>, <code>application</code>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:10px">
-      <button class="btn btn-ghost btn-sm" onclick="downloadBulkTemplate('research')"><i class="ti ti-download"></i> Template JSON</button>
-      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bulk-file-research').click()"><i class="ti ti-upload"></i> Upload File</button>
+      <button class="btn btn-ghost btn-sm" onclick="downloadBulkTemplate('research')"><i class="ti ti-download"></i> <span data-i18n="btnTemplate">Template JSON</span></button>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bulk-file-research').click()"><i class="ti ti-upload"></i> <span data-i18n="btnUploadFile">Upload File</span></button>
       <input type="file" id="bulk-file-research" accept=".json" style="display:none" onchange="loadBulkFile(this,'research-textarea')">
     </div>
     <textarea id="research-textarea" class="form-textarea" style="font-family:monospace;font-size:12px;min-height:220px;resize:vertical" placeholder='[{"title":"Protein timing study","authors":"Phillips SM","year":2023,"journal":"J Sports Sci","category":"Nutrition","summary":"Post-workout protein maximizes MPS.","url":"https://pubmed.ncbi.nlm.nih.gov/","application":"30-40g protein within 30 min post-workout"}]'></textarea>
@@ -2812,8 +2805,8 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
-    <button class="btn btn-ghost" onclick="validateSectionBulk('research')"><i class="ti ti-check"></i> Validate</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
+    <button class="btn btn-ghost" onclick="validateSectionBulk('research')"><i class="ti ti-check"></i> <span data-i18n="btnValidate">Validate</span></button>
     <button class="btn btn-primary" onclick="runSectionBulkImport('research')"><i class="ti ti-file-import"></i> Import Research</button>
   </div>
 </div>
@@ -2860,25 +2853,25 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
         <input class="form-input" type="number" id="food-protein" placeholder="31">
       </div>
       <div class="form-group" style="flex:1;min-width:100px">
-        <label class="form-label">Carbs (g)</label>
+        <label class="form-label" data-i18n="recipeCarbsG">Carbs (g)</label>
         <input class="form-input" type="number" id="food-carbs" placeholder="0">
       </div>
       <div class="form-group" style="flex:1;min-width:100px">
-        <label class="form-label">Fat (g)</label>
+        <label class="form-label" data-i18n="recipeFatG">Fat (g)</label>
         <input class="form-input" type="number" id="food-fat" placeholder="4">
       </div>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
-    <button class="btn btn-primary" onclick="saveAdminFood()"><i class="ti ti-check"></i> Save Food</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
+    <button class="btn btn-primary" onclick="saveAdminFood()"><i class="ti ti-check"></i> <span data-i18n="btnSaveFood">Save Food</span></button>
   </div>
 </div>
 
 <!-- ══ FOOD PICKER MODAL (trainer) ══ -->
 <div class="modal modal-wide" id="modal-food-picker">
   <div class="modal-header">
-    <h3><i class="ti ti-apple" style="color:var(--accent)"></i> Add Food from Database</h3>
+    <h3><i class="ti ti-apple" style="color:var(--accent)"></i> <span data-i18n="pickFoodTitle">Add Food from Database</span></h3>
     <button class="modal-close" onclick="closeFoodPicker()"><i class="ti ti-x"></i></button>
   </div>
   <div class="modal-body">
@@ -2886,7 +2879,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     <div id="food-picker-list-view">
       <div class="search-wrap" style="margin-bottom:10px">
         <i class="ti ti-search"></i>
-        <input type="text" id="food-picker-search" placeholder="Search foods..." oninput="filterFoodPicker(this.value)">
+        <input type="text" id="food-picker-search" placeholder="Search foods..." data-i18n="searchFoods" data-i18n-attr="placeholder" oninput="filterFoodPicker(this.value)">
       </div>
       <!-- Category filter pills -->
       <div id="food-picker-cats" style="display:flex;gap:6px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:8px;margin-bottom:10px;scrollbar-width:none;-webkit-overflow-scrolling:touch"></div>
@@ -2899,12 +2892,12 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
         <div id="food-qty-name" style="font-size:18px;font-weight:700;margin-bottom:4px"></div>
         <div id="food-qty-base" style="font-size:12px;color:var(--muted);margin-bottom:16px"></div>
         <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px">
-          <label style="font-size:14px;color:var(--muted)">Quantity:</label>
+          <label style="font-size:14px;color:var(--muted)" data-i18n="quantity">Quantity:</label>
           <input class="form-input" type="number" id="food-qty-input" style="width:100px;text-align:center;font-size:18px;font-weight:700" oninput="updateFoodQtyPreview()">
           <span id="food-qty-unit" style="font-size:14px;color:var(--muted)">g</span>
         </div>
         <div id="food-qty-preview" style="padding:14px;background:rgba(126,232,162,0.08);border-radius:10px;margin-bottom:16px"></div>
-        <button class="btn btn-primary btn-full" onclick="confirmFoodQty()"><i class="ti ti-plus"></i> Add to Meal</button>
+        <button class="btn btn-primary btn-full" onclick="confirmFoodQty()"><i class="ti ti-plus"></i> <span data-i18n="addToMeal">Add to Meal</span></button>
       </div>
     </div>
   </div>
@@ -2921,8 +2914,8 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
       Required: <code>name</code>, <code>category</code>, <code>calories</code>. Optional: <code>serving</code> (default 100), <code>unit</code> (default g), <code>protein</code>, <code>carbs</code>, <code>fat</code>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:10px">
-      <button class="btn btn-ghost btn-sm" onclick="downloadBulkTemplate('foods')"><i class="ti ti-download"></i> Template JSON</button>
-      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bulk-file-foods').click()"><i class="ti ti-upload"></i> Upload File</button>
+      <button class="btn btn-ghost btn-sm" onclick="downloadBulkTemplate('foods')"><i class="ti ti-download"></i> <span data-i18n="btnTemplate">Template JSON</span></button>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bulk-file-foods').click()"><i class="ti ti-upload"></i> <span data-i18n="btnUploadFile">Upload File</span></button>
       <input type="file" id="bulk-file-foods" accept=".json" style="display:none" onchange="loadBulkFile(this,'foods-textarea')">
     </div>
     <textarea id="foods-textarea" class="form-textarea" style="font-family:monospace;font-size:12px;min-height:220px;resize:vertical" placeholder='[{"name":"Chicken Breast","category":"Proteins","serving":100,"unit":"g","calories":165,"protein":31,"carbs":0,"fat":4}]'></textarea>
@@ -2933,8 +2926,8 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
-    <button class="btn btn-ghost" onclick="validateSectionBulk('foods')"><i class="ti ti-check"></i> Validate</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
+    <button class="btn btn-ghost" onclick="validateSectionBulk('foods')"><i class="ti ti-check"></i> <span data-i18n="btnValidate">Validate</span></button>
     <button class="btn btn-primary" onclick="runSectionBulkImport('foods')"><i class="ti ti-file-import"></i> Import Foods</button>
   </div>
 </div>
@@ -3092,13 +3085,13 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
   <!-- Profile Tabs -->
   <div style="display:flex;border-bottom:1px solid var(--border);padding:0 16px;flex-shrink:0">
     <button class="client-profile-tab active" id="cptab-assign" onclick="switchClientProfileTab('assign')">
-      <i class="ti ti-clipboard-list"></i> Assignments
+      <i class="ti ti-clipboard-list"></i> <span data-i18n="tabAssignments">Assignments</span>
     </button>
     <button class="client-profile-tab" id="cptab-training" onclick="switchClientProfileTab('training')">
-      <i class="ti ti-chart-line"></i> Training Log
+      <i class="ti ti-chart-line"></i> <span data-i18n="tabTrainingLog">Training Log</span>
     </button>
     <button class="client-profile-tab" id="cptab-body" onclick="switchClientProfileTab('body')">
-      <i class="ti ti-ruler" style=""></i> Body
+      <i class="ti ti-ruler" style=""></i> <span data-i18n="tabBody">Body</span>
     </button>
   </div>
   <!-- Tab content -->
@@ -3168,7 +3161,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </div>
 
     <div class="form-group" style="margin-top:16px">
-      <label class="form-label">Assign to Clients</label>
+      <label class="form-label" data-i18n="btnAssignClient">Assign to Clients</label>
       <div id="gw-client-picker" style="max-height:300px;overflow-y:auto"></div>
     </div>
 
@@ -3178,8 +3171,8 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
-    <button class="btn btn-primary" onclick="saveGroupWorkout()"><i class="ti ti-check"></i> Save & Assign</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
+    <button class="btn btn-primary" onclick="saveGroupWorkout()"><i class="ti ti-check"></i> <span data-i18n="btnSaveAssign">Save & Assign</span></button>
   </div>
 </div>
 
@@ -3236,8 +3229,8 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Cancel</button>
-    <button class="btn btn-primary" onclick="saveClientWorkoutLog()"><i class="ti ti-check"></i> Save Workout</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="btnCancel">Cancel</button>
+    <button class="btn btn-primary" onclick="saveClientWorkoutLog()"><i class="ti ti-check"></i> <span data-i18n="btnSaveWorkout">Save Workout</span></button>
   </div>
 </div>
 

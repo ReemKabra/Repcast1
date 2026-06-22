@@ -1,215 +1,7 @@
-/* ══════════════════════════════════════════════════════════
-   i18n — Internationalisation (English + Hebrew)
-   Usage: t('key') returns string in current language
-          applyLang(lang) swaps entire UI instantly
-══════════════════════════════════════════════════════════ */
-var _lang = localStorage.getItem('repcast_lang') || 
-  (navigator.language && navigator.language.startsWith('he') ? 'he' : 'en');
-
-/* ── Collection name helper ─────────────────────────────
-   col('menus')    → 'menus'    (English)  or  'menus_he'    (Hebrew)
-   col('programs') → 'programs' (English)  or  'programs_he' (Hebrew)
-   col('recipes')  → 'recipes'  (English)  or  'recipes_he'  (Hebrew)
-   col('foods')    → 'foods'    (English)  or  'foods_he'    (Hebrew)
-   col('masterLibrary') → 'masterLibrary'  or  'masterLibrary_he'
-   Research is always single collection.
-─────────────────────────────────────────────────────── */
-var _langCollections = ['menus','programs','recipes','foods','masterLibrary'];
-
-function col(name) {
-  if (_lang === 'he' && _langCollections.includes(name)) return name + '_he';
-  return name;
-}
-
-function colHe(name) { return name + '_he'; }
-function colEn(name) { return name; }
-
-var _i18n = {
-  en: {
-    /* ── Nav ── */
-    navLibrary:'Library', navRoutines:'Routines', navNutrition:'Nutrition',
-    navPrograms:'Programs', navRecipes:'Recipes', navResearch:'Research',
-    navClients:'Clients', navProfile:'Profile', navBilling:'Billing',
-    /* ── Library ── */
-    libraryTitle:'Exercise Library', searchExercises:'Search exercises...',
-    allExercises:'All Exercises', tabLibrary:'Library', tabMyVideos:'My Videos',
-    tabMyMenus:'My Menus', tabMyPrograms:'My Programs', tabMyRecipes:'My Recipes',
-    tabMyResearch:'My Research', uploadVideo:'Upload Video', addExercise:'Add Exercise',
-    /* ── Routines ── */
-    routinesTitle:'Routines Sent', noRoutines:'No routines sent yet.',
-    /* ── Nutrition ── */
-    nutritionTitle:'Nutrition Plans', searchMenus:'Search menus...',
-    addMenu:'Add Menu', noMenus:'No menus yet.',
-    pickFromDB:'Pick from Database', addManually:'Add Manually',
-    addMeal:'+ Add Meal', addFood:'Add Food',
-    mealName:'Meal name...', foodName:'Food name',
-    qty:'Qty', unit:'Unit', cal:'Cal', pro:'Pro', carbs:'Carbs', fat:'Fat',
-    colExercise:'Exercise', colMuscle:'Muscle', colSets:'Sets', colReps:'Reps', colRest:'Rest', colNotes:'Notes',
-    filterAll:'All', filterCut:'Cut', filterMaintain:'Maintain', filterBulk:'Bulk',
-    navGroupWorkouts:'Group Workouts', groupWorkoutsTitle:'Group Workouts',
-    createGroupWorkout:'Create Group Workout', logWorkout:'Log Workout',
-    todaysWorkout:"Today's Workout", freeWorkout:'Free Workout',
-    assignToClients:'Assign to Clients', submittedBy:'Submitted by',
-    filterStrength:'Strength', filterHypertrophy:'Hypertrophy', filterFatLoss:'Fat Loss',
-    libraryAll:'All Exercises', menuLibrary:'Menu Library', programsLib:'Programs',
-    colCalories:'Calories', colProtein:'Protein', colCarbs:'Carbs', colFat:'Fat', colQty:'Qty',
-    menuName:'Menu Name', menuGoal:'Goal', menuDesc:'Description',
-    goalCut:'Cut', goalBulk:'Bulk', goalMaintain:'Maintain',
-    saveMenu:'Save Menu', deleteMenu:'Delete Menu',
-    publicVisible:'Public — visible to all trainers',
-    /* ── Programs ── */
-    programsTitle:'Training Programs', addProgram:'Add Program',
-    noPrograms:'No programs yet.', weeksLabel:'weeks',
-    /* ── Recipes ── */
-    recipesTitle:'Recipe Library', addRecipe:'Add Recipe',
-    noRecipes:'No recipes yet.', prepTime:'Prep time',
-    /* ── Research ── */
-    researchTitle:'Research Library', addStudy:'Add Study',
-    noResearch:'No research yet.',
-    /* ── Clients ── */
-    clientsTitle:'My Clients', addClient:'Add Client',
-    noClients:'No clients yet.', viewClient:'View',
-    assignContent:'Assign Content Now', itemsAssigned:'items assigned',
-    nothingAssigned:'Nothing assigned yet',
-    /* ── Profile ── */
-    profileTitle:'Profile & Settings', saveProfile:'Save Changes',
-    fullName:'Full Name', phone:'Phone Number', businessName:'Business Name',
-    specialty:'Specialty', bio:'Bio / About',
-    /* ── Auth ── */
-    signIn:'Sign In', signUp:'Sign Up', signOut:'Sign Out',
-    emailLabel:'Email', passwordLabel:'Password', forgotPassword:'Forgot password?',
-    continueGoogle:'Continue with Google', alreadyAccount:'Already have an account?',
-    noAccount:"Don't have an account?", register:'Register',
-    /* ── Modals / Actions ── */
-    save:'Save', cancel:'Cancel', delete:'Delete', edit:'Edit', close:'Close',
-    confirm:'Confirm', back:'Back', add:'Add', remove:'Remove', search:'Search...',
-    validate:'Validate', import:'Import', download:'Download Template',
-    upload:'Upload File', loading:'Loading...', saving:'Saving...',
-    /* ── Toasts ── */
-    toastSaved:'Saved!', toastDeleted:'Deleted!', toastError:'Something went wrong.',
-    toastCopied:'Copied!', toastAssigned:'Assignment saved!',
-    /* ── Empty states ── */
-    emptyLibrary:'No exercises found.', emptyClients:'Add your first client to get started.',
-    emptyMenus:'Click "Add Menu" to create your first nutrition plan.',
-    emptyPrograms:'Click "Add Program" to get started.',
-    emptyRecipes:'Recipes will appear here once added.',
-    emptyResearch:'Research articles will appear here once added.',
-    /* ── Food picker ── */
-    pickFoodTitle:'Add Food from Database', searchFoods:'Search foods...',
-    quantity:'Quantity:', addToMeal:'Add to Meal',
-    /* ── Assign modal ── */
-    assignMenus:'Assign Menus', assignPrograms:'Assign Programs',
-    assignRecipes:'Assign Recipes', assignRoutines:'Assign Routines',
-    saveAssignment:'Save Assignment', allGoals:'All Goals',
-    /* ── Checkout ── */
-    reviewAssign:'Review & Assign', routineName:'Name this routine...',
-    saveRoutine:'Save Routine', assignToClient:'Assign to Client',
-    chooseClient:'— Choose client —',
-    /* ── Lang ── */
-    langBtn:'🇮🇱 עב', langName:'English',
-    /* ── Content lang filter ── */
-    langField:'Language', langEn:'English', langHe:'Hebrew', langBoth:'Both',
-  },
-  he: {
-    /* ── Nav ── */
-    navLibrary:'ספרייה', navRoutines:'שגרות', navNutrition:'תזונה',
-    navPrograms:'תוכניות', navRecipes:'מתכונים', navResearch:'מחקר',
-    navClients:'לקוחות', navProfile:'פרופיל', navBilling:'חיוב',
-    /* ── Library ── */
-    libraryTitle:'ספריית תרגילים', searchExercises:'חיפוש תרגילים...',
-    allExercises:'כל התרגילים', tabLibrary:'ספרייה', tabMyVideos:'הסרטונים שלי',
-    tabMyMenus:'התפריטים שלי', tabMyPrograms:'התוכניות שלי', tabMyRecipes:'המתכונים שלי',
-    tabMyResearch:'המחקר שלי', uploadVideo:'העלאת סרטון', addExercise:'הוסף תרגיל',
-    /* ── Routines ── */
-    routinesTitle:'שגרות שנשלחו', noRoutines:'לא נשלחו שגרות עדיין.',
-    /* ── Nutrition ── */
-    nutritionTitle:'תוכניות תזונה', searchMenus:'חיפוש תפריטים...',
-    addMenu:'הוסף תפריט', noMenus:'אין תפריטים עדיין.',
-    pickFromDB:'בחר ממאגר', addManually:'הוסף ידנית',
-    addMeal:'+ הוסף ארוחה', addFood:'הוסף מזון',
-    mealName:'שם ארוחה...', foodName:'שם מזון',
-    qty:'כמות', unit:'יחידה', cal:'קל׳', pro:'חלבון', carbs:'פחמימות', fat:'שומן',
-    menuName:'שם תפריט', menuGoal:'מטרה', menuDesc:'תיאור',
-    goalCut:'חיטוב', goalBulk:'מסה', goalMaintain:'שמירה',
-    saveMenu:'שמור תפריט', deleteMenu:'מחק תפריט',
-    publicVisible:'ציבורי — גלוי לכל המאמנים',
-    /* ── Programs ── */
-    programsTitle:'תוכניות אימון', addProgram:'הוסף תוכנית',
-    noPrograms:'אין תוכניות עדיין.', weeksLabel:'שבועות',
-    /* ── Recipes ── */
-    recipesTitle:'ספריית מתכונים', addRecipe:'הוסף מתכון',
-    noRecipes:'אין מתכונים עדיין.', prepTime:'זמן הכנה',
-    /* ── Research ── */
-    researchTitle:'ספריית מחקר', addStudy:'הוסף מחקר',
-    noResearch:'אין מחקרים עדיין.',
-    /* ── Clients ── */
-    clientsTitle:'הלקוחות שלי', addClient:'הוסף לקוח',
-    noClients:'הוסף את הלקוח הראשון שלך כדי להתחיל.', viewClient:'צפה',
-    assignContent:'הקצה תוכן עכשיו', itemsAssigned:'פריטים מוקצים',
-    nothingAssigned:'לא הוקצה כלום עדיין',
-    /* ── Profile ── */
-    profileTitle:'פרופיל והגדרות', saveProfile:'שמור שינויים',
-    fullName:'שם מלא', phone:'מספר טלפון', businessName:'שם העסק',
-    specialty:'התמחות', bio:'ביו / אודות',
-    /* ── Auth ── */
-    signIn:'התחברות', signUp:'הרשמה', signOut:'התנתק',
-    colExercise:'תרגיל', colMuscle:'שריר', colSets:'סטים', colReps:'חזרות', colRest:'מנוחה', colNotes:'הערות',
-    filterAll:'הכל', filterCut:'חיתוך', filterMaintain:'שמירה', filterBulk:'עלייה',
-    navGroupWorkouts:'אימוני קבוצה', groupWorkoutsTitle:'אימוני קבוצה',
-    createGroupWorkout:'צור אימון קבוצתי', logWorkout:'תעד אימון',
-    todaysWorkout:'אימון היום', freeWorkout:'אימון חופשי',
-    assignToClients:'שייך ללקוחות', submittedBy:'הוגש על ידי',
-    filterStrength:'כוח', filterHypertrophy:'היפרטרופיה', filterFatLoss:'שריפת שומן',
-    libraryAll:'כל התרגילים', menuLibrary:'ספריית תפריטים', programsLib:'תוכניות',
-    colCalories:'קלוריות', colProtein:'חלבון', colCarbs:'פחמימות', colFat:'שומן', colQty:'כמות',
-    emailLabel:'אימייל', passwordLabel:'סיסמה', forgotPassword:'שכחת סיסמה?',
-    continueGoogle:'המשך עם Google', alreadyAccount:'כבר יש לך חשבון?',
-    noAccount:'אין לך חשבון?', register:'הרשמה',
-    /* ── Modals / Actions ── */
-    save:'שמור', cancel:'ביטול', delete:'מחק', edit:'ערוך', close:'סגור',
-    confirm:'אישור', back:'חזרה', add:'הוסף', remove:'הסר', search:'חיפוש...',
-    validate:'אמת', import:'ייבוא', download:'הורד תבנית',
-    upload:'העלה קובץ', loading:'טוען...', saving:'שומר...',
-    /* ── Toasts ── */
-    toastSaved:'נשמר!', toastDeleted:'נמחק!', toastError:'משהו השתבש.',
-    toastCopied:'הועתק!', toastAssigned:'ההקצאה נשמרה!',
-    /* ── Empty states ── */
-    emptyLibrary:'לא נמצאו תרגילים.', emptyClients:'הוסף את הלקוח הראשון שלך.',
-    emptyMenus:'לחץ "הוסף תפריט" כדי ליצור תוכנית תזונה ראשונה.',
-    emptyPrograms:'לחץ "הוסף תוכנית" כדי להתחיל.',
-    emptyRecipes:'מתכונים יופיעו כאן לאחר הוספה.',
-    emptyResearch:'מאמרי מחקר יופיעו כאן לאחר הוספה.',
-    /* ── Food picker ── */
-    pickFoodTitle:'הוסף מזון ממאגר', searchFoods:'חפש מזון...',
-    quantity:'כמות:', addToMeal:'הוסף לארוחה',
-    /* ── Assign modal ── */
-    assignMenus:'הקצה תפריטים', assignPrograms:'הקצה תוכניות',
-    assignRecipes:'הקצה מתכונים', assignRoutines:'הקצה שגרות',
-    saveAssignment:'שמור הקצאה', allGoals:'כל המטרות',
-    /* ── Checkout ── */
-    reviewAssign:'סקירה והקצאה', routineName:'שם השגרה...',
-    saveRoutine:'שמור שגרה', assignToClient:'הקצה ללקוח',
-    chooseClient:'— בחר לקוח —',
-    /* ── Lang ── */
-    langBtn:'🇺🇸 EN', langName:'עברית',
-    /* ── Content lang filter ── */
-    langField:'שפה', langEn:'אנגלית', langHe:'עברית', langBoth:'שתיהן',
-  }
-};
-
-function t(key) {
-  return (_i18n[_lang] && _i18n[_lang][key]) || (_i18n.en[key]) || key;
-}
-
-// Pick Hebrew or English content field
-function ct(item, field) {
-  if (_lang === 'he' && item[field + '_he']) return item[field + '_he'];
-  return item[field] || '';
-}
-
 function applyLang(lang) {
   // Admin panel always stays in English regardless of saved language
-  if (state && state.isManager) lang = 'en';
+  // Guard with typeof — applyLang may run before `const state` initializes (defer timing)
+  if (typeof state !== 'undefined' && state && state.isManager) lang = 'en';
   var d = _i18n[lang] || _i18n.en;
   var isHe = lang === 'he';
 
@@ -227,6 +19,29 @@ function applyLang(lang) {
     var el = document.getElementById(id);
     if (el && d[key]) el.placeholder = d[key];
   }
+  // Show/hide language-specific form fields based on current lang
+  // .lang-field-en shown in English, .lang-field-he shown in Hebrew
+  document.querySelectorAll('.lang-field-en').forEach(function(el) {
+    el.style.display = isHe ? 'none' : '';
+  });
+  document.querySelectorAll('.lang-field-he').forEach(function(el) {
+    el.style.display = isHe ? '' : 'none';
+  });
+  // Auto-set hidden lang fields so saves write the right language to Firestore
+  ['admin-menu-lang', 'admin-prog-lang'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.value = lang;
+  });
+  // Bulk update all data-i18n elements
+  document.querySelectorAll('[data-i18n]').forEach(function(el) {
+    var key = el.getAttribute('data-i18n');
+    if (d[key]) el.textContent = d[key];
+  });
+  // Update select options with data-i18n-opt
+  document.querySelectorAll('[data-i18n-opt]').forEach(function(opt) {
+    var key = opt.getAttribute('data-i18n-opt');
+    if (d[key]) opt.textContent = d[key];
+  });
 
   // Nav labels
   setText('tnav-library-label',       'navLibrary');
@@ -238,6 +53,7 @@ function applyLang(lang) {
   setText('tnav-clients-label',       'navClients');
   setText('tnav-profile-label',       'navProfile');
   setText('tnav-group-workouts-label','navGroupWorkouts');
+  setText('tnav-billing-label',       'navBilling');
 
   // Mobile tabs
   setText('mtab-library-label',        'navLibrary');
@@ -249,19 +65,51 @@ function applyLang(lang) {
   setText('mtab-clients-label',        'navClients');
   setText('mtab-profile-label',        'navProfile');
   setText('mtab-group-workouts-label', 'navGroupWorkouts');
-  // client profile tab label (Hebrew: "הפרופיל שלי")
   var cpTabLabel = document.querySelector('#mtab-client-profile span');
   if (cpTabLabel) cpTabLabel.textContent = (lang === 'he') ? 'הפרופיל שלי' : 'My Profile';
 
   // View titles
-  setText('view-library-title',        'libraryTitle');
-  setText('view-routines-title',       'routinesTitle');
-  setText('view-nutrition-title',      'nutritionTitle');
-  setText('view-programs-title',       'programsTitle');
-  setText('view-recipes-title',        'recipesTitle');
-  setText('view-research-title',       'researchTitle');
-  setText('view-clients-title',        'clientsTitle');
-  setText('view-group-workouts-title', 'groupWorkoutsTitle');
+  setText('view-library-title',        'navLibrary');
+  setText('view-routines-title',       'titleRoutines');
+  setText('view-nutrition-title',      'titleMenuLib');
+  setText('view-programs-title',       'titlePrograms');
+  setText('view-recipes-title',        'titleRecipes');
+  setText('view-research-title',       'titleResearch');
+  setText('view-clients-title',        'titleClients');
+  setText('view-group-workouts-title', 'navGroupWorkouts');
+  var profileTitle = document.querySelector('#view-profile .view-title');
+  if (profileTitle) profileTitle.textContent = t('titleProfile');
+
+  // Library sub-tabs (need IDs in HTML)
+  setText('lib-tab-master',            'libMasterLib');
+  setText('lib-tab-videos',            'libMyVideos');
+  setText('lib-tab-menus',             'libMyMenus');
+  setText('lib-tab-programs',          'libMyPrograms');
+  setText('lib-tab-recipes',           'libMyRecipes');
+  setText('lib-tab-research',          'libMyResearch');
+
+  // Meal category filter tabs
+  setText('meal-tab-all',              'mealAll');
+  setText('meal-tab-breakfast',        'mealBreakfast');
+  setText('meal-tab-lunch',            'mealLunch');
+  setText('meal-tab-dinner',           'mealDinner');
+  setText('meal-tab-snacks',           'mealSnacks');
+  setText('meal-tab-post-workout',     'mealPostWorkout');
+  setText('meal-tab-protein-desserts', 'mealProteinDesserts');
+
+  // Profile field labels
+  setText('pf-label-name',      'lblFullName');
+  setText('pf-label-phone',     'lblPhone');
+  setText('pf-label-biz',       'lblBizName');
+  setText('pf-label-specialty', 'lblSpecialty');
+  setText('pf-label-bio',       'lblBio');
+
+  // Register form labels
+  setText('reg-label-name',      'lblFullName');
+  setText('reg-label-biz',       'lblBizName');
+  setText('reg-label-email',     'fldEmail');
+  setText('reg-label-pass',      'fldPassword');
+  setText('reg-label-specialty', 'lblSpecialty');
 
   // Search placeholders
   setPlaceholder('exercises-search', 'searchExercises');
@@ -294,6 +142,10 @@ function applyLang(lang) {
   if (window._renderRecipesView)  try { window._renderRecipesView(); }  catch(e){}
   if (window._renderResearchView) try { window._renderResearchView(); } catch(e){}
   if (window._renderClientsList)  try { window._renderClientsList(); }  catch(e){}
+  // Re-render open client profile modal if any
+  if (window._currentOpenClientId) {
+    try { openClientProfile(window._currentOpenClientId); } catch(e){}
+  }
 }
 
 async function setLang(newLang) {
@@ -357,7 +209,7 @@ async function setLang(newLang) {
 function toggleLang() { setLang(_lang === 'en' ? 'he' : 'en'); }
 
 /* Apply language on page load — after DOM ready */
-document.addEventListener('DOMContentLoaded', function() {
+function _initLangOnLoad() {
   applyLang(_lang);
   // Set initial button active state
   ['en','he'].forEach(function(l) {
@@ -373,7 +225,15 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   });
-});
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _initLangOnLoad);
+} else {
+  // DOM already parsed (defer script ran late). Defer to a macrotask so the
+  // REST of this script (including `const state` further down) finishes
+  // initializing first — otherwise applyLang() hits the temporal dead zone.
+  setTimeout(_initLangOnLoad, 0);
+}
 
 /* ==========================================================
    REPCAST — app.js  (production-ready)
@@ -1641,7 +1501,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
    function showProGate(viewId) {
      var names = {
-       nutrition:'Nutrition', programs:'Programs',
+       nutrition:'Nutrition', programs:t('programsLib'),
        recipes:'Recipes', research:'Research', clients:'Clients'
      };
      var modal = document.getElementById('modal-pro-gate');
@@ -1823,9 +1683,10 @@ document.addEventListener('DOMContentLoaded', function() {
      if (tab === 'myresearch') { items = researches.filter(function(r){ return r.createdBy === myUid; }); type = 'research'; }
 
      // Update section title
-     var sectionTitle = { mymenus:'My Menus', myprograms:'My Programs', myrecipes:'My Recipes', myresearch:'My Research' };
+     var sectionTitle = { mymenus: t('libMyMenus'), myprograms: t('libMyPrograms'), myrecipes: t('libMyRecipes'), myresearch: t('libMyResearch') };
+     var noItemsKey   = { mymenus: 'noMenusYet', myprograms: 'noProgramsYet', myrecipes: 'noRecipesYet', myresearch: 'noResearchYet' };
      var titleEl = document.getElementById('library-section-title');
-     if (titleEl) titleEl.textContent = sectionTitle[tab] || 'My Content';
+     if (titleEl) titleEl.textContent = sectionTitle[tab] || t('navLibrary');
      var countEl = document.getElementById('library-section-count');
      if (countEl) countEl.textContent = items.length + ' items';
 
@@ -1834,10 +1695,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 : tab==='myrecipes'  ? 'openAdminRecipeModal()'
                 : tab==='myresearch' ? 'openAdminResearchModal()'
                 : '';
-     var addLabel = tab==='mymenus'    ? 'Add Menu'
-                 : tab==='myprograms' ? 'Add Program'
-                 : tab==='myrecipes'  ? 'Add Recipe'
-                 : 'Add Study';
+     var addLabel = tab==='mymenus'    ? t('addMenu')
+                 : tab==='myprograms' ? t('addProgram')
+                 : tab==='myrecipes'  ? t('addRecipe')
+                 : t('addStudy');
      var addIcon  = tab==='mymenus'    ? 'ti-salad'
                  : tab==='myprograms' ? 'ti-calendar'
                  : tab==='myrecipes'  ? 'ti-chef-hat'
@@ -1859,8 +1720,8 @@ document.addEventListener('DOMContentLoaded', function() {
        grid.innerHTML = addBtn +
          '<div style="text-align:center;padding:40px 20px;color:var(--muted)">' +
            '<i class="ti ti-' + (tab==='mymenus'?'salad':tab==='myprograms'?'calendar':tab==='myrecipes'?'chef-hat':'book') + '" style="font-size:36px;display:block;margin-bottom:10px;opacity:0.25"></i>' +
-           '<p style="font-size:14px;font-weight:600;margin-bottom:4px">No ' + sectionTitle[tab] + ' yet</p>' +
-           '<p style="font-size:13px;opacity:0.7">Tap the button above to create one</p>' +
+           '<p style="font-size:14px;font-weight:600;margin-bottom:4px">' + t(noItemsKey[tab] || 'noMenusYet') + '</p>' +
+           '<p style="font-size:13px;opacity:0.7">' + t('tapToCreate') + '</p>' +
          '</div>';
        return;
      }
@@ -1885,7 +1746,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
      var meta = '';
      if (type === 'menu')    meta = (item.calories||'') + ' kcal';
-     if (type === 'program') meta = (item.weeks||'?') + ' weeks · ' + (item.goal||'');
+     if (type === 'program') meta = (item.weeks||'?') + ' ' + t('lblWeeks').toLowerCase() + ' · ' + t('goal' + (item.goal ? item.goal.charAt(0).toUpperCase() + item.goal.slice(1).replace('-','') : '')) || item.goal || '';
      if (type === 'recipe')  meta = (item.calories||0) + ' kcal · ' + (item.prepTime||'?') + ' min';
      if (type === 'research') meta = item.category || '';
 
@@ -1896,7 +1757,7 @@ document.addEventListener('DOMContentLoaded', function() {
        (photo ? '<img src="' + photo + '" style="width:100%;height:140px;object-fit:cover">' : '') +
        '<div style="padding:14px;flex:1;display:flex;flex-direction:column;gap:8px">' +
          // Title
-         '<div style="font-size:14px;font-weight:700;line-height:1.3">' + (item.name||item.title||'Untitled') + '</div>' +
+         '<div style="font-size:14px;font-weight:700;line-height:1.3">' + (_lang==='he'&&item.name_he ? item.name_he : (item.name||item.title||'Untitled')) + '</div>' +
          (meta ? '<div style="font-size:12px;color:var(--muted)">' + meta + '</div>' : '') +
          // Public/Private toggle
          '<div style="display:flex;align-items:center;gap:6px;margin-top:auto;padding-top:8px;border-top:1px solid var(--border);flex-wrap:wrap">' +
@@ -2022,7 +1883,7 @@ document.addEventListener('DOMContentLoaded', function() {
    
      const section = state.filterSub    ? state.filterSub
                    : state.filterMuscle ? capitalize(state.filterMuscle)
-                   : isMaster           ? 'All Exercises'
+                   : isMaster           ? t('allExercises')
                    :                      'My Custom Videos';
    
      const body = document.getElementById('library-body');
@@ -2118,10 +1979,10 @@ document.addEventListener('DOMContentLoaded', function() {
                </button>` : ''}
              ${isLocked
                ? `<button class="add-to-cart-btn" onclick="promptTrialOrUpgrade()" style="color:var(--warn);border-color:rgba(251,191,36,0.3)">
-                    <i class="ti ti-lock"></i> Locked
+                    <i class="ti ti-lock"></i> ${t('btnLocked')}
                   </button>`
                : `<button class="add-to-cart-btn${inCart ? ' added' : ''}" onclick="toggleCart('${ex.id}')">
-                       <i class="ti ti-${inCart ? 'check' : 'plus'}"></i> ${inCart ? 'Added' : 'Add'}
+                       <i class="ti ti-${inCart ? 'check' : 'plus'}"></i> ${inCart ? t('btnAdded') : t('btnAdd')}
                      </button>`
              }
            </div>
@@ -2282,7 +2143,7 @@ document.addEventListener('DOMContentLoaded', function() {
        const btn = card.querySelector('.add-to-cart-btn');
        if (btn) {
          btn.className = 'add-to-cart-btn' + (inCart ? ' added' : '');
-         btn.innerHTML = `<i class="ti ti-${inCart ? 'check' : 'plus'}"></i> ${inCart ? 'Added' : 'Add'}`;
+         btn.innerHTML = `<i class="ti ti-${inCart ? 'check' : 'plus'}"></i> ${inCart ? t('btnAdded') : t('btnAdd')}`;
        }
      }
    }
@@ -2296,16 +2157,16 @@ document.addEventListener('DOMContentLoaded', function() {
    function updateCartBar() {
      const n = state.cart.size;
      document.getElementById('cart-count').textContent = n;
-     document.getElementById('cart-label').textContent = n === 1 ? 'exercise selected' : 'exercises selected';
+     document.getElementById('cart-label').textContent = n === 1 ? t('exerciseSelected') : t('exercisesSelected');
      document.getElementById('cart-bar').classList.toggle('visible', n > 0);
      // Swap cart button label/action depending on role
      var cartBtn = document.querySelector('#cart-bar .btn-accent');
      if (cartBtn) {
        if (state.isClient) {
-         cartBtn.innerHTML = '<i class="ti ti-dumbbell"></i> Log Workout <i class="ti ti-arrow-right"></i>';
+         cartBtn.innerHTML = '<i class="ti ti-dumbbell"></i> ' + t('logWorkout') + ' <i class="ti ti-arrow-right"></i>';
          cartBtn.onclick = function(){ openClientCartCheckout(); };
        } else {
-         cartBtn.innerHTML = '<i class="ti ti-clipboard-list"></i> Review &amp; Assign <i class="ti ti-arrow-right"></i>';
+         cartBtn.innerHTML = '<i class="ti ti-clipboard-list"></i> ' + t('btnReviewAssign') + ' <i class="ti ti-arrow-right"></i>';
          cartBtn.onclick = function(){ openModal('checkout'); renderCheckout(); };
        }
      }
@@ -2328,6 +2189,9 @@ document.addEventListener('DOMContentLoaded', function() {
      document.getElementById('modal-' + name).classList.add('open');
      if (name === 'checkout')    renderCheckout();
      if (name === 'start-trial') prepareTrialModal();
+     // On native: hide the floating cart bar while a modal is open
+     var cb = document.getElementById('cart-bar');
+     if (cb) cb.classList.add('modal-hidden');
    }
    
    /* ── Prepare trial modal based on whether trial was already used ── */
@@ -2379,6 +2243,10 @@ document.addEventListener('DOMContentLoaded', function() {
    function closeAllModals() {
      document.getElementById('modal-backdrop').classList.remove('open');
      document.querySelectorAll('.modal').forEach(m => m.classList.remove('open'));
+     window._currentOpenClientId = null;
+     // Restore the floating cart bar
+     var cb = document.getElementById('cart-bar');
+     if (cb) cb.classList.remove('modal-hidden');
    }
 
    // Close only the food picker and return to the menu modal
@@ -2915,7 +2783,7 @@ document.addEventListener('DOMContentLoaded', function() {
        window._lastSavedRoutine = null;
 
        var msgEl = document.getElementById('checkout-success-msg');
-       if (msgEl) msgEl.textContent = '✓ Assigned to ' + (client.name || 'client') + '!';
+       if (msgEl) msgEl.textContent = '✓ ' + t('assignedTo') + ' ' + (client.name || 'client') + '!';
        showToast('✓ Assigned to ' + (client.name || 'client'));
        setTimeout(function(){ closeAllModals(); }, 1500);
      } catch(e) { showToast('Error: ' + e.message); }
@@ -2983,7 +2851,7 @@ document.addEventListener('DOMContentLoaded', function() {
        body.innerHTML = `
          <div class="empty-state">
            <div class="empty-icon"><i class="ti ti-list-check"></i></div>
-           <h3>No routines sent yet</h3>
+           <h3>' + t('noRoutinesYet') + '</h3>
            <p>Build a routine from the Exercise Library and send it to a client.</p>
            <button class="btn btn-primary" onclick="setView('library',document.getElementById('tnav-library'))">
              <i class="ti ti-layout-grid"></i> Browse Library
@@ -3527,7 +3395,7 @@ document.addEventListener('DOMContentLoaded', function() {
        const ex = MASTER_EXERCISES.find(e => e.id === id);
        if (!ex) return;
        titleEl.innerHTML = '<i class="ti ti-edit"></i> Edit Exercise';
-       saveBtn.innerHTML = '<i class="ti ti-check"></i> Save Changes';
+       saveBtn.innerHTML = '<i class="ti ti-check"></i> ' + t('saveProfile');
        document.getElementById('admin-edit-id').value      = ex.id;
        document.getElementById('admin-ex-title').value     = ex.title;
        document.getElementById('admin-ex-muscle').value    = ex.muscle;
@@ -3540,7 +3408,7 @@ document.addEventListener('DOMContentLoaded', function() {
        document.getElementById('admin-ex-video').value     = ex.videoURL || '';
      } else {
        titleEl.innerHTML = '<i class="ti ti-plus"></i> Add Exercise to Master Library';
-       saveBtn.innerHTML = '<i class="ti ti-check"></i> Save Exercise';
+       saveBtn.innerHTML = '<i class="ti ti-check"></i> ' + t('btnSaveExercise');
      }
    
      document.getElementById('modal-backdrop').classList.add('open');
@@ -3604,12 +3472,12 @@ document.addEventListener('DOMContentLoaded', function() {
          showToast('Video upload failed. Check Firebase Storage rules.');
          const saveBtn2 = document.getElementById('admin-modal-save-btn');
          saveBtn2.disabled = false;
-         saveBtn2.innerHTML = '<i class="ti ti-check"></i> Save Exercise';
+         saveBtn2.innerHTML = '<i class="ti ti-check"></i> ' + t('btnSaveExercise');
          return;
        }
        const saveBtn2 = document.getElementById('admin-modal-save-btn');
        saveBtn2.disabled = false;
-       saveBtn2.innerHTML = '<i class="ti ti-check"></i> Save Exercise';
+       saveBtn2.innerHTML = '<i class="ti ti-check"></i> ' + t('btnSaveExercise');
        if (fileInput) fileInput.value = '';
        document.getElementById('admin-file-label').textContent = 'Choose video file…';
      }
@@ -3846,7 +3714,7 @@ document.addEventListener('DOMContentLoaded', function() {
        showToast('Import failed: ' + (e.code || e.message));
      }
 
-     if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-file-import"></i> Import to Library'; }
+     if (btn) { btn.disabled = false; btn.innerHTML = '<i class="ti ti-file-import"></i> ' + t('btnImportLib'); }
    }
 
    /* ── Import new exercises into Firestore master library ─── */
@@ -4699,11 +4567,11 @@ setInterval(function() {
    FOOD PICKER — trainer picks from food database for menus
 ══════════════════════════════════════════════════════════ */
 var _foodPickerMealId = null;
-var _foodPickerCat    = 'All';
+var _foodPickerCat    = 'All'; // reset to translated on open
 
 async function openFoodPicker(mealId) {
   _foodPickerMealId = mealId;
-  _foodPickerCat    = 'All';
+  _foodPickerCat    = t('allFoodsTab') || 'All';
   // In Hebrew mode, ensure we have Hebrew foods loaded
   if (!foods.length) await loadFoods();
   // If Hebrew is active but foods are English (no lang field), reload from Hebrew collection
@@ -4735,7 +4603,9 @@ async function openFoodPicker(mealId) {
 function renderFoodPickerCategories() {
   var bar = document.getElementById('food-picker-cats');
   if (!bar) return;
-  var cats = ['All'].concat([...new Set(foods.map(function(f){ return f.category||'Other'; }))].sort());
+  var allLabel = t('allFoodsTab') || 'All';
+  if (_foodPickerCat === 'All') _foodPickerCat = allLabel;
+  var cats = [allLabel].concat([...new Set(foods.map(function(f){ return f.category||'Other'; }))].sort());
   bar.innerHTML = cats.map(function(c){
     return '<button class="food-cat-pill' + (c === _foodPickerCat ? ' active' : '') + '" onclick="setFoodPickerCat(\'' + c.replace(/'/g, '') + '\')">' + c + '</button>';
   }).join('');
@@ -4758,7 +4628,7 @@ function renderFoodPicker(query) {
   query = (query || '').toLowerCase().trim();
 
   var filtered = foods.filter(function(f){
-    var matchCat = (_foodPickerCat === 'All' || (f.category||'Other') === _foodPickerCat);
+    var allLabel2 = t('allFoodsTab')||'All'; var matchCat = (_foodPickerCat === 'All' || _foodPickerCat === allLabel2 || (f.category||'Other') === _foodPickerCat);
     var matchQ   = !query || (f.name||'').toLowerCase().includes(query) || (f.category||'').toLowerCase().includes(query);
     return matchCat && matchQ;
   });
@@ -4773,7 +4643,7 @@ function renderFoodPicker(query) {
 
   // Group by category (only when showing All)
   var html = '';
-  if (_foodPickerCat === 'All') {
+  if (_foodPickerCat === 'All' || _foodPickerCat === (t('allFoodsTab')||'All')) {
     var byCat = {};
     filtered.forEach(function(f){ (byCat[f.category||'Other'] = byCat[f.category||'Other'] || []).push(f); });
     Object.keys(byCat).sort().forEach(function(cat){
@@ -5043,7 +4913,7 @@ function renderMenuLibrary() {
         '<div>' +
           '<div class="menu-card-name">' + m.name + '</div>' +
           '<div class="menu-card-meta">' +
-            '<span class="tag" style="background:rgba(126,232,162,0.1);color:var(--accent);font-size:10px">' + (m.goal||'').toUpperCase() + '</span>' +
+            '<span class="tag" style="background:rgba(126,232,162,0.1);color:var(--accent);font-size:10px">' + (t('goal'+(m.goal||'').charAt(0).toUpperCase()+(m.goal||'').slice(1)+'Tag')||m.goal||'').toUpperCase() + '</span>' +
             (match ? '<span style="font-size:11px;color:var(--accent)">' + match + '</span>' : '') +
           '</div>' +
         '</div>' +
@@ -5080,7 +4950,7 @@ function calcMenuTotals(menu) {
 function openMenuDetail(id) {
   var menu = menus.find(function(m){ return m.id === id; });
   if (!menu) return;
-  document.getElementById('menu-detail-title').innerHTML = '<i class="ti ti-salad"></i> ' + menu.name;
+  document.getElementById('menu-detail-title').innerHTML = '<i class="ti ti-salad"></i> ' + (_lang==='he'&&menu.name_he ? menu.name_he : menu.name);
   var assignBtn = document.getElementById('menu-assign-btn');
   if (assignBtn) assignBtn.setAttribute('data-menu-id', id);
 
@@ -5206,7 +5076,7 @@ function renderAdminMenuList() {
   if (countEl) countEl.textContent = menus.length + ' menus';
 
   if (!menus.length) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="ti ti-salad"></i></div><h3>No menus yet</h3><p>Click "Add Menu" to create your first nutrition plan.</p></div>';
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="ti ti-salad"></i></div><h3>' + t('noMenusYet') + '</h3><p>' + t('tapToCreate') + '</p></div>';
     return;
   }
   var goalColors = { cut:'rgba(244,114,182,0.1)', maintain:'rgba(96,165,250,0.1)', bulk:'rgba(126,232,162,0.1)' };
@@ -5218,7 +5088,7 @@ function renderAdminMenuList() {
         (m.goal||'').toUpperCase() + ' · ' + totals.calories + ' kcal · P:' + totals.protein + 'g C:' + totals.carbs + 'g F:' + totals.fat + 'g' +
       '</div></div>' +
       '<div class="admin-actions">' +
-        '<button class="admin-action-btn edit" onclick="openAdminMenuModal(\'' + m.id + '\')"><i class="ti ti-edit"></i> Edit</button>' +
+        '<button class="admin-action-btn edit" onclick="openAdminMenuModal(\'' + m.id + '\')"><i class="ti ti-edit"></i> ' + t('btnEdit') + '</button>' +
         '<button class="admin-action-btn delete" onclick="deleteMenu(\'' + m.id + '\')"><i class="ti ti-trash"></i></button>' +
       '</div></div>';
   }).join('');
@@ -5246,12 +5116,14 @@ function openAdminMenuModal(id) {
     if (!menu) return;
     titleEl.innerHTML = '<i class="ti ti-edit"></i> Edit Menu';
     document.getElementById('admin-menu-name').value     = menu.name || '';
+    var heNameEl = document.getElementById('admin-menu-name-he');
+    if (heNameEl) heNameEl.value = menu.name_he || menu.name || '';
     document.getElementById('admin-menu-goal').value     = menu.goal || 'cut';
     document.getElementById('admin-menu-calories').value = menu.calories || '';
     document.getElementById('admin-menu-desc').value     = menu.desc || '';
     (menu.meals || []).forEach(function(meal){ renderMealEditor(meal); });
   } else {
-    titleEl.innerHTML = '<i class="ti ti-plus"></i> Add Menu Plan';
+    titleEl.innerHTML = '<i class="ti ti-plus"></i> ' + t('addMenuPlan');
     // Start with 4 default meals
     ['Breakfast','Lunch','Dinner','Snacks'].forEach(function(name){ renderMealEditor({ name:name, items:[] }); });
   }
@@ -5267,17 +5139,17 @@ function renderMealEditor(meal) {
   div.id = mealId;
   div.innerHTML =
     '<div class="meal-editor-header">' +
-      '<input class="form-input meal-name-input" value="' + (meal.name||'Meal') + '" placeholder="Meal name (e.g. Breakfast)" style="flex:1">' +
+      '<input class="form-input meal-name-input" value="' + (meal.name||t('mealBreakfast')) + '" placeholder="' + t('mealNamePlaceholder') + '" style="flex:1">' +
       '<button class="admin-action-btn delete" onclick="this.closest(\'.meal-editor\').remove()"><i class="ti ti-trash"></i></button>' +
     '</div>' +
     '<div class="food-table-header">' +
-      '<span style="flex:2">Food Name</span>' +
-      '<span style="width:60px">Qty</span>' +
-      '<span style="width:60px">Unit</span>' +
-      '<span style="width:65px">Calories</span>' +
+      '<span style="flex:2">' + t('colFoodName') + '</span>' +
+      '<span style="width:60px">' + t('colQty') + '</span>' +
+      '<span style="width:60px">' + t('colUnit') + '</span>' +
+      '<span style="width:65px">' + t('colCalories') + '</span>' +
       '<span style="width:55px">' + t('colProtein') + '</span>' +
-      '<span style="width:55px">Carbs</span>' +
-      '<span style="width:55px">Fat</span>' +
+      '<span style="width:55px">' + t('colCarbs') + '</span>' +
+      '<span style="width:55px">' + t('colFat') + '</span>' +
       '<span style="width:32px"></span>' +
     '</div>' +
     '<div class="food-items-container" id="items-' + mealId + '">' +
@@ -5285,10 +5157,10 @@ function renderMealEditor(meal) {
     '</div>' +
     '<div style="display:flex;gap:6px;margin-top:6px">' +
       '<button class="btn btn-primary btn-sm" data-mid="' + mealId + '" onclick="openFoodPicker(this.dataset.mid)">' +
-        '<i class="ti ti-search"></i> Pick from Database' +
+        '<i class="ti ti-search"></i> ' + t('pickFromDB') +
       '</button>' +
       '<button class="btn btn-ghost btn-sm" data-mid="' + mealId + '" onclick="addFoodItem(this.dataset.mid)">' +
-        '<i class="ti ti-plus"></i> Add Manually' +
+        '<i class="ti ti-plus"></i> ' + t('addManually') +
       '</button>' +
     '</div>';
   container.appendChild(div);
@@ -5332,10 +5204,10 @@ function updateAdminMenuPreview() {
     macroChartHTML(Math.round(pro), Math.round(car), Math.round(fat), Math.round(cal), 140) +
     '<div class="menu-grand-total" style="margin-top:12px">' +
       '<div class="menu-grand-macros">' +
-        '<div class="menu-grand-macro"><span class="menu-grand-val">' + Math.round(cal) + '</span><em>Calories</em></div>' +
+        '<div class="menu-grand-macro"><span class="menu-grand-val">' + Math.round(cal) + '</span><em>' + t('colCalories') + '</em></div>' +
         '<div class="menu-grand-macro" style="color:#60A5FA"><span class="menu-grand-val">' + Math.round(pro) + 'g</span><em>' + t('colProtein') + '</em></div>' +
-        '<div class="menu-grand-macro" style="color:#FBBF24"><span class="menu-grand-val">' + Math.round(car) + 'g</span><em>Carbs</em></div>' +
-        '<div class="menu-grand-macro" style="color:#F472B6"><span class="menu-grand-val">' + Math.round(fat) + 'g</span><em>Fat</em></div>' +
+        '<div class="menu-grand-macro" style="color:#FBBF24"><span class="menu-grand-val">' + Math.round(car) + 'g</span><em>' + t('colCarbs') + '</em></div>' +
+        '<div class="menu-grand-macro" style="color:#F472B6"><span class="menu-grand-val">' + Math.round(fat) + 'g</span><em>' + t('colFat') + '</em></div>' +
       '</div>' +
     '</div>';
   var calEl = document.getElementById('admin-menu-calories');
@@ -5344,10 +5216,14 @@ function updateAdminMenuPreview() {
 
 /* ── ADMIN: Save menu to Firestore ───────────────────── */
 async function saveAdminMenu() {
-  var name = document.getElementById('admin-menu-name').value.trim();
+  var isHe = (_lang === 'he');
+  // Pick name from the active language field
+  var nameEn = (document.getElementById('admin-menu-name')||{}).value || '';
+  var nameHe = (document.getElementById('admin-menu-name-he')||{}).value || '';
+  var name = isHe ? nameHe.trim() : nameEn.trim();
   var goal = document.getElementById('admin-menu-goal').value;
   var desc = document.getElementById('admin-menu-desc').value.trim();
-  if (!name) { showToast('Please enter a menu name.'); return; }
+  if (!name) { showToast(isHe ? 'נא להזין שם תפריט.' : 'Please enter a menu name.'); return; }
 
   // Collect meals from editor
   var meals = [];
@@ -5372,12 +5248,12 @@ async function saveAdminMenu() {
 
   var langEl = document.getElementById('admin-menu-lang');
   var menuData = {
-    name:      name,
-    name_he:   (document.getElementById('admin-menu-name-he')||{}).value || '',
+    name:      isHe ? nameEn || name : name,
+    name_he:   isHe ? name : nameHe,
     goal:      goal,
     desc:      desc,
     meals:     meals,
-    lang:      langEl ? langEl.value : 'en',
+    lang:      langEl ? langEl.value || _lang : _lang,
     updatedAt: new Date().toISOString(),
   };
 
@@ -5497,14 +5373,14 @@ function renderProgramsView() {
   }
   if (!allPrograms.length) {
     var isNative = document.documentElement.classList.contains('is-native');
-    body.innerHTML = '<div style="text-align:center;padding:40px 20px"><div class="empty-icon"><i class="ti ti-calendar"></i></div><h3>No programs yet</h3><p style="color:var(--muted);margin-bottom:20px">Training programs will appear here.</p>' +
-      ((isNative || state.isClient) ? '' : '<button class="btn btn-primary" onclick="openCreateOwnProgram()"><i class="ti ti-plus"></i> Create My Own Program</button>') +
+    body.innerHTML = '<div style="text-align:center;padding:40px 20px"><div class="empty-icon"><i class="ti ti-calendar"></i></div><h3>' + t('noProgramsYet') + '</h3><p style="color:var(--muted);margin-bottom:20px">' + t('tapToCreate') + '</p>' +
+      ((isNative || state.isClient) ? '' : '<button class="btn btn-primary" onclick="openCreateOwnProgram()"><i class="ti ti-plus"></i> ' + t('btnCreateProgram') + '</button>') +
     '</div>';
     return;
   }
   var gc = { strength:'#F472B6', hypertrophy:'#A78BFA', 'fat-loss':'#7EE8A2', endurance:'#60A5FA', rehab:'#FBBF24' };
   body.innerHTML =
-    ((document.documentElement.classList.contains('is-native') || state.isClient) ? '' : '<div style="display:flex;justify-content:flex-end;padding:0 24px 12px"><button class="btn btn-ghost" onclick="openCreateOwnProgram()"><i class="ti ti-plus"></i> Create My Own Program</button></div>') +
+    ((document.documentElement.classList.contains('is-native') || state.isClient) ? '' : '<div style="display:flex;justify-content:flex-end;padding:0 24px 12px"><button class="btn btn-ghost" onclick="openCreateOwnProgram()"><i class="ti ti-plus"></i> ' + t('btnCreateProgram') + '</button></div>') +
     '<div class="resource-grid" style="padding:0 24px">' +
     allPrograms.map(function(p) {
       var col = gc[p.goal] || '#7EE8A2';
@@ -5512,13 +5388,13 @@ function renderProgramsView() {
       return '<div class="resource-card" onclick="openProgramDetail(\'' + p.id + '\')">' +
         '<div class="resource-card-header" style="background:linear-gradient(135deg,' + col + '22,' + col + '08)">' +
           '<i class="ti ti-calendar resource-card-icon" style="color:' + col + '"></i>' +
-          '<div style="flex:1"><div class="resource-card-name">' + p.name + '</div>' +
-          '<div class="resource-card-meta">' + (p.weeks||'?') + ' weeks &middot; ' + (p.days||p.trainingDays&&p.trainingDays.length||'?') + 'x/week &middot; ' + (p.level||'') + '</div></div>' +
+          '<div style="flex:1"><div class="resource-card-name">' + (_lang==='he'&&p.name_he ? p.name_he : p.name) + '</div>' +
+          '<div class="resource-card-meta">' + (p.weeks||'?') + ' ' + t('weeksLabel') + ' &middot; ' + (p.days||p.trainingDays&&p.trainingDays.length||'?') + 'x/' + t('weeksLabel') + ' &middot; ' + (p.level||'') + '</div></div>' +
         '</div>' +
         (splits.length ? '<div class="program-splits">' + splits.slice(0,5).map(function(s){ return '<span class="split-pill">' + s + '</span>'; }).join('') + '</div>' : '') +
         '<div class="resource-card-body">' + (p.desc||'').slice(0,100) + (p.desc&&p.desc.length>100?'...':'') + '</div>' +
         '<div class="resource-card-tags">' +
-          '<span class="tag" style="background:' + col + '22;color:' + col + '">' + (p.goal||'').replace(/-/g,' ').toUpperCase() + '</span>' +
+          '<span class="tag" style="background:' + col + '22;color:' + col + '">' + (t('goal'+(p.goal||'').replace('-','').split('-').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join('')+'Tag')||(p.goal||'').replace(/-/g,' ')).toUpperCase() + '</span>' +
           (p._isPersonal ? '<span class="tag" style="background:rgba(96,165,250,0.1);color:#60A5FA">MY PROGRAM</span>' : '') +
         ((myUid && p.createdBy === myUid) ? '<span class="tag" style="background:rgba(255,107,107,0.1);color:var(--danger);cursor:pointer" onclick="event.stopPropagation();deleteTrainerProgram(\'' + p.id + '\')"><i class="ti ti-trash" style="font-size:10px"></i> Delete</span>' : '') +
         '</div>' +
@@ -5529,13 +5405,13 @@ function renderProgramsView() {
 function openProgramDetail(id) {
   var p = programs.find(function(x){ return x.id === id; });
   if (!p) return;
-  document.getElementById('program-detail-title').innerHTML = '<i class="ti ti-calendar"></i> ' + p.name;
+  document.getElementById('program-detail-title').innerHTML = '<i class="ti ti-calendar"></i> ' + (_lang==='he'&&p.name_he ? p.name_he : p.name);
   var el = document.getElementById('program-detail-body');
   el.setAttribute('data-id', id);
   var days = p.trainingDays || [];
   el.innerHTML =
     '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px">' +
-      '<div class="bmr-stat"><div class="bmr-stat-val">' + (p.weeks||'?') + '</div><div class="bmr-stat-label">Weeks</div></div>' +
+      '<div class="bmr-stat"><div class="bmr-stat-val">' + (p.weeks||'?') + '</div><div class="bmr-stat-label">' + t('lblWeeks') + '</div></div>' +
       '<div class="bmr-stat"><div class="bmr-stat-val">' + (days.length||p.days||'?') + '</div><div class="bmr-stat-label">Days/week</div></div>' +
       '<div class="bmr-stat accent"><div class="bmr-stat-val">' + (p.goal||'').replace('-',' ') + '</div><div class="bmr-stat-label">Goal</div></div>' +
       '<div class="bmr-stat"><div class="bmr-stat-val">' + (p.level||'?') + '</div><div class="bmr-stat-label">Level</div></div>' +
@@ -5578,7 +5454,7 @@ async function assignProgram() {
   modal.className = 'modal';
   modal.style.cssText = 'max-width:400px';
   modal.innerHTML =
-    '<div class="modal-header"><h3><i class="ti ti-user-check"></i> Assign to Client</h3>' +
+    '<div class="modal-header"><h3><i class="ti ti-user-check"></i> ' + t('btnAssignClient') + '</h3>' +
     '<button class="modal-close" onclick="this.closest(\'.modal\').remove()"><i class="ti ti-x"></i></button></div>' +
     '<div class="modal-body">' +
       '<p style="color:var(--muted);font-size:13px;margin-bottom:14px">Assign <strong>' + prog.name + '</strong> to:</p>' +
@@ -5641,7 +5517,7 @@ function addProgramDay(dayData) {
     '</div>' +
     '<div class="prog-ex-header"><span style="flex:2;min-width:230px">' + ((_lang==='he')?'תרגיל':'Exercise') + '</span><span style="width:52px">' + ((_lang==='he')?'סטים':'Sets') + '</span><span style="width:60px">' + ((_lang==='he')?'חזרות':'Reps') + '</span><span style="width:60px">' + ((_lang==='he')?'מנוחה':'Rest') + '</span><span style="flex:1">' + ((_lang==='he')?'הערות':'Notes') + '</span><span style="width:32px"></span></div>' +
     '<div class="prog-ex-container" id="pex-' + dayId + '">' + exHTML + '</div>' +
-    '<button class="btn btn-ghost btn-sm" data-dayid="' + dayId + '" onclick="addProgramExercise(this.dataset.dayid)" style="margin-top:6px"><i class="ti ti-plus"></i> Add Exercise</button>';
+    '<button class="btn btn-ghost btn-sm" data-dayid="' + dayId + '" onclick="addProgramExercise(this.dataset.dayid)" style="margin-top:6px"><i class="ti ti-plus"></i> ' + t('addExercise') + '</button>';
   container.appendChild(div);
 }
 
@@ -5685,12 +5561,14 @@ function openAdminProgramModal(id) {
   document.getElementById('prog-goal').value  = 'strength';
   document.getElementById('prog-level').value = 'Intermediate';
   document.getElementById('prog-exercises-container').innerHTML = '';
-  document.getElementById('admin-program-title').innerHTML = id ? '<i class="ti ti-edit"></i> Edit Program' : '<i class="ti ti-plus"></i> Add Program';
+  document.getElementById('admin-program-title').innerHTML = id ? '<i class="ti ti-edit"></i> ' + t('btnEdit') + ' Program' : '<i class="ti ti-plus"></i> ' + t('addProgram');
   if (id) {
     var allP = programs.concat(JSON.parse(localStorage.getItem('repcast_my_programs')||'[]'));
     var p = allP.find(function(x){ return x.id === id; });
     if (p) {
       document.getElementById('prog-name').value     = p.name     || '';
+      var pnHe = document.getElementById('prog-name-he');
+      if (pnHe) pnHe.value = p.name_he || p.name || '';
       document.getElementById('prog-weeks').value    = p.weeks    || '';
       document.getElementById('prog-days').value     = p.days     || '';
       document.getElementById('prog-goal').value     = p.goal     || 'strength';
@@ -5709,8 +5587,11 @@ function openAdminProgramModal(id) {
 }
 
 async function saveAdminProgram() {
-  var name = document.getElementById('prog-name').value.trim();
-  if (!name) { showToast('Please enter a program name.'); return; }
+  var isHe = (_lang === 'he');
+  var nameEn = (document.getElementById('prog-name')||{}).value || '';
+  var nameHe = (document.getElementById('prog-name-he')||{}).value || '';
+  var name = isHe ? nameHe.trim() : nameEn.trim();
+  if (!name) { showToast(isHe ? 'נא להזין שם תוכנית.' : 'Please enter a program name.'); return; }
   // Collect training days
   var trainingDays = [];
   document.querySelectorAll('#prog-days-editor .meal-editor').forEach(function(dayEl) {
@@ -5726,7 +5607,10 @@ async function saveAdminProgram() {
     if (dayName) trainingDays.push({ name:dayName, muscleGroup:muscle, exercises:exercises });
   });
   var data = {
-    name, weeks: parseInt(document.getElementById('prog-weeks').value)||0,
+    name: isHe ? (nameEn || name) : name,
+    name_he: isHe ? name : (nameHe || ''),
+    lang: _lang,
+    weeks: parseInt(document.getElementById('prog-weeks').value)||0,
     days: trainingDays.length,
     goal: document.getElementById('prog-goal').value,
     level: document.getElementById('prog-level').value,
@@ -5749,16 +5633,16 @@ function renderAdminProgramsList() {
   if (!el) return;
   var cnt = document.getElementById('admin-programs-count');
   if (cnt) cnt.textContent = programs.length + ' programs';
-  if (!programs.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="ti ti-calendar"></i></div><h3>No programs yet</h3></div>'; return; }
+  if (!programs.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="ti ti-calendar"></i></div><h3>' + t('noProgramsYet') + '</h3></div>'; return; }
   var gc = { strength:'rgba(244,114,182,0.08)', hypertrophy:'rgba(167,139,250,0.08)', 'fat-loss':'rgba(126,232,162,0.08)', endurance:'rgba(96,165,250,0.08)', rehab:'rgba(251,191,36,0.08)' };
   el.innerHTML = programs.map(function(p) {
     var days = (p.trainingDays||[]).length || p.days || 0;
     var totalEx = (p.trainingDays||[]).reduce(function(s,d){ return s+(d.exercises||[]).length; },0);
     return '<div class="admin-menu-row" style="background:' + (gc[p.goal]||'var(--surface)') + '">' +
       '<div style="flex:1"><strong>' + p.name + '</strong>' +
-      '<div style="font-size:12px;color:var(--muted);margin-top:3px">' + (p.goal||'').replace('-',' ') + ' &middot; ' + (p.weeks||0) + ' weeks &middot; ' + days + ' days/week &middot; ' + totalEx + ' exercises &middot; ' + (p.level||'') + '</div></div>' +
+      '<div style="font-size:12px;color:var(--muted);margin-top:3px">' + (p.goal||'').replace('-',' ') + ' &middot; ' + (p.weeks||0) + ' ' + t('weeksLabel') + ' &middot; ' + days + ' ' + t('fldProgDays') + ' &middot; ' + totalEx + ' exercises &middot; ' + (p.level||'') + '</div></div>' +
       '<div class="admin-actions">' +
-        '<button class="admin-action-btn edit" onclick="openAdminProgramModal(\'' + p.id + '\')"><i class="ti ti-edit"></i> Edit</button>' +
+        '<button class="admin-action-btn edit" onclick="openAdminProgramModal(\'' + p.id + '\')"><i class="ti ti-edit"></i> ' + t('btnEdit') + '</button>' +
         '<button class="admin-action-btn delete" onclick="deleteProgram(\'' + p.id + '\')"><i class="ti ti-trash"></i></button>' +
       '</div></div>';
   }).join('');
@@ -5849,9 +5733,9 @@ function renderRecipesView() {
         '<i class="ti ti-chef-hat resource-card-icon" style="color:' + col + '"></i>' +
         '<div><div class="resource-card-name">' + r.name + '</div><div class="resource-card-meta">' + (r.prepTime||'?') + ' min &middot; ' + (r.calories||0) + ' kcal</div></div>' +
       '</div>' +
-      '<div class="menu-card-macros"><div class="menu-macro"><span>' + (r.protein||0) + 'g</span><em>Protein</em></div><div class="menu-macro"><span>' + (r.carbs||0) + 'g</span><em>Carbs</em></div><div class="menu-macro"><span>' + (r.fat||0) + 'g</span><em>Fat</em></div></div>' +
+      '<div class="menu-card-macros"><div class="menu-macro"><span>' + (r.protein||0) + 'g</span><em>' + t('colProtein') + '</em></div><div class="menu-macro"><span>' + (r.carbs||0) + 'g</span><em>' + t('colCarbs') + '</em></div><div class="menu-macro"><span>' + (r.fat||0) + 'g</span><em>' + t('colFat') + '</em></div></div>' +
       '<div class="resource-card-tags">' +
-        '<span class="tag" style="background:' + col + '22;color:' + col + '">' + (r.category||'').toUpperCase() + '</span>' +
+        '<span class="tag" style="background:' + col + '22;color:' + col + '">' + (t('cat'+(r.category||'').charAt(0).toUpperCase()+(r.category||'').slice(1)) || (r.category||'').toUpperCase()) + '</span>' +
         (!r.isPublic && canEditR ? '<span class="tag" style="background:rgba(251,191,36,0.1);color:#FBBF24">🔒 Private</span>' : '') +
       '</div>' +
       (canEditR ? '<div class="menu-card-actions">' +
@@ -5885,9 +5769,9 @@ function openRecipeDetail(id) {
     mediaHTML +
     '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px">' +
       '<div class="bmr-stat accent"><div class="bmr-stat-val">' + (r.calories||0) + '</div><div class="bmr-stat-label">Calories</div></div>' +
-      '<div class="bmr-stat"><div class="bmr-stat-val">' + (r.protein||0) + 'g</div><div class="bmr-stat-label">Protein</div></div>' +
-      '<div class="bmr-stat"><div class="bmr-stat-val">' + (r.carbs||0) + 'g</div><div class="bmr-stat-label">Carbs</div></div>' +
-      '<div class="bmr-stat"><div class="bmr-stat-val">' + (r.fat||0) + 'g</div><div class="bmr-stat-label">Fat</div></div>' +
+      '<div class="bmr-stat"><div class="bmr-stat-val">' + (r.protein||0) + 'g</div><div class="bmr-stat-label">' + t('colProtein') + '</div></div>' +
+      '<div class="bmr-stat"><div class="bmr-stat-val">' + (r.carbs||0) + 'g</div><div class="bmr-stat-label">' + t('colCarbs') + '</div></div>' +
+      '<div class="bmr-stat"><div class="bmr-stat-val">' + (r.fat||0) + 'g</div><div class="bmr-stat-label">' + t('colFat') + '</div></div>' +
       '<div class="bmr-stat"><div class="bmr-stat-val">' + (r.prepTime||'?') + '</div><div class="bmr-stat-label">Minutes</div></div>' +
     '</div>' +
     '<div class="recipe-two-col">' +
@@ -5976,7 +5860,7 @@ function renderAdminRecipesList() {
   if (!el) return;
   var cnt = document.getElementById('admin-recipes-count');
   if (cnt) cnt.textContent = recipes.length + ' recipes';
-  if (!recipes.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="ti ti-chef-hat"></i></div><h3>No recipes yet</h3></div>'; return; }
+  if (!recipes.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="ti ti-chef-hat"></i></div><h3>' + t('noRecipesYet') + '</h3></div>'; return; }
   el.innerHTML = recipes.map(function(r) {
     return '<div class="admin-menu-row"><div style="flex:1"><strong>' + r.name + '</strong><div style="font-size:12px;color:var(--muted);margin-top:3px">' + (r.category||'') + ' &middot; ' + (r.calories||0) + ' kcal</div></div>' +
       '<div class="admin-actions"><button class="admin-action-btn edit" onclick="openAdminRecipeModal(\'' + r.id + '\')"><i class="ti ti-edit"></i></button><button class="admin-action-btn delete" onclick="deleteRecipe(\'' + r.id + '\')"><i class="ti ti-trash"></i></button></div></div>';
@@ -6021,7 +5905,7 @@ function renderResearchView() {
   if (!body) return;
   var pool = researches.filter(function(r){ var rl = r.lang || 'both'; return rl === _lang || rl === 'both'; });
   if (researchQuery) pool = pool.filter(function(r){ return (r.title||'').toLowerCase().includes(researchQuery)||(r.summary||'').toLowerCase().includes(researchQuery); });
-  if (!pool.length) { body.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="ti ti-microscope"></i></div><h3>No studies found</h3></div>'; return; }
+  if (!pool.length) { body.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="ti ti-microscope"></i></div><h3>' + t('noResearchYet') + '</h3></div>'; return; }
   var cc = { strength:'#F472B6', hypertrophy:'#A78BFA', nutrition:'#7EE8A2', recovery:'#60A5FA', injury:'#FBBF24', cardio:'#3ECFCF', physio:'#FB923C', psychology:'#EC4899' };
   body.innerHTML = '<div class="research-list">' + pool.map(function(r) {
     var col = cc[r.category] || 'var(--accent)';
@@ -6029,7 +5913,7 @@ function renderResearchView() {
       '<div class="research-card-header">' +
         '<div style="flex:1"><div class="research-title">' + (r.title||'') + '</div>' +
         '<div class="research-meta">' + [r.authors,r.journal,r.year].filter(Boolean).join(' &middot; ') + '</div></div>' +
-        '<span class="tag" style="background:' + col + '22;color:' + col + ';flex-shrink:0">' + (r.category||'').toUpperCase() + '</span>' +
+        '<span class="tag" style="background:' + col + '22;color:' + col + ';flex-shrink:0">' + (t('cat'+(r.category||'').charAt(0).toUpperCase()+(r.category||'').slice(1)) || (r.category||'').toUpperCase()) + '</span>' +
       '</div>' +
       '<div class="research-summary">' + (r.summary||'').slice(0,220) + '...</div>' +
       '<div class="research-footer">' +
@@ -6048,7 +5932,7 @@ function openAdminResearchModal(id) {
   document.getElementById('admin-research-id').value = id || '';
   ['research-title-input','research-authors','research-year','research-journal','research-summary','research-url','research-application'].forEach(function(x){ document.getElementById(x).value=''; });
   document.getElementById('research-cat').value = 'strength';
-  document.getElementById('admin-research-title').innerHTML = id ? '<i class="ti ti-edit"></i> Edit Study' : '<i class="ti ti-plus"></i> Add Study';
+  document.getElementById('admin-research-title').innerHTML = id ? '<i class="ti ti-edit"></i> ' + t('btnEdit') + ' ' + t('addStudy') : '<i class="ti ti-plus"></i> ' + t('addStudy');
   if (id) {
     var r = researches.find(function(x){ return x.id === id; });
     if (r) { document.getElementById('research-title-input').value=r.title||'';
@@ -6112,7 +5996,7 @@ function addProgExercise(dayData) {
       ((dayData.exercises||[]).map(function(ex){ return progExRowHTML(dayId, ex); }).join('')) +
     '</div>' +
     '<button class="btn btn-ghost btn-sm" data-day="' + dayId + '" onclick="addProgExRow(this.dataset.day)" style="margin-top:6px">' +
-      '<i class="ti ti-plus"></i> Add Exercise' +
+      '<i class="ti ti-plus"></i> ' + t('addExercise') +
     '</button>';
   container.appendChild(div);
 }
@@ -6319,12 +6203,14 @@ function openAdminProgramModal(id) {
   document.getElementById('prog-goal').value  = 'strength';
   document.getElementById('prog-level').value = 'Intermediate';
   document.getElementById('prog-exercises-container').innerHTML = '';
-  document.getElementById('admin-program-title').innerHTML = id ? '<i class="ti ti-edit"></i> Edit Program' : '<i class="ti ti-plus"></i> Add Program';
+  document.getElementById('admin-program-title').innerHTML = id ? '<i class="ti ti-edit"></i> ' + t('btnEdit') + ' Program' : '<i class="ti ti-plus"></i> ' + t('addProgram');
 
   if (id) {
     var p = programs.find(function(x){ return x.id === id; });
     if (p) {
       document.getElementById('prog-name').value     = p.name     || '';
+      var pnHe = document.getElementById('prog-name-he');
+      if (pnHe) pnHe.value = p.name_he || p.name || '';
       document.getElementById('prog-weeks').value    = p.weeks    || '';
       document.getElementById('prog-days').value     = p.days     || '';
       document.getElementById('prog-goal').value     = p.goal     || 'strength';
@@ -6359,7 +6245,7 @@ function openProgramDetail(id) {
   }
   if (!p) { showToast('Program not found'); return; }
 
-  document.getElementById('program-detail-title').innerHTML = '<i class="ti ti-calendar"></i> ' + p.name;
+  document.getElementById('program-detail-title').innerHTML = '<i class="ti ti-calendar"></i> ' + (_lang==='he'&&p.name_he ? p.name_he : p.name);
   var el = document.getElementById('program-detail-body');
   el.setAttribute('data-id', id);
 
@@ -6368,7 +6254,7 @@ function openProgramDetail(id) {
   goalFull = goalFull.charAt(0).toUpperCase() + goalFull.slice(1);
   var html =
     '<div style="display:flex;gap:8px;flex-wrap:nowrap;margin-bottom:16px;overflow-x:auto">' +
-      '<div class="bmr-stat" style="min-width:56px;text-align:center"><div class="bmr-stat-val">' + (p.weeks||'?') + '</div><div class="bmr-stat-label">Weeks</div></div>' +
+      '<div class="bmr-stat" style="min-width:56px;text-align:center"><div class="bmr-stat-val">' + (p.weeks||'?') + '</div><div class="bmr-stat-label">' + t('lblWeeks') + '</div></div>' +
       '<div class="bmr-stat" style="min-width:56px;text-align:center"><div class="bmr-stat-val">' + (p.trainingDays&&p.trainingDays.length||p.days||'?') + '</div><div class="bmr-stat-label">Days</div></div>' +
       '<div class="bmr-stat accent" style="flex:1;text-align:center"><div class="bmr-stat-val" style="font-size:13px">' + goalFull + '</div><div class="bmr-stat-label">Goal</div></div>' +
       '<div class="bmr-stat" style="flex:1;text-align:center"><div class="bmr-stat-val" style="font-size:13px">' + (p.level||'?') + '</div><div class="bmr-stat-label">Level</div></div>' +
@@ -6688,19 +6574,19 @@ function macroChartHTML(protein, carbs, fat, calories, size) {
     '<div class="macro-legend">' +
       '<div class="macro-legend-item">' +
         '<span class="macro-legend-dot" style="background:#60A5FA"></span>' +
-        '<span class="macro-legend-label">Protein</span>' +
+        '<span class="macro-legend-label">' + t('colProtein') + '</span>' +
         '<span class="macro-legend-val">' + (protein||0) + 'g</span>' +
         '<span class="macro-legend-pct">' + pPct + '%</span>' +
       '</div>' +
       '<div class="macro-legend-item">' +
         '<span class="macro-legend-dot" style="background:#FBBF24"></span>' +
-        '<span class="macro-legend-label">Carbs</span>' +
+        '<span class="macro-legend-label">' + t('colCarbs') + '</span>' +
         '<span class="macro-legend-val">' + (carbs||0) + 'g</span>' +
         '<span class="macro-legend-pct">' + cPct + '%</span>' +
       '</div>' +
       '<div class="macro-legend-item">' +
         '<span class="macro-legend-dot" style="background:#F472B6"></span>' +
-        '<span class="macro-legend-label">Fat</span>' +
+        '<span class="macro-legend-label">' + t('colFat') + '</span>' +
         '<span class="macro-legend-val">' + (fat||0) + 'g</span>' +
         '<span class="macro-legend-pct">' + fPct + '%</span>' +
       '</div>' +
@@ -6920,7 +6806,7 @@ function updateAdminMenusTopbar(lang) {
     if (addBtn)  { addBtn.onclick  = function(){ openAdminMenuModalHe(); }; addBtn.innerHTML  = '<i class="ti ti-plus"></i> הוסף תפריט'; }
     if (bulkBtn) { bulkBtn.onclick = function(){ openModal('bulk-menus-he'); }; bulkBtn.innerHTML = '<i class="ti ti-file-import"></i> ייבוא עברית'; }
   } else {
-    if (addBtn)  { addBtn.onclick  = function(){ openAdminMenuModal(); }; addBtn.innerHTML  = '<i class="ti ti-plus"></i> Add Menu'; }
+    if (addBtn)  { addBtn.onclick  = function(){ openAdminMenuModal(); }; addBtn.innerHTML  = '<i class="ti ti-plus"></i> ' + t('addMenu'); }
     if (bulkBtn) { bulkBtn.onclick = function(){ openModal('bulk-menus'); }; bulkBtn.innerHTML = '<i class="ti ti-file-import"></i> Bulk Import'; }
   }
 }
@@ -6931,7 +6817,7 @@ function updateAdminProgramsTopbar(lang) {
     if (addBtn)  { addBtn.onclick  = function(){ openAdminProgramModalHe(); }; addBtn.innerHTML  = '<i class="ti ti-plus"></i> הוסף תוכנית'; }
     if (bulkBtn) { bulkBtn.onclick = function(){ openModal('bulk-programs-he'); }; bulkBtn.innerHTML = '<i class="ti ti-file-import"></i> ייבוא עברית'; }
   } else {
-    if (addBtn)  { addBtn.onclick  = function(){ openAdminProgramModal(); }; addBtn.innerHTML  = '<i class="ti ti-plus"></i> Add Program'; }
+    if (addBtn)  { addBtn.onclick  = function(){ openAdminProgramModal(); }; addBtn.innerHTML  = '<i class="ti ti-plus"></i> ' + t('addProgram'); }
     if (bulkBtn) { bulkBtn.onclick = function(){ openModal('bulk-programs'); }; bulkBtn.innerHTML = '<i class="ti ti-file-import"></i> Bulk Import'; }
   }
 }
@@ -6942,7 +6828,7 @@ function updateAdminRecipesTopbar(lang) {
     if (addBtn)  { addBtn.onclick  = function(){ openAdminRecipeModalHe(); }; addBtn.innerHTML  = '<i class="ti ti-plus"></i> הוסף מתכון'; }
     if (bulkBtn) { bulkBtn.onclick = function(){ openModal('bulk-recipes-he'); }; bulkBtn.innerHTML = '<i class="ti ti-file-import"></i> ייבוא עברית'; }
   } else {
-    if (addBtn)  { addBtn.onclick  = function(){ openAdminRecipeModal(); }; addBtn.innerHTML  = '<i class="ti ti-plus"></i> Add Recipe'; }
+    if (addBtn)  { addBtn.onclick  = function(){ openAdminRecipeModal(); }; addBtn.innerHTML  = '<i class="ti ti-plus"></i> ' + t('addRecipe'); }
     if (bulkBtn) { bulkBtn.onclick = function(){ openModal('bulk-recipes'); }; bulkBtn.innerHTML = '<i class="ti ti-file-import"></i> Bulk Import'; }
   }
 }
@@ -6953,7 +6839,7 @@ function updateAdminFoodsTopbar(lang) {
     if (addBtn)  { addBtn.onclick  = function(){ openAdminFoodModalHe(); }; addBtn.innerHTML  = '<i class="ti ti-plus"></i> הוסף מזון'; }
     if (bulkBtn) { bulkBtn.onclick = function(){ openModal('bulk-foods-he'); }; bulkBtn.innerHTML = '<i class="ti ti-file-import"></i> ייבוא עברית'; }
   } else {
-    if (addBtn)  { addBtn.onclick  = function(){ openAdminFoodModal(); }; addBtn.innerHTML  = '<i class="ti ti-plus"></i> Add Food'; }
+    if (addBtn)  { addBtn.onclick  = function(){ openAdminFoodModal(); }; addBtn.innerHTML  = '<i class="ti ti-plus"></i> ' + t('addFood'); }
     if (bulkBtn) { bulkBtn.onclick = function(){ openModal('bulk-foods'); }; bulkBtn.innerHTML = '<i class="ti ti-file-import"></i> Bulk Import'; }
   }
 }
@@ -6974,7 +6860,7 @@ function renderHeExercisesList() {
   var el = document.getElementById('admin-exercises-he-list');
   if (!el) return;
   if (!_heExercises.length) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="ti ti-language"></i></div><h3>No Hebrew exercises yet</h3><p>Add exercises or bulk import.</p></div>';
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="ti ti-language"></i></div><h3>' + t('noResearchYet') + '</h3><p>' + t('tapToCreate') + '</p></div>';
     return;
   }
   var muscleColors = {
@@ -7023,7 +6909,7 @@ async function updateAdminExercisesTopbar(lang) {
   } else {
     if (enWrap) enWrap.style.display = '';
     if (heWrap) heWrap.style.display = 'none';
-    if (addBtn) { addBtn.innerHTML = '<i class="ti ti-plus"></i> Add Exercise'; addBtn.onclick = function(){ window._addExToHe=false; openAdminModal('add'); }; }
+    if (addBtn) { addBtn.innerHTML = '<i class="ti ti-plus"></i> ' + t('addExercise'); addBtn.onclick = function(){ window._addExToHe=false; openAdminModal('add'); }; }
     if (bulkBtn) { bulkBtn.innerHTML = '<i class="ti ti-file-import"></i> Bulk Import'; bulkBtn.onclick = function(){ openModal('bulk-import'); }; }
   }
 }
@@ -7476,7 +7362,7 @@ async function sendPasswordReset() {
     if (errEl) { errEl.style.display = 'block'; errEl.textContent = msg; }
     else showToast(msg);
   } finally {
-    if (sendBtn) { sendBtn.disabled = false; sendBtn.innerHTML = '<i class="ti ti-send"></i> Send Reset Link'; }
+    if (sendBtn) { sendBtn.disabled = false; sendBtn.innerHTML = '<i class="ti ti-send"></i> ' + t('btnSendReset'); }
   }
 }
 
@@ -7594,7 +7480,7 @@ function applyClientNav() {
   forceShow('tnav-group-workouts', 'flex');
   // Update label for client context
   var gwLabel = document.getElementById('tnav-group-workouts-label');
-  if (gwLabel) gwLabel.textContent = (_lang === 'he') ? 'אימוני קבוצה' : 'Group Workouts';
+  if (gwLabel) gwLabel.textContent = (_lang === 'he') ? 'אימוני קבוצה' : t('navGroupWorkouts');
 
   // Inject Today's Workout banner + Log Workout button into client profile view
   var cpView = document.getElementById('view-client-profile');
@@ -7777,7 +7663,7 @@ async function renderClientProfileTab(data) {
     // Current stats — weight, body fat, workouts
     '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:24px">' +
       _clientStatCard('ti-weight', (latest && latest.weight ? latest.weight + ' ' + (latest.weightUnit||'kg') : '—'), 'Weight', '#60A5FA') +
-      _clientStatCard('ti-percentage', (latest && latest.bodyFat ? latest.bodyFat + '%' : '—'), 'Body Fat', '#F472B6') +
+      _clientStatCard('ti-percentage', (latest && latest.bodyFat ? latest.bodyFat + '%' : '—'), t('bodyFatLabel'), '#F472B6') +
       _clientStatCard('ti-barbell', totalWorkouts, 'Workouts', '#7EE8A2') +
     '</div>' +
 
@@ -7794,7 +7680,7 @@ async function renderClientProfileTab(data) {
           '<div style="background:var(--surface2);border-radius:10px;padding:12px">' +
             '<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">BMR</div>' +
             '<div style="font-size:20px;font-weight:800">' + (b.bmr||'-') + '</div>' +
-            '<div style="font-size:10px;color:var(--muted)">kcal at rest</div>' +
+            '<div style="font-size:10px;color:var(--muted)">' + t('kCalAtRest') + '</div>' +
           '</div>' +
           '<div style="background:var(--surface2);border-radius:10px;padding:12px">' +
             '<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Maintenance</div>' +
@@ -7843,7 +7729,7 @@ async function renderClientProfileTab(data) {
         var d = new Date(s.date);
         var dur = s.durationSeconds ? Math.floor(s.durationSeconds/60) + ' min' : '';
         var isGroup = !!s.groupWorkoutId;
-        var label = isGroup ? (s.programName||'Group Workout') : (s.dayName||s.programName||'Workout');
+        var label = isGroup ? (s.programName||t('groupWorkout')||'Group Workout') : (s.dayName||s.programName||t('freeWorkout')||'Workout');
         return '<div style="padding:12px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;margin-bottom:6px">' +
           '<div style="display:flex;justify-content:space-between;align-items:center">' +
             '<div style="font-size:14px;font-weight:700;display:flex;align-items:center;gap:7px">' + label +
@@ -7900,7 +7786,7 @@ async function openEditWorkoutSession(sessionId) {
     var footer = modal.querySelector('.modal-footer');
     if (footer) footer.innerHTML =
       '<button class="btn btn-ghost" onclick="closeAllModals()">' + (isHe ? 'ביטול' : 'Cancel') + '</button>' +
-      '<button class="btn btn-primary" onclick="saveEditWorkoutSession()"><i class="ti ti-check"></i> ' + (isHe ? 'שמור שינויים' : 'Save Changes') + '</button>';
+      '<button class="btn btn-primary" onclick="saveEditWorkoutSession()"><i class="ti ti-check"></i> ' + t('saveProfile') + '</button>';
     openModal('client-workout-log');
   } catch(e) { showToast('Error: ' + e.message); }
 }
@@ -8032,7 +7918,7 @@ function renderExerciseProgressChart(sessions, suffix) {
   var dataKey  = '_exProgressData'     + suffix;
 
   // Build HTML with a select + chart placeholder (chart drawn on select change)
-  var html = '<h3 style="font-size:15px;font-weight:700;margin:0 0 12px"><i class="ti ti-chart-line" style="color:var(--accent)"></i> Exercise Progress</h3>' +
+  var html = '<h3 style="font-size:15px;font-weight:700;margin:0 0 12px"><i class="ti ti-chart-line" style="color:var(--accent)"></i> ' + t('exerciseProgress') + '</h3>' +
     '<div style="background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:16px;margin-bottom:24px">' +
       '<select id="' + pickerId + '" onchange="renderExerciseChart(\'' + suffix + '\')" ' +
         'style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border2);background:var(--surface2);color:var(--fg);font-size:14px;font-weight:600;margin-bottom:14px;font-family:inherit">' +
@@ -8065,7 +7951,7 @@ function renderExerciseChart(suffix) {
   if (points.length < 2) {
     container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">' +
       '<i class="ti ti-chart-dots" style="font-size:24px;display:block;margin-bottom:8px;opacity:0.4"></i>' +
-      (points.length === 1 ? 'Log this exercise at least twice to see progress.' : 'No data yet.') +
+      (points.length === 1 ? t('chartLogTwice') : t('chartNoData')) +
     '</div>';
     return;
   }
@@ -8163,7 +8049,7 @@ function renderClientMeasurements(measurements) {
   var sorted = measurements.slice().sort(function(a,b){ return new Date(b.date) - new Date(a.date); });
   var latest = sorted[0];
 
-  return '<h3 style="font-size:15px;font-weight:700;margin:20px 0 12px">Body Measurements</h3>' +
+  return '<h3 style="font-size:15px;font-weight:700;margin:20px 0 12px">' + t('bodyMeasurements') + '</h3>' +
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">' +
       (latest.weight ? '<div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:16px;text-align:center"><i class="ti ti-weight" style="font-size:20px;color:#60A5FA"></i><div style="font-size:24px;font-weight:800;margin:6px 0 2px">' + latest.weight + ' ' + (latest.weightUnit||'kg') + '</div><div style="font-size:12px;color:var(--muted)">Weight</div></div>' : '') +
       (latest.bodyFat ? '<div style="background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:16px;text-align:center"><i class="ti ti-percentage" style="font-size:20px;color:#F472B6"></i><div style="font-size:24px;font-weight:800;margin:6px 0 2px">' + latest.bodyFat + '%</div><div style="font-size:12px;color:var(--muted)">Body Fat</div></div>' : '') +
@@ -8224,7 +8110,7 @@ function renderClientPortal(data) {
             '<div class="client-bmr-stat">' +
               '<div class="client-bmr-stat-val">' + b.bmr + '</div>' +
               '<div class="client-bmr-stat-label">BMR</div>' +
-              '<div class="client-bmr-stat-explain">Calories your body burns at rest — just to keep your heart beating, breathing, and organs working. This is your baseline even if you stayed in bed all day.</div>' +
+              '<div class="client-bmr-stat-explain">' + t('bmrTooltip') + '</div>' +
             '</div>' +
 
             '<div class="client-bmr-stat">' +
@@ -8288,7 +8174,7 @@ function renderClientPortal(data) {
 function renderClientSection(elId, items, type) {
   var el = document.getElementById(elId);
   if (!el || !items.length) {
-    if (el) el.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:12px 0">Nothing assigned yet.</p>';
+    if (el) el.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:12px 0">' + t('nothingAssignedYet') + '</p>';
     return;
   }
   if (type === 'menus') {
@@ -8305,7 +8191,7 @@ function renderClientSection(elId, items, type) {
       return '<div class="client-item-card" onclick="openProgramDetail(\'' + p.id + '\')">' +
         '<div class="client-item-icon"><i class="ti ti-calendar"></i></div>' +
         '<div><div class="client-item-name">' + p.name + '</div>' +
-        '<div class="client-item-meta">' + (p.weeks||'?') + ' weeks · ' + (p.goal||'') + ' · ' + (p.level||'') + '</div></div>' +
+        '<div class="client-item-meta">' + (p.weeks||'?') + ' ' + t('weeksLabel') + ' · ' + (p.goal||'') + ' · ' + (p.level||'') + '</div></div>' +
       '</div>';
     }).join('');
   } else if (type === 'recipes') {
@@ -8387,7 +8273,7 @@ function renderClientsList(searchQuery) {
   if (!el) return;
   var query = (searchQuery || '').toLowerCase().trim();
   var cnt = document.getElementById('clients-count');
-  if (cnt) cnt.textContent = clientsList.length + ' clients';
+  if (cnt) cnt.textContent = clientsList.length + ' ' + t('navClients').toLowerCase();
 
   if (!clientsList.length) {
     el.innerHTML =
@@ -8395,7 +8281,7 @@ function renderClientsList(searchQuery) {
         '<div class="empty-icon"><i class="ti ti-users"></i></div>' +
         '<h3>No clients yet</h3>' +
         '<p style="color:var(--muted);margin-bottom:20px">Add your first client to get started.</p>' +
-        '<button class="btn btn-primary" onclick="openAddClientModal()"><i class="ti ti-user-plus"></i> Add Client</button>' +
+        '<button class="btn btn-primary" onclick="openAddClientModal()"><i class="ti ti-user-plus"></i> ' + t('addClient') + '</button>' +
       '</div>';
     return;
   }
@@ -8417,13 +8303,13 @@ function renderClientsList(searchQuery) {
       '<div class="client-avatar">' + ((c.name||'?')[0]).toUpperCase() + '</div>' +
       '<div class="client-info">' +
         '<div class="client-name">' + c.name + '</div>' +
-        '<div class="client-meta">' + (c.email||'') + (c.goal ? ' · <span style="color:' + goalColor + '">' + c.goal + '</span>' : '') + '</div>' +
+        '<div class="client-meta">' + (c.email||'') + (c.goal ? ' · <span style="color:' + goalColor + '">' + (t('goal'+(c.goal||'').charAt(0).toUpperCase()+(c.goal||'').slice(1)+'Tag')||c.goal) + '</span>' : '') + '</div>' +
       '</div>' +
       '<div class="client-stats">' +
-        '<span class="tag">' + assigned + ' items assigned</span>' +
+        '<span class="tag">' + t('itemsAssigned').replace('{n}', assigned) + '</span>' +
       '</div>' +
       '<div class="client-actions">' +
-        '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openClientProfile(\'' + c.id + '\')"><i class="ti ti-eye"></i> View</button>' +
+        '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openClientProfile(\'' + c.id + '\')"><i class="ti ti-eye"></i> ' + t('btnView') + '</button>' +
       '</div>' +
     '</div>';
   }).join('');
@@ -8574,7 +8460,7 @@ function showClientCredentials(name, email) {
     '</div>' +
     '<div class="modal-footer">' +
       '<button class="btn btn-ghost" onclick="closeCredsModal()">Close</button>' +
-      (newClientId ? '<button class="btn btn-ghost" onclick="closeCredsModal();openClientProfile(\'' + newClientId + '\')"><i class="ti ti-user-plus"></i> Assign Content Now</button>' : '') +
+      (newClientId ? '<button class="btn btn-ghost" onclick="closeCredsModal();openClientProfile(\'' + newClientId + '\')"><i class="ti ti-user-plus"></i> ' + t('assignContentNow') + '</button>' : '') +
       '<button class="btn btn-primary" onclick="copyClientCreds()"><i class="ti ti-copy"></i> Copy Login Details</button>' +
     '</div>';
 
@@ -8594,6 +8480,7 @@ var _currentClientTab = 'assign';
 
 async function openClientProfile(clientId) {
   _currentClientId = clientId;
+  window._currentOpenClientId = clientId; // used by applyLang to re-render on lang change
   var client = clientsList.find(function(c){ return c.id === clientId; });
   if (!client) return;
 
@@ -8641,7 +8528,7 @@ async function switchClientProfileTab(tab) {
 
 function renderClientAssignTab(body, footer, client) {
   var clientId = client.id;
-  footer.innerHTML = '<button class="btn btn-ghost" onclick="closeAllModals()">Close</button>';
+  footer.innerHTML = '<button class="btn btn-ghost" onclick="closeAllModals()">' + t('close') + '</button>';
   var menus2   = (client.assignedMenus    || []);
   var progs    = (client.assignedPrograms || []);
   var routs    = (client.assignedRoutines || []);
@@ -8660,33 +8547,33 @@ function renderClientAssignTab(body, footer, client) {
   if (b) {
     html += '<div style="background:var(--surface2);border:1px solid var(--border2);border-radius:12px;padding:14px;margin-bottom:14px">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
-        '<span style="font-size:13px;font-weight:700">BMR & Nutrition Targets</span>' +
-        '<button class="btn btn-ghost btn-sm" onclick="openEditClientBMR(\'' + clientId + '\')"><i class="ti ti-edit"></i> Edit</button>' +
+        '<span style="font-size:13px;font-weight:700">' + t('bmrNutrition') + '</span>' +
+        '<button class="btn btn-ghost btn-sm" onclick="openEditClientBMR(\'' + clientId + '\')"><i class="ti ti-edit"></i> ' + t('btnEdit') + '</button>' +
       '</div>' +
       '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">' +
-        '<div style="text-align:center"><div style="font-size:18px;font-weight:800">' + (b.target||b.tdee||'-') + '</div><div style="font-size:11px;color:var(--muted)">Target kcal</div></div>' +
-        '<div style="text-align:center"><div style="font-size:18px;font-weight:800;color:#60A5FA">' + (b.proteinG||'-') + 'g</div><div style="font-size:11px;color:var(--muted)">Protein</div></div>' +
-        '<div style="text-align:center"><div style="font-size:18px;font-weight:800;color:var(--accent)">' + (b.carbsG||'-') + 'g</div><div style="font-size:11px;color:var(--muted)">Carbs</div></div>' +
+        '<div style="text-align:center"><div style="font-size:18px;font-weight:800">' + (b.target||b.tdee||'-') + '</div><div style="font-size:11px;color:var(--muted)">' + t('targetKcal') + '</div></div>' +
+        '<div style="text-align:center"><div style="font-size:18px;font-weight:800;color:#60A5FA">' + (b.proteinG||'-') + 'g</div><div style="font-size:11px;color:var(--muted)">' + t('colProtein') + '</div></div>' +
+        '<div style="text-align:center"><div style="font-size:18px;font-weight:800;color:var(--accent)">' + (b.carbsG||'-') + 'g</div><div style="font-size:11px;color:var(--muted)">' + t('colCarbs') + '</div></div>' +
       '</div>' +
     '</div>';
   } else {
     html += '<div style="margin-bottom:12px">' +
       '<button class="btn btn-ghost btn-sm" onclick="openEditClientBMR(\'' + clientId + '\')">' +
-        '<i class="ti ti-calculator"></i> Set BMR & Nutrition Targets' +
+        '<i class="ti ti-calculator"></i> ' + t('setBMR') +
       '</button></div>';
   }
 
   html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">';
-  [['menus','ti-salad','Menus',menus2],['programs','ti-calendar','Programs',progs],
-   ['routines','ti-run','Routines',routs],['recipes','ti-chef-hat','Recipes',recs]].forEach(function(item) {
+  [['menus','ti-salad',t('assignMenus'),menus2],['programs','ti-calendar',t('assignPrograms'),progs],
+   ['routines','ti-run',t('assignRoutines'),routs],['recipes','ti-chef-hat',t('assignRecipes'),recs]].forEach(function(item) {
     html += '<button class="btn btn-ghost btn-sm" onclick="openAssignModal(\'' + client.id + '\',\'' + item[0] + '\')">' +
-      '<i class="ti ' + item[1] + '"></i> Assign ' + item[2] + ' <span style="background:var(--surface2);border-radius:10px;padding:0 6px;font-size:11px">' + item[3].length + '</span></button>';
+      '<i class="ti ' + item[1] + '"></i> ' + item[2] + ' <span style="background:var(--surface2);border-radius:10px;padding:0 6px;font-size:11px">' + item[3].length + '</span></button>';
   });
   html += '</div>';
 
   // List assigned items
   if (routs.length) {
-    html += '<h4 style="font-size:13px;font-weight:700;color:var(--muted);margin:12px 0 8px">ROUTINES</h4>';
+    html += '<h4 style="font-size:13px;font-weight:700;color:var(--muted);margin:12px 0 8px">' + t('sectionRoutines') + '</h4>';
     routs.forEach(function(r) {
       html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;margin-bottom:6px">' +
         '<span style="font-size:14px;font-weight:600">' + (r.name||'Routine') + '</span>' +
@@ -8695,16 +8582,16 @@ function renderClientAssignTab(body, footer, client) {
     });
   }
   if (progs.length) {
-    html += '<h4 style="font-size:13px;font-weight:700;color:var(--muted);margin:12px 0 8px">PROGRAMS</h4>';
+    html += '<h4 style="font-size:13px;font-weight:700;color:var(--muted);margin:12px 0 8px">' + t('sectionPrograms') + '</h4>';
     progs.forEach(function(p) {
       html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;margin-bottom:6px">' +
-        '<span style="font-size:14px;font-weight:600">' + (p.name||'Program') + langBadge(p) + '</span>' +
+        '<span style="font-size:14px;font-weight:600">' + (_lang==='he'&&p.name_he ? p.name_he : (p.name||'Program')) + langBadge(p) + '</span>' +
         '<button class="btn btn-ghost btn-sm" onclick="unassignFromClient(\'' + client.id + '\',\'assignedPrograms\',\'' + p.id + '\')"><i class="ti ti-x"></i></button>' +
       '</div>';
     });
   }
   if (menus2.length) {
-    html += '<h4 style="font-size:13px;font-weight:700;color:var(--muted);margin:12px 0 8px">MENUS</h4>';
+    html += '<h4 style="font-size:13px;font-weight:700;color:var(--muted);margin:12px 0 8px">' + t('sectionMenus') + '</h4>';
     menus2.forEach(function(m) {
       html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;margin-bottom:6px">' +
         '<span style="font-size:14px;font-weight:600">' + (m.name||'Menu') + langBadge(m) + '</span>' +
@@ -8713,7 +8600,7 @@ function renderClientAssignTab(body, footer, client) {
     });
   }
   if (recs.length) {
-    html += '<h4 style="font-size:13px;font-weight:700;color:var(--muted);margin:12px 0 8px">RECIPES</h4>';
+    html += '<h4 style="font-size:13px;font-weight:700;color:var(--muted);margin:12px 0 8px">' + t('sectionRecipes') + '</h4>';
     recs.forEach(function(rc) {
       html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;margin-bottom:6px">' +
         '<span style="font-size:14px;font-weight:600">' + (rc.name||'Recipe') + langBadge(rc) + '</span>' +
@@ -8723,7 +8610,7 @@ function renderClientAssignTab(body, footer, client) {
   }
 
   if (!routs.length && !progs.length && !menus2.length && !recs.length) {
-    html += '<div style="text-align:center;padding:30px;color:var(--muted)"><i class="ti ti-clipboard-list" style="font-size:28px;opacity:0.3;display:block;margin-bottom:8px"></i>No content assigned yet. Use the buttons above to assign.</div>';
+    html += '<div style="text-align:center;padding:30px;color:var(--muted)"><i class="ti ti-clipboard-list" style="font-size:28px;opacity:0.3;display:block;margin-bottom:8px"></i>' + t('nothingAssignedYet') + '</div>';
   }
 
   html += '</div>';
@@ -8731,8 +8618,8 @@ function renderClientAssignTab(body, footer, client) {
 }
 
 async function renderClientTrainingTab(body, footer, client) {
-  footer.innerHTML = '<button class="btn btn-ghost" onclick="closeAllModals()">Close</button>';
-  body.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)"><i class="ti ti-loader" style="font-size:28px;animation:spin 1s linear infinite"></i><div style="margin-top:8px">Loading training log...</div></div>';
+  footer.innerHTML = '<button class="btn btn-ghost" onclick="closeAllModals()">' + t('close') + '</button>';
+  body.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)"><i class="ti ti-loader" style="font-size:28px;animation:spin 1s linear infinite"></i><div style="margin-top:8px">' + (t('loading')||'Loading...') + '</div></div>';
 
   try {
     // Single where clause — no composite index needed. Sort client-side.
@@ -8749,7 +8636,7 @@ async function renderClientTrainingTab(body, footer, client) {
     sessions.sort(function(a,b){ return (b.date||'') > (a.date||'') ? 1 : -1; });
 
     if (!sessions.length) {
-      body.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted)"><i class="ti ti-chart-line" style="font-size:36px;opacity:0.3;display:block;margin-bottom:10px"></i><div>No workouts logged yet.</div></div>';
+      body.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted)"><i class="ti ti-chart-line" style="font-size:36px;opacity:0.3;display:block;margin-bottom:10px"></i><div>' + t('noWorkoutsYet') + '</div></div>';
       return;
     }
 
@@ -8761,21 +8648,21 @@ async function renderClientTrainingTab(body, footer, client) {
     var daysSince = Math.floor((Date.now() - lastDate.getTime()) / 86400000);
 
     html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px">' +
-      _trainerStatCard(totalSessions, 'Sessions', 'ti-barbell', '#7EE8A2') +
-      _trainerStatCard((daysSince === 0 ? 'Today' : daysSince + 'd ago'), 'Last Workout', 'ti-clock', '#60A5FA') +
-      _trainerStatCard(sessions.reduce(function(a,s){ return a + (s.durationSeconds||0); }, 0) > 0 ? Math.round(sessions.reduce(function(a,s){ return a + (s.durationSeconds||0); }, 0) / sessions.length / 60) + ' min' : '-', 'Avg Duration', 'ti-stopwatch', '#FBBF24') +
+      _trainerStatCard(totalSessions, t('statSessions'), 'ti-barbell', '#7EE8A2') +
+      _trainerStatCard((daysSince === 0 ? t('statToday') : daysSince + ' ' + t('statDaysAgo')), t('statLastWorkout'), 'ti-clock', '#60A5FA') +
+      _trainerStatCard(sessions.reduce(function(a,s){ return a + (s.durationSeconds||0); }, 0) > 0 ? Math.round(sessions.reduce(function(a,s){ return a + (s.durationSeconds||0); }, 0) / sessions.length / 60) + ' min' : '-', t('statAvgDuration'), 'ti-stopwatch', '#FBBF24') +
     '</div>';
 
     // Exercise progress chart (trainer view uses suffix '-t' to avoid ID clash with client profile)
     html += renderExerciseProgressChart(sessions, '-t');
 
     // Session list
-    html += '<h4 style="font-size:13px;font-weight:700;color:var(--muted);margin:16px 0 10px">SESSION HISTORY</h4>';
+    html += '<h4 style="font-size:13px;font-weight:700;color:var(--muted);margin:16px 0 10px">' + t('sessionHistory') + '</h4>';
     sessions.forEach(function(s) {
       var d = new Date(s.date);
       var dur = s.durationSeconds ? Math.floor(s.durationSeconds/60) + ' min' : '';
       var isGroup = !!s.groupWorkoutId;
-      var label = isGroup ? (s.programName||'Group Workout') : (s.dayName||s.programName||'Workout');
+      var label = isGroup ? (s.programName||t('groupWorkout')||'Group Workout') : (s.dayName||s.programName||t('freeWorkout')||'Workout');
       html += '<div onclick="expandTrainerSession(\'' + s.id + '\')" style="padding:14px 16px;background:var(--surface);border:1px solid var(--border2);border-radius:12px;margin-bottom:8px;cursor:pointer">' +
         '<div style="display:flex;justify-content:space-between;align-items:center">' +
           '<div>' +
@@ -8842,9 +8729,9 @@ function _trainerStatCard(value, label, icon, color) {
 
 async function renderClientBodyTab(body, footer, client) {
   footer.innerHTML =
-    '<button class="btn btn-ghost" onclick="closeAllModals()">Close</button>' +
+    '<button class="btn btn-ghost" onclick="closeAllModals()">' + t('close') + '</button>' +
     '<button class="btn btn-primary" onclick="openAddMeasurementModal(\'' + client.id + '\')">' +
-      '<i class="ti ti-plus"></i> Add Measurement' +
+      '<i class="ti ti-plus"></i> ' + t('addMeasurement') +
     '</button>';
 
   body.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)"><i class="ti ti-loader" style="font-size:28px;animation:spin 1s linear infinite"></i></div>';
@@ -8868,11 +8755,11 @@ async function renderClientBodyTab(body, footer, client) {
     var html = '<div style="padding:16px">';
     var latest = measurements[0];
     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">' +
-      (latest.weight ? _trainerStatCard(latest.weight + ' ' + (latest.weightUnit||'kg'), 'Current Weight', 'ti-weight', '#60A5FA') : '') +
-      (latest.bodyFat ? _trainerStatCard(latest.bodyFat + '%', 'Body Fat', 'ti-percentage', '#F472B6') : '') +
+      (latest.weight ? _trainerStatCard(latest.weight + ' ' + (latest.weightUnit||'kg'), t('currentWeight'), 'ti-weight', '#60A5FA') : '') +
+      (latest.bodyFat ? _trainerStatCard(latest.bodyFat + '%', t('bodyFatLabel'), 'ti-percentage', '#F472B6') : '') +
     '</div>';
 
-    html += '<h4 style="font-size:13px;font-weight:700;color:var(--muted);margin:0 0 10px">MEASUREMENT HISTORY</h4>';
+    html += '<h4 style="font-size:13px;font-weight:700;color:var(--muted);margin:0 0 10px">' + t('measurementHistory') + '</h4>';
     measurements.forEach(function(m) {
       html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;margin-bottom:6px">' +
         '<span style="font-size:13px;color:var(--muted)">' + new Date(m.date).toLocaleDateString() + '</span>' +
@@ -8900,18 +8787,18 @@ function openAddMeasurementModal(clientId) {
   modal.style.cssText = 'position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px';
   modal.innerHTML =
     '<div style="background:var(--surface);border-radius:16px;padding:24px;width:100%;max-width:400px">' +
-      '<h3 style="margin:0 0 16px;font-size:16px;font-weight:700">Add Measurement</h3>' +
+      '<h3 style="margin:0 0 16px;font-size:16px;font-weight:700">' + t('addMeasurement') + '</h3>' +
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">' +
-        '<div><label class="form-label">Weight</label><input class="form-input" type="number" id="meas-weight" placeholder="75.5"></div>' +
-        '<div><label class="form-label">Unit</label><select class="form-select" id="meas-unit"><option value="kg">kg</option><option value="lbs">lbs</option></select></div>' +
+        '<div><label class="form-label">' + t('measWeight') + '</label><input class="form-input" type="number" id="meas-weight" placeholder="75.5"></div>' +
+        '<div><label class="form-label">' + t('measUnit') + '</label><select class="form-select" id="meas-unit"><option value="kg">kg</option><option value="lbs">lbs</option></select></div>' +
       '</div>' +
-      '<div class="form-group"><label class="form-label">Body Fat %</label><input class="form-input" type="number" id="meas-bodyfat" placeholder="18.5"></div>' +
-      '<div class="form-group"><label class="form-label">Date</label><input class="form-input" type="date" id="meas-date" value="' + new Date().toISOString().split('T')[0] + '"></div>' +
-      '<div class="form-group"><label class="form-label">Notes</label><input class="form-input" id="meas-notes" placeholder="After morning weigh-in..."></div>' +
+      '<div class="form-group"><label class="form-label">' + t('measBodyFat') + '</label><input class="form-input" type="number" id="meas-bodyfat" placeholder="18.5"></div>' +
+      '<div class="form-group"><label class="form-label">' + t('measDate') + '</label><input class="form-input" type="date" id="meas-date" value="' + new Date().toISOString().split('T')[0] + '"></div>' +
+      '<div class="form-group"><label class="form-label">' + t('measNotes') + '</label><input class="form-input" id="meas-notes" placeholder="' + t('measPlaceholderNotes') + '"></div>' +
       '<div style="display:flex;gap:8px;margin-top:16px">' +
-        '<button class="btn btn-ghost" style="flex:1" onclick="document.getElementById(\'modal-add-measurement\').remove()">Cancel</button>' +
+        '<button class="btn btn-ghost" style="flex:1" onclick="document.getElementById(\'modal-add-measurement\').remove()">' + t('btnCancel') + '</button>' +
         '<button class="btn btn-primary" style="flex:2" onclick="saveMeasurement(\'' + clientId + '\')">' +
-          'Save Measurement</button>' +
+          t('measSaveBtn') + '</button>' +
       '</div>' +
     '</div>';
   document.body.appendChild(modal);
@@ -8984,13 +8871,13 @@ function openClientProfile_OLD(clientId) {
     '</div>';
   } else {
     bmrHTML = '<div style="margin-bottom:16px"><button class="btn btn-ghost btn-sm" onclick="openEditClientBMR(\'' + clientId + '\')">' +
-      '<i class="ti ti-calculator"></i> Set BMR & Nutrition Targets</button></div>';
+      '<i class="ti ti-calculator"></i> ' + t('setBMR') + '</button></div>';
   }
 
   // Assignment sections
   var sections = [
     { key:'assignedMenus',    icon:'ti-salad',      label:'Menus',    type:'menus'    },
-    { key:'assignedPrograms', icon:'ti-calendar',   label:'Programs', type:'programs' },
+    { key:'assignedPrograms', icon:'ti-calendar',   label:t('programsLib'), type:'programs' },
     { key:'assignedRoutines', icon:'ti-list-check', label:'Routines', type:'routines' },
     { key:'assignedRecipes',  icon:'ti-chef-hat',   label:'Recipes',  type:'recipes'  },
   ];
@@ -9007,11 +8894,11 @@ function openClientProfile_OLD(clientId) {
       (items.length
         ? '<div class="client-assigned-list">' + items.map(function(item) {
             return '<div class="client-assigned-item">' +
-              '<span>' + (item.name||item.title||'Item') + '</span>' +
+              '<span>' + (_lang==='he'&&item.name_he ? item.name_he : (item.name||item.title||'Item')) + '</span>' +
               '<button class="admin-action-btn delete" style="padding:3px 8px" onclick="unassignFromClient(\'' + clientId + '\',\'' + s.key + '\',\'' + (item.id||item.shareToken) + '\')"><i class="ti ti-x"></i></button>' +
             '</div>';
           }).join('') + '</div>'
-        : '<p style="font-size:12px;color:var(--muted2);padding:8px 0">Nothing assigned yet.</p>'
+        : '<p style="font-size:12px;color:var(--muted2);padding:8px 0">' + t('nothingAssignedYet') + '</p>'
       ) +
     '</div>';
   }).join('');
@@ -9033,7 +8920,7 @@ function openClientProfile_OLD(clientId) {
       '<button class="btn btn-ghost" style="color:var(--danger);border-color:rgba(255,107,107,0.3)" onclick="deleteClient(\'' + clientId + '\')">' +
         '<i class="ti ti-trash"></i> Delete Client' +
       '</button>' +
-      '<button class="btn btn-ghost" onclick="closeAllModals()">Close</button>';
+      '<button class="btn btn-ghost" onclick="closeAllModals()">' + t('close') + '</button>';
   }
 
   openModal('client-profile');
@@ -9066,7 +8953,7 @@ function openAssignModal(clientId, type) {
 
   // Set title
   var title = document.getElementById('assign-modal-title');
-  if (title) title.textContent = 'Assign ' + type.charAt(0).toUpperCase() + type.slice(1) + ' to ' + client.name;
+  if (title) title.textContent = t('assignTo') + ' ' + t('assign' + type.charAt(0).toUpperCase() + type.slice(1)) + ' — ' + client.name;
 
   // Reset search
   var searchEl = document.getElementById('assign-search-input');
@@ -9077,7 +8964,7 @@ function openAssignModal(clientId, type) {
   if (pillsEl) {
     var pills = [];
     if (type === 'menus' || type === 'programs') {
-      pills = ['All', 'Cut', 'Bulk', 'Maintain'];
+      pills = [['All',t('filterAll')], ['cut',t('filterCut')], ['bulk',t('filterBulk')], ['maintain',t('filterMaintain')]];
     } else if (type === 'recipes') {
       var cats = ['All'].concat([...new Set(_assignPool.map(function(i){ return i.category||'Other'; }))].sort());
       pills = cats;
@@ -9085,7 +8972,7 @@ function openAssignModal(clientId, type) {
     if (pills.length > 1) {
       pillsEl.style.display = 'flex';
       pillsEl.innerHTML = pills.map(function(p, i){
-        return '<button class="assign-pill' + (i===0?' active':'') + '" onclick="setAssignFilter(this,\'' + p + '\')">' + p + '</button>';
+        var filterVal = Array.isArray(p) ? p[0] : p; var filterLabel = Array.isArray(p) ? p[1] : p; return '<button class="assign-pill' + (i===0?' active':'') + '" data-filter="' + filterVal + '" onclick="setAssignFilter(this,\'' + filterVal + '\')">' + filterLabel + '</button>';
       }).join('');
     } else {
       pillsEl.style.display = 'none';
@@ -9111,7 +8998,7 @@ function setAssignFilter(btn, filter) {
 
 function filterAssignSearch(q) {
   var activeBtn = document.querySelector('#assign-filter-pills .assign-pill.active');
-  var filter = activeBtn ? activeBtn.textContent : 'All';
+  var filter = activeBtn ? (activeBtn.getAttribute('data-filter') || activeBtn.textContent) : 'All';
   renderAssignList(q, filter);
 }
 
@@ -9144,7 +9031,7 @@ function renderAssignList(query, filter) {
     var assigned = _assignAlready.includes(id);
     var label    = item.name || item.title || 'Item';
     var meta     = _assignType2 === 'menus'    ? ((typeof calcMenuTotals === 'function' ? calcMenuTotals(item).calories : 0) + ' kcal · ' + (item.goal||'')) :
-                   _assignType2 === 'programs' ? ((item.weeks||'?') + ' weeks · ' + (item.goal||'') + ' · ' + (item.level||'')) :
+                   _assignType2 === 'programs' ? ((item.weeks||'?') + ' ' + t('lblWeeks').toLowerCase() + ' · ' + t('goal' + (item.goal ? item.goal.charAt(0).toUpperCase() + item.goal.slice(1).replace('-','') : '')) || item.goal || '' + ' · ' + (item.level||'')) :
                    _assignType2 === 'recipes'  ? ((item.calories||0) + ' kcal · ' + (item.prepTime||'?') + ' min · ' + (item.category||'')) :
                    _assignType2 === 'routines' ? ((item.exercises||[]).length + ' exercises') : '';
     return '<div class="assign-row' + (assigned?' assigned':'') + '" onclick="toggleAssign(\'' + id + '\')">' +
@@ -9182,7 +9069,7 @@ function openEditClientBMR(clientId) {
   var titleEl    = document.getElementById('ebmr-title');
   var previewEl  = document.getElementById('ebmr-preview');
 
-  if (titleEl)   titleEl.textContent   = 'Edit BMR — ' + client.name;
+  if (titleEl)   titleEl.textContent   = t('editBMRTitle') + ' — ' + client.name;
   if (genderEl)  genderEl.value        = b.gender     || client.gender  || 'male';
   if (goalEl)    goalEl.value          = b.goal       || client.goal    || 'maintain';
   if (ageEl)     ageEl.value           = client.age   || b.age          || '';
@@ -9199,7 +9086,7 @@ function openEditClientBMR(clientId) {
   if (!bmrBackdrop) {
     bmrBackdrop = document.createElement('div');
     bmrBackdrop.id = 'bmr-extra-backdrop';
-    bmrBackdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;';
+    bmrBackdrop.style.cssText = 'position:fixed;inset:0;background:rgba(20,30,60,0.6);z-index:590;display:block;';
     bmrBackdrop.onclick = function() { closeBmrEditModal(); };
     document.body.appendChild(bmrBackdrop);
   }
@@ -9207,16 +9094,26 @@ function openEditClientBMR(clientId) {
 
   var bmrModal = document.getElementById('modal-edit-bmr');
   if (bmrModal) {
-    // Remove !important override by forcing via style attribute
-    // Then add .open class which has display:flex !important
-    bmrModal.setAttribute('style', 'z-index:310 !important; display:flex !important;');
+    // Force display regardless of CSS rules
+    bmrModal.style.cssText = [
+      'display:flex',
+      'position:fixed',
+      'top:50%',
+      'left:50%',
+      'transform:translate(-50%,-50%)',
+      'width:92%',
+      'max-width:520px',
+      'max-height:88vh',
+      'background:var(--surface)',
+      'border:1px solid var(--border2)',
+      'border-radius:18px',
+      'flex-direction:column',
+      'opacity:1',
+      'pointer-events:auto',
+      'overflow:hidden',
+      'z-index:600',
+    ].map(function(s){ return s + ' !important'; }).join(';') + ';';
     bmrModal.classList.add('open');
-    // Also ensure it's positioned correctly for native (override bottom-sheet to center)
-    if (document.documentElement.classList.contains('is-native')) {
-      bmrModal.style.cssText = 'z-index:310;display:flex;position:fixed;top:50%;left:50%;' +
-        'transform:translate(-50%,-50%);width:92%;max-width:520px;max-height:88vh;' +
-        'background:var(--surface);border-radius:18px;flex-direction:column;opacity:1;pointer-events:auto;overflow:hidden;';
-    }
   }
   // Auto-preview if data exists
   if (client.age && client.weight && client.height) {
@@ -9228,18 +9125,17 @@ function closeEditBMR() {
   var bmrModal = document.getElementById('modal-edit-bmr');
   if (bmrModal) {
     bmrModal.classList.remove('open');
-    bmrModal.removeAttribute('style'); // clear the forced display:flex !important
+    bmrModal.style.cssText = ''; // clear all inline overrides
   }
-  // Hide the extra backdrop
   var bmrBackdrop = document.getElementById('bmr-extra-backdrop');
   if (bmrBackdrop) bmrBackdrop.style.display = 'none';
-  // Reopen client profile if we have a client
-  if (_bmrEditClientId) {
-    openClientProfile(_bmrEditClientId);
+  var cid = _bmrEditClientId;
+  _bmrEditClientId = null;
+  if (cid) {
+    openClientProfile(cid);
   } else {
     closeAllModals();
   }
-  _bmrEditClientId = null;
 }
 function closeBmrEditModal() { closeEditBMR(); }
 
@@ -9253,7 +9149,7 @@ function previewEditBMR() {
   var cutF     = parseFloat((document.getElementById('ebmr-cut')    ||{}).value) || 0.85;
   var bulkF    = parseFloat((document.getElementById('ebmr-bulk')   ||{}).value) || 1.10;
 
-  if (!age || !weight || !height) { showToast('Fill in age, weight and height first.'); return; }
+  if (!age || !weight || !height) { showToast(t('fillAgeWeightHeight')); return; }
 
   var bmr    = Math.round((10*weight) + (6.25*height) - (5*age) + (gender==='male'?5:-161));
   var tdee   = Math.round(bmr * activity);
@@ -9263,7 +9159,7 @@ function previewEditBMR() {
   var fatG     = Math.round(weight * 0.9);
   var carbsG   = Math.max(50, Math.round((target - proteinG*4 - fatG*9)/4));
 
-  var actLabels = {'1.2':'Sedentary','1.375':'Lightly Active','1.55':'Moderately Active','1.725':'Very Active','1.9':'Athlete'};
+  var actLabels = {'1.2':t('actSedentary'),'1.375':t('actLight'),'1.55':t('actModerate'),'1.725':t('actVery'),'1.9':t('actAthlete')};
 
   var el = document.getElementById('ebmr-preview');
   if (el) el.innerHTML =
@@ -9272,9 +9168,9 @@ function previewEditBMR() {
         macroChartHTML(proteinG, carbsG, fatG, target, 140) +
         '<div style="flex:1;min-width:160px">' +
           '<div class="bmr-stats-grid" style="grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">' +
-            '<div class="bmr-stat"><div class="bmr-stat-val" style="font-size:18px">' + bmr + '</div><div class="bmr-stat-label">BMR<br><small>at rest</small></div></div>' +
+            '<div class="bmr-stat"><div class="bmr-stat-val" style="font-size:18px">' + bmr + '</div><div class="bmr-stat-label">BMR<br><small>' + t('atRest') + '</small></div></div>' +
             '<div class="bmr-stat"><div class="bmr-stat-val" style="font-size:18px">' + tdee + '</div><div class="bmr-stat-label">TDEE<br><small>' + (actLabels[String(activity)]||'') + '</small></div></div>' +
-            '<div class="bmr-stat accent" style="grid-column:span 2"><div class="bmr-stat-val" style="font-size:20px">' + target + '</div><div class="bmr-stat-label">Target kcal/day · ' + goal + '</div></div>' +
+            '<div class="bmr-stat accent" style="grid-column:span 2"><div class="bmr-stat-val" style="font-size:20px">' + target + '</div><div class="bmr-stat-label">' + t('targetKcal') + ' · ' + goal + '</div></div>' +
           '</div>' +
           '<p style="font-size:12px;color:var(--muted2)">P: ' + proteinG + 'g · C: ' + carbsG + 'g · F: ' + fatG + 'g</p>' +
         '</div>' +
@@ -9366,7 +9262,7 @@ function toggleAssign(itemId) {
   _assignAlready = arr.map(function(x){ return x.id || x.shareToken; });
   var q = document.getElementById('assign-search-input');
   var activeBtn = document.querySelector('#assign-filter-pills .assign-pill.active');
-  var filter = activeBtn ? activeBtn.textContent : 'All';
+  var filter = activeBtn ? (activeBtn.getAttribute('data-filter') || activeBtn.textContent) : 'All';
   renderAssignList(q ? q.value : '', filter);
 }
 
@@ -9399,7 +9295,7 @@ async function confirmAssign() {
   } catch(e) {
     showToast('Error saving: ' + (e.message || e.code));
   } finally {
-    if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = '<i class="ti ti-check"></i> Save Assignment'; }
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.innerHTML = '<i class="ti ti-check"></i> ' + t('saveAssignment'); }
   }
 }
 
@@ -9642,6 +9538,8 @@ setView = function(viewId, navEl) {
   });
   var mBtn = document.getElementById('mtab-' + viewId);
   if (mBtn) mBtn.classList.add('active');
+  // Re-apply translations so any blank/static labels in the newly shown view get filled
+  try { applyLang(_lang); } catch(e){}
 };
 
    /* ══════════════════════════════════════════════════════════
@@ -9978,8 +9876,8 @@ function renderGroupWorkoutsView() {
           '</div>' +
         '</div>' +
         '<div style="padding:8px 16px 12px;display:flex;gap:8px;border-top:1px solid var(--border)">' +
-          '<button class="btn btn-ghost btn-sm" onclick="openEditGroupWorkout(\'' + gw.id + '\')"><i class="ti ti-edit"></i> Edit</button>' +
-          '<button class="btn btn-ghost btn-sm" onclick="openGroupWorkoutDetail(\'' + gw.id + '\')"><i class="ti ti-chart-bar"></i> Results</button>' +
+          '<button class="btn btn-ghost btn-sm" onclick="openEditGroupWorkout(\'' + gw.id + '\')"><i class="ti ti-edit"></i> ' + t('btnEdit') + '</button>' +
+          '<button class="btn btn-ghost btn-sm" onclick="openGroupWorkoutDetail(\'' + gw.id + '\')"><i class="ti ti-chart-bar"></i> ' + t('btnResults') + '</button>' +
           '<button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="deleteGroupWorkout(\'' + gw.id + '\')"><i class="ti ti-trash"></i></button>' +
         '</div>' +
       '</div>';
