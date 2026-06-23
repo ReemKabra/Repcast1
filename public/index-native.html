@@ -402,7 +402,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <input class="form-input" type="email" placeholder="trainer@studio.com" id="login-email">
         </div>
         <div class="form-group">
-          <label class="form-label">Password</label>
+          <label class="form-label" id="reg-label-pass"></label>
           <input class="form-input" type="password" placeholder="••••••••" id="login-pass">
           <div style="text-align:right;margin-top:5px">
             <a href="javascript:void(0)" onclick="showForgotPassword()" style="font-size:12px;color:var(--muted);text-decoration:none">Forgot password?</a>
@@ -444,16 +444,16 @@ document.addEventListener('DOMContentLoaded', function() {
         <p class="auth-subtitle">Create your account and get started</p>
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Full Name</label>
+            <label class="form-label" id="reg-label-name"></label>
             <input class="form-input" type="text" placeholder="Jordan Davis" id="reg-name">
           </div>
           <div class="form-group">
-            <label class="form-label">Business Name</label>
+            <label class="form-label" id="reg-label-biz"></label>
             <input class="form-input" type="text" placeholder="Peak Performance" id="reg-biz">
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label">Email</label>
+          <label class="form-label" id="reg-label-email"></label>
           <input class="form-input" type="email" placeholder="trainer@studio.com" id="reg-email">
         </div>
         <div class="form-group">
@@ -463,10 +463,10 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="form-group">
           <label class="form-label">Specialty</label>
           <select class="form-select" id="reg-specialty">
-            <option>Personal Trainer</option>
+            <option data-i18n-opt="specPT">Personal Trainer</option>
             <option>Physiotherapist</option>
-            <option>Sports Therapist</option>
-            <option>Rehab Specialist</option>
+            <option data-i18n-opt="specSports">Sports Therapist</option>
+            <option data-i18n-opt="specRehab">Rehab Specialist</option>
           </select>
         </div>
         <div class="trial-info-box" style="background:rgba(96,165,250,0.07);border-color:rgba(96,165,250,0.18)">
@@ -620,19 +620,19 @@ document.addEventListener('DOMContentLoaded', function() {
             <i class="ti ti-database"></i> Library
           </button>
           <button class="lib-tab" id="tab-custom" onclick="switchLibTab('custom',this)" style="flex-shrink:0">
-            <i class="ti ti-cloud-upload"></i> My Videos
+            <i class="ti ti-cloud-upload"></i> <span data-i18n="libMyVideos">My Videos</span>
           </button>
           <button class="lib-tab" id="tab-mymenus" onclick="switchLibTab('mymenus',this)" style="flex-shrink:0">
-            <i class="ti ti-salad"></i> My Menus
+            <i class="ti ti-salad"></i> <span data-i18n="libMyMenus">My Menus</span>
           </button>
           <button class="lib-tab" id="tab-myprograms" onclick="switchLibTab('myprograms',this)" style="flex-shrink:0">
-            <i class="ti ti-calendar"></i> My Programs
+            <i class="ti ti-calendar"></i> <span data-i18n="libMyPrograms">My Programs</span>
           </button>
           <button class="lib-tab" id="tab-myrecipes" onclick="switchLibTab('myrecipes',this)" style="flex-shrink:0">
-            <i class="ti ti-chef-hat"></i> My Recipes
+            <i class="ti ti-chef-hat"></i> <span data-i18n="libMyRecipes">My Recipes</span>
           </button>
           <button class="lib-tab" id="tab-myresearch" onclick="switchLibTab('myresearch',this)" style="flex-shrink:0">
-            <i class="ti ti-book"></i> My Research
+            <i class="ti ti-book"></i> <span data-i18n="libMyResearch">My Research</span>
           </button>
         </div>
 
@@ -727,7 +727,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="topbar-left"><h2 class="view-title"><i class="ti ti-chef-hat" style="color:var(--accent)"></i> <span id="view-recipes-title">Recipe Library</span></h2></div>
           <div class="topbar-right">
             <div class="lib-tabs" style="margin:0">
-              <button class="lib-tab active" id="recipe-tab-all" onclick="filterRecipes('all',this)">All</button>
+              <button class="lib-tab active" id="recipe-tab-all" onclick="filterRecipes('all',this)" data-i18n="allFoodsTab">All</button>
               <button class="lib-tab" onclick="filterRecipes('breakfast',this)">Breakfast</button>
               <button class="lib-tab" onclick="filterRecipes('lunch',this)">Lunch</button>
               <button class="lib-tab" onclick="filterRecipes('dinner',this)">Dinner</button>
@@ -791,7 +791,7 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
           <div class="topbar-right">
             <button class="btn btn-primary" onclick="openAddClientModal()">
-              <i class="ti ti-user-plus"></i> Add Client
+              <i class="ti ti-user-plus"></i> <span data-i18n="btnAddClient">Add Client</span>
             </button>
           </div>
           <div class="search-wrap" style="width:100%;margin-top:4px">
@@ -821,7 +821,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <!-- PROFILE VIEW -->
       <div class="view" id="view-profile" style="overflow-y:auto;-webkit-overflow-scrolling:touch">
         <div class="view-topbar">
-          <div class="topbar-left"><h2 class="view-title">Profile &amp; Settings</h2></div>
+          <div class="topbar-left"><h2 class="view-title"><span data-i18n="titleProfile">Profile &amp; Settings</span></h2></div>
           <div class="topbar-right">
             <button class="btn btn-primary" onclick="saveProfile()"><i class="ti ti-check"></i> Save Changes</button>
           </div>
@@ -837,9 +837,9 @@ document.addEventListener('DOMContentLoaded', function() {
               <h3 id="profile-display-name">Jordan Davis, PT</h3>
               <p id="profile-display-biz">Peak Performance Physio</p>
               <div class="profile-stats">
-                <div class="pstat"><span id="pstat-videos">0</span><em>Custom Videos</em></div>
-                <div class="pstat"><span id="pstat-routines">0</span><em>Routines Sent</em></div>
-                <div class="pstat"><span id="pstat-clients">0</span><em>Clients Reached</em></div>
+                <div class="pstat"><span id="pstat-videos">0</span><em data-i18n="pstatVideos">Custom Videos</em></div>
+                <div class="pstat"><span id="pstat-routines">0</span><em data-i18n="pstatRoutines">Routines Sent</em></div>
+                <div class="pstat"><span id="pstat-clients">0</span><em data-i18n="pstatClients">Clients Reached</em></div>
               </div>
             </div>
           </div>
@@ -854,20 +854,20 @@ document.addEventListener('DOMContentLoaded', function() {
             </button>
           </div>
           <div class="profile-form-grid">
-            <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="pf-name" value="Jordan Davis"></div>
-            <div class="form-group"><label class="form-label">Phone Number</label><input class="form-input" id="pf-phone" value="+972 50 123 4567"></div>
-            <div class="form-group"><label class="form-label">Business Name</label><input class="form-input" id="pf-biz" value="Peak Performance Physio"></div>
+            <div class="form-group"><label class="form-label" id="pf-label-name"></label><input class="form-input" id="pf-name" value="Jordan Davis"></div>
+            <div class="form-group"><label class="form-label" id="pf-label-phone"></label><input class="form-input" id="pf-phone" value="+972 50 123 4567"></div>
+            <div class="form-group"><label class="form-label" id="pf-label-biz"></label><input class="form-input" id="pf-biz" value="Peak Performance Physio"></div>
             <div class="form-group">
-              <label class="form-label">Specialty</label>
+              <label class="form-label" id="reg-label-specialty"></label>
               <select class="form-select" id="pf-specialty">
-                <option selected>Physiotherapist</option>
-                <option>Personal Trainer</option>
-                <option>Sports Therapist</option>
-                <option>Rehab Specialist</option>
+                <option selected data-i18n-opt="specPhysio">Physiotherapist</option>
+                <option data-i18n-opt="specPT">Personal Trainer</option>
+                <option data-i18n-opt="specSports">Sports Therapist</option>
+                <option data-i18n-opt="specRehab">Rehab Specialist</option>
               </select>
             </div>
             <div class="form-group full-span">
-              <label class="form-label">Professional Bio</label>
+              <label class="form-label" id="pf-label-bio"></label>
               <textarea class="form-textarea" id="pf-bio" rows="3">Helping athletes recover faster and perform better. Specialising in sports rehabilitation and corrective exercise programming.</textarea>
             </div>
           </div>
@@ -968,10 +968,10 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="cart-badge-wrap">
         <div class="cart-badge" id="cart-count">0</div>
       </div>
-      <span id="cart-label">exercises selected</span>
+      <span id="cart-label"></span>
     </div>
     <div class="cart-actions">
-      <button class="btn btn-ghost-sm" onclick="clearCart()"><i class="ti ti-trash"></i> Clear</button>
+      <button class="btn btn-ghost-sm" onclick="clearCart()"><i class="ti ti-trash"></i> <span data-i18n="btnClear">Clear</span></button>
       <button class="btn btn-accent" onclick="openModal('checkout');renderCheckout()"><i class="ti ti-clipboard-list"></i> Review &amp; Assign <i class="ti ti-arrow-right"></i></button>
     </div>
   </div>
@@ -1051,7 +1051,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
     <div class="topnav-links">
       <a class="topnav-link active" id="mnav-exercises" onclick="setAdminView('exercises',this)" href="#">
-        <i class="ti ti-database"></i> Master Library
+        <i class="ti ti-database"></i> <span data-i18n="libMasterLib">Master Library</span>
       </a>
       <a class="topnav-link" id="mnav-users" onclick="setAdminView('users',this)" href="#">
         <i class="ti ti-users"></i> Users
@@ -1343,7 +1343,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Sub-category *</label>
+        <label class="form-label" data-i18n="exSubcatLabel">Sub-category *</label>
         <select class="form-select" id="upload-subcat"><option value="">Select group first</option></select>
       </div>
     </div>
@@ -1401,7 +1401,7 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <input class="form-input" id="checkout-routine-name" placeholder="e.g. Upper Body Day A" style="margin-bottom:10px">
       <button class="btn btn-full" onclick="saveAsRoutine()" style="background:rgba(96,165,250,0.12);border:1px solid rgba(96,165,250,0.4);color:#60A5FA;font-weight:700">
-        <i class="ti ti-bookmark"></i> Save Routine
+        <i class="ti ti-bookmark"></i> <span data-i18n="btnSaveRoutine">Save Routine</span>
       </button>
     </div>
 
@@ -1427,20 +1427,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Close</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="close">Close</button>
   </div>
 </div>
 
 <!-- Admin Add/Edit Modal -->
 <div class="modal modal-wide" id="modal-admin-exercise">
   <div class="modal-header">
-    <h3 id="admin-modal-title"><i class="ti ti-plus"></i> Add Exercise to Master Library</h3>
+    <h3 id="admin-modal-title"><i class="ti ti-plus"></i> <span data-i18n="addExerciseMaster">Add Exercise to Master Library</span></h3>
     <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
   </div>
   <div class="modal-body">
     <input type="hidden" id="admin-edit-id">
     <div class="form-group">
-      <label class="form-label">Exercise Title * <span style="color:var(--muted);font-weight:400">(English)</span></label>
+      <label class="form-label" data-i18n="exTitleLabel">Exercise Title * (EN)</label>
       <input class="form-input" id="admin-ex-title" placeholder="e.g. Incline Dumbbell Press">
     </div>
     <div class="form-group">
@@ -1449,7 +1449,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Primary Muscle Group *</label>
+        <label class="form-label" data-i18n="exMuscleLabel">Primary Muscle Group *</label>
         <select class="form-select" id="admin-ex-muscle" onchange="populateSubcats('admin-ex-muscle','admin-ex-subcat')">
           <option value="">Select muscle…</option>
           <option value="chest">Chest</option>
@@ -1469,18 +1469,18 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Difficulty</label>
+        <label class="form-label" data-i18n="exDiffLabel">Difficulty</label>
         <select class="form-select" id="admin-ex-diff">
-          <option>Beginner</option>
-          <option>Intermediate</option>
-          <option>Advanced</option>
+          <option data-i18n-opt="lvlBeginner">Beginner</option>
+          <option data-i18n-opt="lvlIntermediate">Intermediate</option>
+          <option data-i18n-opt="lvlAdvanced">Advanced</option>
         </select>
       </div>
       <!-- Duration is auto-detected from video metadata, not manually entered -->
       <input type="hidden" id="admin-ex-duration" value="">
     </div>
     <div class="form-group">
-      <label class="form-label">Description / Coaching Cues * <span style="color:var(--muted);font-weight:400">(English)</span></label>
+      <label class="form-label" data-i18n="exDescLabel">Description / Coaching Cues * (EN)</label>
       <textarea class="form-textarea" id="admin-ex-desc" rows="3" placeholder="Step-by-step instructions and coaching cues…"></textarea>
     </div>
     <div class="form-group">
@@ -1490,18 +1490,18 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="form-group">
       <label class="form-label" style="display:flex;align-items:center;gap:8px;cursor:pointer">
         <input type="checkbox" id="admin-ex-premium" style="width:16px;height:16px;accent-color:var(--warn)">
-        Premium only (hidden from free tier)
+        <span data-i18n="exPremiumLabel">Premium only (hidden from free tier)</span>
       </label>
     </div>
     <div class="form-group">
-      <label class="form-label">Video URL (Firebase Storage, YouTube, or paste direct link)</label>
+      <label class="form-label" data-i18n="exVideoLabel">Video URL</label>
       <input class="form-input" id="admin-ex-video" placeholder="https://… or leave blank to upload a file below">
     </div>
     <div class="form-group">
-      <label class="form-label">— or — Upload Video from Computer</label>
+      <label class="form-label" data-i18n="exUploadLabel">— or — Upload Video from Computer</label>
       <div class="admin-file-upload-zone" onclick="document.getElementById('admin-ex-file').click()">
         <i class="ti ti-cloud-upload"></i>
-        <span id="admin-file-label">Choose video file…</span>
+        <span id="admin-file-label" data-i18n="chooseVideoFile">Choose video file…</span>
         <small>MP4, MOV, WebM · max 500 MB · overwrites URL field above</small>
         <input type="file" id="admin-ex-file" accept="video/mp4,video/quicktime,video/webm"
           style="display:none" onchange="handleAdminFileSelect(this)">
@@ -1810,7 +1810,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
   </div>
   <div class="modal-body" id="recipe-detail-body"></div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Close</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="close">Close</button>
   </div>
 </div>
 
@@ -1994,22 +1994,22 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
   <div class="modal-body">
     <div class="form-row">
       <div class="form-group" style="flex:2">
-        <label class="form-label">Full Name *</label>
+        <label class="form-label" data-i18n="fldFullName">Full Name *</label>
         <input class="form-input" id="client-name" placeholder="David Cohen">
       </div>
       <div class="form-group">
         <label class="form-label">Gender</label>
         <select class="form-input" id="client-gender">
-          <option value="male">Male</option>
-          <option value="female">Female</option>
+          <option value="male" data-i18n-opt="ebmrMale">Male</option>
+          <option value="female" data-i18n-opt="ebmrFemale">Female</option>
         </select>
       </div>
       <div class="form-group">
         <label class="form-label" data-i18n="fldProgGoal">Goal</label>
         <select class="form-input" id="client-goal">
-          <option value="cut">Cut</option>
-          <option value="maintain" selected>Maintain</option>
-          <option value="bulk">Bulk</option>
+          <option value="cut" data-i18n-opt="goalCutTag">Cut</option>
+          <option value="maintain" selected data-i18n-opt="goalMaintainTag">Maintain</option>
+          <option value="bulk" data-i18n-opt="goalBulkTag">Bulk</option>
         </select>
       </div>
     </div>
@@ -2025,7 +2025,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Age</label>
+        <label class="form-label" data-i18n="ebmrAge">Age</label>
         <input class="form-input" id="client-age" type="number" placeholder="30">
       </div>
       <div class="form-group">
@@ -2033,38 +2033,38 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
         <input class="form-input" id="client-weight" type="number" placeholder="80">
       </div>
       <div class="form-group">
-        <label class="form-label">Height (cm)</label>
+        <label class="form-label" data-i18n="ebmrHeight">Height (cm)</label>
         <input class="form-input" id="client-height" type="number" placeholder="175">
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Activity Level</label>
+      <label class="form-label" data-i18n="ebmrActivity">Activity Level</label>
       <select class="form-input" id="client-activity">
-        <option value="1.2">Sedentary (desk job, no exercise)</option>
-        <option value="1.375">Lightly Active (1–3 days/week)</option>
-        <option value="1.55" selected>Moderately Active (3–5 days/week)</option>
-        <option value="1.725">Very Active (6–7 days/week)</option>
-        <option value="1.9">Athlete (twice daily / physical job)</option>
+        <option value="1.2" data-i18n-opt="actSedentary">Sedentary (desk job, no exercise)</option>
+        <option value="1.375" data-i18n-opt="actLight">Lightly Active (1–3 days/week)</option>
+        <option value="1.55" selected data-i18n-opt="actModerate">Moderately Active (3–5 days/week)</option>
+        <option value="1.725" data-i18n-opt="actVery">Very Active (6–7 days/week)</option>
+        <option value="1.9" data-i18n-opt="actAthlete">Athlete (twice daily / physical job)</option>
       </select>
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Cut Intensity</label>
+        <label class="form-label" data-i18n="ebmrCutInt">Cut Intensity</label>
         <select class="form-input" id="client-cut-intensity">
-          <option value="0.85">Moderate Cut (−15%)</option>
-          <option value="0.80">Aggressive Cut (−20%)</option>
+          <option value="0.85" data-i18n-opt="cutModerate">Moderate Cut (−15%)</option>
+          <option value="0.80" data-i18n-opt="cutAggressive">Aggressive Cut (−20%)</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Bulk Intensity</label>
+        <label class="form-label" data-i18n="ebmrBulkInt">Bulk Intensity</label>
         <select class="form-input" id="client-bulk-intensity">
-          <option value="1.10">Lean Bulk (+10%)</option>
-          <option value="1.20">Aggressive Bulk (+20%)</option>
+          <option value="1.10" data-i18n-opt="bulkLean">Lean Bulk (+10%)</option>
+          <option value="1.20" data-i18n-opt="bulkAggressive">Aggressive Bulk (+20%)</option>
         </select>
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Trainer Notes <small style="color:var(--muted2)">(private — client cannot see)</small></label>
+      <label class="form-label" data-i18n="trainerNotesLabel">Trainer Notes <small style="color:var(--muted2)">(private — client cannot see)</small></label>
       <textarea class="form-textarea" id="client-notes" rows="2" placeholder="Injury history, preferences, goals..."></textarea>
     </div>
   </div>
@@ -2110,10 +2110,10 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
   <div class="modal-body">
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Gender</label>
+        <label class="form-label" data-i18n="fldGender">Gender</label>
         <select class="form-input" id="ebmr-gender" onchange="previewEditBMR()">
-          <option value="male">Male</option>
-          <option value="female">Female</option>
+          <option value="male" data-i18n-opt="ebmrMale">Male</option>
+          <option value="female" data-i18n-opt="ebmrFemale">Female</option>
         </select>
       </div>
       <div class="form-group">
@@ -2127,26 +2127,26 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Age</label>
+        <label class="form-label" data-i18n="ebmrAge">Age</label>
         <input class="form-input" id="ebmr-age" type="number" placeholder="30" oninput="previewEditBMR()">
       </div>
       <div class="form-group">
-        <label class="form-label">Weight (kg)</label>
+        <label class="form-label" data-i18n="ebmrWeight">Weight (kg)</label>
         <input class="form-input" id="ebmr-weight" type="number" placeholder="80" oninput="previewEditBMR()">
       </div>
       <div class="form-group">
-        <label class="form-label">Height (cm)</label>
+        <label class="form-label" data-i18n="ebmrHeight">Height (cm)</label>
         <input class="form-input" id="ebmr-height" type="number" placeholder="175" oninput="previewEditBMR()">
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Activity Level</label>
+      <label class="form-label" data-i18n="ebmrActivity">Activity Level</label>
       <select class="form-input" id="ebmr-activity" onchange="previewEditBMR()">
-        <option value="1.2">Sedentary (desk job, no exercise)</option>
-        <option value="1.375">Lightly Active (1–3 days/week)</option>
-        <option value="1.55" selected>Moderately Active (3–5 days/week)</option>
-        <option value="1.725">Very Active (6–7 days/week)</option>
-        <option value="1.9">Athlete (twice daily / physical job)</option>
+        <option value="1.2" data-i18n-opt="actSedentary">Sedentary (desk job, no exercise)</option>
+        <option value="1.375" data-i18n-opt="actLight">Lightly Active (1–3 days/week)</option>
+        <option value="1.55" selected data-i18n-opt="actModerate">Moderately Active (3–5 days/week)</option>
+        <option value="1.725" data-i18n-opt="actVery">Very Active (6–7 days/week)</option>
+        <option value="1.9" data-i18n-opt="actAthlete">Athlete (twice daily / physical job)</option>
       </select>
       <div class="recipe-tips" style="margin-top:8px;font-size:12px">
         <i class="ti ti-info-circle"></i>
@@ -2159,24 +2159,24 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Cut Intensity</label>
+        <label class="form-label" data-i18n="ebmrCutInt">Cut Intensity</label>
         <select class="form-input" id="ebmr-cut" onchange="previewEditBMR()">
-          <option value="0.85">Moderate Cut (−15%)</option>
-          <option value="0.80">Aggressive Cut (−20%)</option>
+          <option value="0.85" data-i18n-opt="cutModerate">Moderate Cut (−15%)</option>
+          <option value="0.80" data-i18n-opt="cutAggressive">Aggressive Cut (−20%)</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Bulk Intensity</label>
+        <label class="form-label" data-i18n="ebmrBulkInt">Bulk Intensity</label>
         <select class="form-input" id="ebmr-bulk" onchange="previewEditBMR()">
-          <option value="1.10">Lean Bulk (+10%)</option>
-          <option value="1.20">Aggressive Bulk (+20%)</option>
+          <option value="1.10" data-i18n-opt="bulkLean">Lean Bulk (+10%)</option>
+          <option value="1.20" data-i18n-opt="bulkAggressive">Aggressive Bulk (+20%)</option>
         </select>
       </div>
     </div>
     <div id="ebmr-preview" style="margin-top:16px"></div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeBmrEditModal()">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeBmrEditModal()" data-i18n="btnCancel">Cancel</button>
     <button class="btn btn-primary" onclick="saveEditClientBMR()">
       <i class="ti ti-check"></i> Save
     </button>
@@ -2410,6 +2410,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
 
 <script src="i18n.en.js" defer></script>
 <script src="i18n.he.js" defer></script>
+<script src="i18n.js" defer></script>
 <script src="app.js?v=1781872092" defer></script>
 <script>
 /* ── Accessibility Widget ─────────────────────────────────────── */
@@ -2973,19 +2974,19 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
   <!-- Profile Tabs -->
   <div style="display:flex;border-bottom:1px solid var(--border);padding:0 16px;flex-shrink:0">
     <button class="client-profile-tab active" id="cptab-assign" onclick="switchClientProfileTab('assign')">
-      <i class="ti ti-clipboard-list"></i> Assignments
+      <i class="ti ti-clipboard-list"></i> <span data-i18n="tabAssignments">Assignments</span>
     </button>
     <button class="client-profile-tab" id="cptab-training" onclick="switchClientProfileTab('training')">
-      <i class="ti ti-chart-line"></i> Training Log
+      <i class="ti ti-chart-line"></i> <span data-i18n="tabTrainingLog">Training Log</span>
     </button>
     <button class="client-profile-tab" id="cptab-body" onclick="switchClientProfileTab('body')">
-      <i class="ti ti-ruler" style=""></i> Body
+      <i class="ti ti-ruler" style=""></i> <span data-i18n="tabBody">Body</span>
     </button>
   </div>
   <!-- Tab content -->
   <div id="client-profile-modal-body" style="flex:1;overflow-y:auto;padding:0"></div>
   <div class="modal-footer" id="client-profile-modal-footer" style="flex-shrink:0">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Close</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="close">Close</button>
   </div>
 </div>
 
@@ -3030,7 +3031,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
   <div class="modal-body" style="overflow-y:auto;max-height:70vh">
     <div class="form-row" style="gap:12px">
       <div class="form-group" style="flex:2">
-        <label class="form-label">Workout Name</label>
+        <label class="form-label" data-i18n="gwWorkoutName">Workout Name</label>
         <input class="form-input" id="gw-name" placeholder="e.g. Upper Body Blast, Monday Legs...">
       </div>
       <div class="form-group" style="flex:1">
@@ -3041,7 +3042,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
 
     <div class="form-group" style="margin-top:16px">
       <label class="form-label">Exercises</label>
-      <div class="prog-ex-header" style="margin-bottom:4px"><span>Exercise</span><span>Sets</span><span>Reps</span><span>Rest</span><span>Notes</span><span></span></div>
+      <div class="prog-ex-header" style="margin-bottom:4px"><span data-i18n="gwExercise">Exercise</span><span data-i18n="colSets">Sets</span><span data-i18n="colReps">Reps</span><span data-i18n="colRest">Rest</span><span data-i18n="measNotes">Notes</span><span></span></div>
       <div id="gw-exercises-body"></div>
       <button class="btn btn-ghost btn-sm" onclick="addGWExercise()" style="margin-top:8px">
         <i class="ti ti-plus"></i> Add Exercise
@@ -3054,7 +3055,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </div>
 
     <div class="form-group" style="margin-top:16px">
-      <label class="form-label">Notes / Instructions</label>
+      <label class="form-label" data-i18n="gwNotes">Notes / Instructions</label>
       <textarea class="form-input" id="gw-notes" rows="3" placeholder="Warm-up instructions, focus points, etc."></textarea>
     </div>
   </div>
@@ -3078,7 +3079,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     <div id="gw-detail-body"></div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Close</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="close">Close</button>
   </div>
 </div>
 

@@ -184,6 +184,9 @@ async function setLang(newLang) {
 
   // ── 5. Re-render all visible content ──
   try { buildMuscleFilters(); } catch(e){}
+  // Show muscle filter only on Master Library tab
+  var mfBar = document.getElementById('muscle-filter-bar');
+  if (mfBar) mfBar.style.display = (typeof _currentLibTab === 'undefined' || _currentLibTab === 'master') ? 'flex' : 'none';
   try { renderLibrary(); }       catch(e){}
   try { renderMenuLibrary(); }   catch(e){}
   try { renderProgramsView(); }  catch(e){}
@@ -1529,6 +1532,15 @@ if (document.readyState === 'loading') {
       MUSCLE FILTER SIDEBAR
    ══════════════════════════════════════════════════════════ */
    
+
+   // Hebrew muscle id → English muscle id mapping for filtering MASTER_EXERCISES
+   var _HE_MUSCLE_MAP = {
+     'חזה':'chest','גב':'back','רגליים':'legs','כתפיים':'shoulders',
+     'ידיים':'arms','בטן':'core','גוף מלא':'fullbody','פיזיו':'physio'
+   };
+   var _EN_MUSCLE_MAP = {};
+   Object.keys(_HE_MUSCLE_MAP).forEach(function(he){ _EN_MUSCLE_MAP[_HE_MUSCLE_MAP[he]] = he; });
+
    function buildMuscleFilters() {
      var isHe = (typeof _lang !== 'undefined' && _lang === 'he');
 
@@ -1651,6 +1663,13 @@ if (document.readyState === 'loading') {
    ══════════════════════════════════════════════════════════ */
    
    function switchLibTab(tab, btn) {
+  _currentLibTab = tab;
+  // Show muscle filter only on Master Library
+  var mfBar = document.getElementById('muscle-filter-bar');
+  if (mfBar) mfBar.style.display = (tab === 'master') ? 'flex' : 'none';
+  if (tab === 'master' && typeof buildMuscleFilters === 'function') {
+    try { buildMuscleFilters(); } catch(e){}
+  }
      // Block upload tabs for clients
      if (window._clientMode && (tab === 'custom')) return;
      state.activeTab = tab;
@@ -1717,6 +1736,7 @@ if (document.readyState === 'loading') {
      '</div>';
 
      if (!items.length) {
+       grid.style.cssText = 'display:block;padding:0';
        grid.innerHTML = addBtn +
          '<div style="text-align:center;padding:40px 20px;color:var(--muted)">' +
            '<i class="ti ti-' + (tab==='mymenus'?'salad':tab==='myprograms'?'calendar':tab==='myrecipes'?'chef-hat':'book') + '" style="font-size:36px;display:block;margin-bottom:10px;opacity:0.25"></i>' +
@@ -1727,26 +1747,31 @@ if (document.readyState === 'loading') {
      }
 
      var isNative = document.documentElement.classList.contains('is-native');
-     if (isNative) {
-       grid.style.cssText = 'display:block;padding:0';
-     } else {
-       // Web: restore grid layout matching exercise cards
-       grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;padding:20px;align-items:start';
-     }
-     grid.innerHTML = addBtn + items.map(function(item) {
-       return renderMyContentCard(item, type, myUid);
-     }).join('');
+     // Render: add button above the card grid (not inside it, to avoid breaking layout)
+     var cardsGrid = '<div style="' +
+       (isNative ? 'display:block;padding:0' :
+         'display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;padding:16px 20px;align-items:start') +
+       '">' +
+       items.map(function(item) { return renderMyContentCard(item, type, myUid); }).join('') +
+       '</div>';
+     grid.style.cssText = 'display:block;padding:0';
+     grid.innerHTML = addBtn + cardsGrid;
    }
 
    function renderMyContentCard(item, type, myUid) {
      var isPublic = item.isPublic !== false;
      var pubColor = isPublic ? 'var(--accent)' : '#FBBF24';
      var pubIcon  = isPublic ? 'ti-world' : 'ti-lock';
-     var pubLabel = isPublic ? 'Public' : 'Private';
+     var pubLabel = isPublic ? t('statusPublic')||'Public' : t('statusPrivate')||'Private';
 
      var meta = '';
      if (type === 'menu')    meta = (item.calories||'') + ' kcal';
-     if (type === 'program') meta = (item.weeks||'?') + ' ' + t('lblWeeks').toLowerCase() + ' · ' + t('goal' + (item.goal ? item.goal.charAt(0).toUpperCase() + item.goal.slice(1).replace('-','') : '')) || item.goal || '';
+     if (type === 'program') {
+    var goalMap = { cut:t('goalCutTag'), bulk:t('goalBulkTag'), maintain:t('goalMaintainTag'),
+      strength:'Strength', hypertrophy:'Hypertrophy', 'fat-loss':'Fat Loss', endurance:'Endurance', rehab:'Rehab' };
+    var goalStr = goalMap[(item.goal||'').toLowerCase()] || item.goal || '';
+    meta = (item.weeks||'?') + ' ' + t('weeksLabel') + ' · ' + goalStr;
+  }
      if (type === 'recipe')  meta = (item.calories||0) + ' kcal · ' + (item.prepTime||'?') + ' min';
      if (type === 'research') meta = item.category || '';
 
@@ -1768,7 +1793,7 @@ if (document.readyState === 'loading') {
            '<div style="flex:1"></div>' +
            '<button onclick="editMyContent(\'' + item.id + '\',\'' + type + '\')" ' +
              'style="padding:4px 10px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit">' +
-             '<i class="ti ti-edit"></i> Edit' +
+             '<i class="ti ti-edit"></i> ' + t('btnEdit') +
            '</button>' +
            '<button onclick="deleteMyContent(\'' + item.id + '\',\'' + type + '\')" ' +
              'style="padding:4px 10px;border-radius:8px;border:1px solid rgba(255,107,107,0.3);background:transparent;color:var(--danger);font-size:12px;cursor:pointer;font-family:inherit">' +
@@ -1785,10 +1810,10 @@ if (document.readyState === 'loading') {
      var item = arr.find(function(x){ return x.id === id; });
      if (!item) return;
      var newPublic = item.isPublic === false ? true : false;
-     var col = type==='menu'?'menus':type==='program'?'programs':type==='recipe'?'recipes':'research';
+     var colName = type==='menu'?col('menus'):type==='program'?col('programs'):type==='recipe'?col('recipes'):'research';
      try {
        await window._firebase.setDoc(
-         window._firebase.doc(window._db, col, id),
+         window._firebase.doc(window._db, colName, id),
          { isPublic: newPublic }, { merge: true }
        );
        item.isPublic = newPublic;
@@ -1797,8 +1822,8 @@ if (document.readyState === 'loading') {
        btn.style.borderColor = color;
        btn.style.background  = color + '18';
        btn.style.color       = color;
-       btn.innerHTML = '<i class="ti ' + icon + '"></i> ' + (newPublic ? 'Public' : 'Private');
-       showToast(newPublic ? '🌐 Now public' : '🔒 Now private');
+       btn.innerHTML = '<i class="ti ' + icon + '"></i> ' + (newPublic ? t('statusPublic')||'Public' : t('statusPrivate')||'Private');
+       showToast(newPublic ? '🌐 ' + (t('statusPublic')||'Public') : '🔒 ' + (t('statusPrivate')||'Private'));
      } catch(e) { showToast('Failed: ' + e.message); }
    }
 
@@ -1810,17 +1835,17 @@ if (document.readyState === 'loading') {
    }
 
    async function deleteMyContent(id, type) {
-     if (!confirm('Delete this ' + type + '? This cannot be undone.')) return;
-     var col = type==='menu'?'menus':type==='program'?'programs':type==='recipe'?'recipes':'research';
+     if (!confirm((t('btnYesDelete')||'Delete') + ' ' + type + '?')) return;
+     var colName = type==='menu'?col('menus'):type==='program'?col('programs'):type==='recipe'?col('recipes'):'research';
      var arr = type==='menu'?menus:type==='program'?programs:type==='recipe'?recipes:research;
      try {
-       await window._firebase.deleteDoc(window._firebase.doc(window._db, col, id));
+       await window._firebase.deleteDoc(window._firebase.doc(window._db, colName, id));
        var idx = arr.findIndex(function(x){ return x.id === id; });
        if (idx > -1) arr.splice(idx, 1);
        showToast(type + ' deleted');
        // Re-render current tab
        var tabMap = { menus:'mymenus', programs:'myprograms', recipes:'myrecipes', research:'myresearch' };
-       var tab = tabMap[col] || ('my' + col);
+       var tab = tabMap[colName] || ('my' + colName.replace('_he',''));
        renderMyContent(tab);
      } catch(e) { showToast('Delete failed: ' + e.message); }
    }
@@ -1863,28 +1888,33 @@ if (document.readyState === 'loading') {
        pool = customExercises.filter(e => e.ownerId === state.user?.uid);
      }
    
-     if (state.filterMuscle) pool = pool.filter(e => e.muscle === state.filterMuscle);
-     if (state.filterSub)    pool = pool.filter(e => e.sub    === state.filterSub);
+    if (state.filterMuscle) {
+      var normMuscle = _HE_MUSCLE_MAP[state.filterMuscle] || state.filterMuscle;
+      pool = pool.filter(function(e){ return e.muscle === normMuscle || e.muscle === state.filterMuscle; });
+    }
+    if (state.filterSub) pool = pool.filter(function(e){ return e.sub === state.filterSub; });
    
-     if (state.searchQuery) {
-       const q = state.searchQuery;
-       pool = pool.filter(e =>
-         e.title.toLowerCase().includes(q) ||
-         e.muscle.includes(q) ||
-         e.sub.toLowerCase().includes(q) ||
-         e.desc.toLowerCase().includes(q)
-       );
-     }
-   
-     var mcEl = document.getElementById('master-count');
-     var ccEl = document.getElementById('custom-count');
+    if (state.searchQuery) {
+      var q = state.searchQuery;
+      pool = pool.filter(function(e) {
+        var heTitle = e.title_he ? e.title_he.toLowerCase().includes(q) : false;
+        var enMuscle = (e.muscle||'').toLowerCase();
+        var heMuscle = _EN_MUSCLE_MAP[enMuscle] || '';
+        return (e.title||'').toLowerCase().includes(q) || heTitle ||
+          enMuscle.includes(q) || heMuscle.includes(q) ||
+          (e.sub||'').toLowerCase().includes(q) ||
+          (e.desc||'').toLowerCase().includes(q);
+      });
+    }
+
+    var mcEl = document.getElementById('master-count');
+    var ccEl = document.getElementById('custom-count');
      if (mcEl) mcEl.textContent = MASTER_EXERCISES.length;
      if (ccEl) ccEl.textContent = customExercises.length;
    
-     const section = state.filterSub    ? state.filterSub
-                   : state.filterMuscle ? capitalize(state.filterMuscle)
-                   : isMaster           ? t('allExercises')
-                   :                      'My Custom Videos';
+    var _muscLbl = state.filterMuscle ? ((_lang==='he' && _EN_MUSCLE_MAP[state.filterMuscle]) ? state.filterMuscle : capitalize(state.filterMuscle)) : null;
+    var section = state.filterSub ? state.filterSub : _muscLbl ? _muscLbl : isMaster ? t('allExercises') : t('libMyVideos');
+
    
      const body = document.getElementById('library-body');
    
@@ -2314,44 +2344,46 @@ if (document.readyState === 'loading') {
       function populateSubcats(muscleSelectId, subcatSelectId) {
      const muscle = document.getElementById(muscleSelectId).value;
      const sc     = document.getElementById(subcatSelectId);
-     if (!muscle) { sc.innerHTML = '<option value="">Select group first</option>'; return; }
+     if (!muscle) { sc.innerHTML = '<option value="">' + (window._heExModal ? (t('selectGroupFirst')||'בחר קבוצה קודם') : (t('selectGroupFirst')||'Select group first')) + '</option>'; return; }
      // Use Hebrew subcats when editing/adding Hebrew exercises
-     var subcatMap = (window._saveExToHe || window._addExToHe) ? SUBCATS_HE : SUBCATS;
+     var subcatMap = (window._saveExToHe || window._heExModal) ? SUBCATS_HE : SUBCATS;
      sc.innerHTML = (subcatMap[muscle] || []).map(s => `<option value="${s}">${s}</option>`).join('');
    }
 
    function switchExModalToHebrew() {
+     window._heExModal = true;
      var sel = document.getElementById('admin-ex-muscle');
      if (!sel) return;
      sel.innerHTML =
-       '<option value="">בחר קבוצת שריר…</option>' +
-       '<option value="חזה">חזה</option>' +
-       '<option value="גב">גב</option>' +
-       '<option value="רגליים">רגליים</option>' +
-       '<option value="כתפיים">כתפיים</option>' +
-       '<option value="ידיים">ידיים</option>' +
-       '<option value="בטן">בטן</option>' +
-       '<option value="גוף מלא">גוף מלא</option>' +
-       '<option value="פיזיו">פיזיו</option>';
+       '<option value="">' + (t('selectMuscle')||'בחר קבוצת שריר…') + '</option>' +
+       '<option value="חזה">' + (t('muscleChest')||'חזה') + '</option>' +
+       '<option value="גב">' + (t('muscleBack')||'גב') + '</option>' +
+       '<option value="רגליים">' + (t('muscleLegs')||'רגליים') + '</option>' +
+       '<option value="כתפיים">' + (t('muscleShoulders')||'כתפיים') + '</option>' +
+       '<option value="ידיים">' + (t('muscleArms')||'ידיים') + '</option>' +
+       '<option value="בטן">' + (t('muscleCore')||'בטן') + '</option>' +
+       '<option value="גוף מלא">' + (t('muscleFullBody')||'גוף מלא') + '</option>' +
+       '<option value="פיזיו">' + (t('musclePhysio')||'פיזיו') + '</option>';
      var sc = document.getElementById('admin-ex-subcat');
-     if (sc) sc.innerHTML = '<option value="">בחר קבוצה קודם</option>';
+     if (sc) sc.innerHTML = '<option value="">' + (t('selectGroupFirst')||'בחר קבוצה קודם') + '</option>';
    }
 
    function switchExModalToEnglish() {
+     window._heExModal = false;
      var sel = document.getElementById('admin-ex-muscle');
      if (!sel) return;
      sel.innerHTML =
-       '<option value="">Select muscle…</option>' +
-       '<option value="chest">Chest</option>' +
-       '<option value="back">Back</option>' +
-       '<option value="legs">Legs</option>' +
-       '<option value="shoulders">Shoulders</option>' +
-       '<option value="arms">Arms</option>' +
-       '<option value="core">Core</option>' +
-       '<option value="fullbody">Full Body</option>' +
-       '<option value="physio">Physiotherapy</option>';
+       '<option value="">' + (t('selectMuscle')||'Select muscle…') + '</option>' +
+       '<option value="chest">' + (t('muscleChest')||'Chest') + '</option>' +
+       '<option value="back">' + (t('muscleBack')||'Back') + '</option>' +
+       '<option value="legs">' + (t('muscleLegs')||'Legs') + '</option>' +
+       '<option value="shoulders">' + (t('muscleShoulders')||'Shoulders') + '</option>' +
+       '<option value="arms">' + (t('muscleArms')||'Arms') + '</option>' +
+       '<option value="core">' + (t('muscleCore')||'Core') + '</option>' +
+       '<option value="fullbody">' + (t('muscleFullBody')||'Full Body') + '</option>' +
+       '<option value="physio">' + (t('musclePhysio')||'Physiotherapy') + '</option>';
      var sc = document.getElementById('admin-ex-subcat');
-     if (sc) sc.innerHTML = '<option value="">Select group first</option>';
+     if (sc) sc.innerHTML = '<option value="">' + (t('selectGroupFirst')||'Select group first') + '</option>';
    }
    
    function handleAdminFileSelect(input) {
@@ -3369,16 +3401,23 @@ if (document.readyState === 'loading') {
      const titleEl = document.getElementById('admin-modal-title');
      const saveBtn = document.getElementById('admin-modal-save-btn');
 
-     // Ensure English muscle dropdown (in case Hebrew modal was open before)
+     // Check Hebrew intent BEFORE resetting flags
+     var _isHebrewEx = window._addExToHe ||
+       (window._adminLang && window._adminLang['exercises'] === 'he') ||
+       (typeof _lang !== 'undefined' && _lang === 'he');
      window._saveExToHe = false;
      window._addExToHe  = false;
-     switchExModalToEnglish();
+     if (_isHebrewEx) {
+       switchExModalToHebrew();
+     } else {
+       switchExModalToEnglish();
+     }
    
      // Reset form fields
      document.getElementById('admin-edit-id').value       = '';
      document.getElementById('admin-ex-title').value      = '';
      document.getElementById('admin-ex-muscle').value     = '';
-     document.getElementById('admin-ex-subcat').innerHTML = '<option value="">Select group first</option>';
+     document.getElementById('admin-ex-subcat').innerHTML = '<option value="">' + (t('selectGroupFirst')||'Select group first') + '</option>';
      document.getElementById('admin-ex-diff').value       = 'Beginner';
      document.getElementById('admin-ex-duration').value   = '';
      document.getElementById('admin-ex-desc').value       = '';
@@ -3387,15 +3426,15 @@ if (document.readyState === 'loading') {
      const adminFile = document.getElementById('admin-ex-file');
      if (adminFile) adminFile.value = '';
      const adminFileLabel = document.getElementById('admin-file-label');
-     if (adminFileLabel) adminFileLabel.textContent = 'Choose video file…';
+     if (adminFileLabel) adminFileLabel.textContent = t('chooseVideoFile')||'Choose video file…';
      const adminProg = document.getElementById('admin-upload-progress');
      if (adminProg) adminProg.style.display = 'none';
    
      if (mode === 'edit' && id) {
        const ex = MASTER_EXERCISES.find(e => e.id === id);
        if (!ex) return;
-       titleEl.innerHTML = '<i class="ti ti-edit"></i> Edit Exercise';
-       saveBtn.innerHTML = '<i class="ti ti-check"></i> ' + t('saveProfile');
+       titleEl.innerHTML = '<i class="ti ti-edit"></i> ' + t('btnEdit') + ' ' + (t('addExercise')||'Exercise');
+       saveBtn.innerHTML = '<i class="ti ti-check"></i> ' + t('btnSaveExercise');
        document.getElementById('admin-edit-id').value      = ex.id;
        document.getElementById('admin-ex-title').value     = ex.title;
        document.getElementById('admin-ex-muscle').value    = ex.muscle;
@@ -3407,7 +3446,7 @@ if (document.readyState === 'loading') {
        document.getElementById('admin-ex-premium').checked = !!ex.premium;
        document.getElementById('admin-ex-video').value     = ex.videoURL || '';
      } else {
-       titleEl.innerHTML = '<i class="ti ti-plus"></i> Add Exercise to Master Library';
+       titleEl.innerHTML = '<i class="ti ti-plus"></i> ' + (t('addExerciseMaster')||'Add Exercise to Master Library');
        saveBtn.innerHTML = '<i class="ti ti-check"></i> ' + t('btnSaveExercise');
      }
    
@@ -3415,6 +3454,40 @@ if (document.readyState === 'loading') {
      modal.classList.add('open');
    }
    
+
+   function openAdminModalHe() {
+     const modal   = document.getElementById('modal-admin-exercise');
+     const titleEl = document.getElementById('admin-modal-title');
+     const saveBtn = document.getElementById('admin-modal-save-btn');
+
+     // Set Hebrew mode flag first — persists through the whole session
+     window._heExModal  = true;
+     window._saveExToHe = false;
+
+     // Reset form
+     document.getElementById('admin-edit-id').value    = '';
+     document.getElementById('admin-ex-title').value   = '';
+     document.getElementById('admin-ex-duration').value= '';
+     document.getElementById('admin-ex-desc').value    = '';
+     document.getElementById('admin-ex-premium').checked = false;
+     document.getElementById('admin-ex-video').value   = '';
+     var adminFile = document.getElementById('admin-ex-file');
+     if (adminFile) adminFile.value = '';
+     var adminFileLabel = document.getElementById('admin-file-label');
+     if (adminFileLabel) adminFileLabel.textContent = t('chooseVideoFile')||'בחר קובץ וידאו…';
+     var adminProg = document.getElementById('admin-upload-progress');
+     if (adminProg) adminProg.style.display = 'none';
+
+     // Switch dropdown to Hebrew AFTER reset
+     switchExModalToHebrew();
+
+     titleEl.innerHTML = '<i class="ti ti-plus"></i> הוסף תרגיל לספרייה הראשית';
+     saveBtn.innerHTML = '<i class="ti ti-check"></i> שמור תרגיל';
+
+     document.getElementById('modal-backdrop').classList.add('open');
+     modal.classList.add('open');
+   }
+
    async function saveAdminExercise() {
      const editId   = document.getElementById('admin-edit-id').value;
      const title    = document.getElementById('admin-ex-title').value.trim();
@@ -4081,7 +4154,7 @@ function renderWorkoutScreen() {
 
   body.innerHTML = _workout.exercises.map(function(ex, ei) {
     var setsHTML = '<table class="workout-sets-table">' +
-      '<thead><tr><th>Set</th><th>' + _workout.weightUnit + '</th><th>Reps</th><th></th></tr></thead><tbody>' +
+      '<thead><tr><th>' + t('colSets') + '</th><th>' + _workout.weightUnit + '</th><th>' + t('colReps') + '</th><th></th></tr></thead><tbody>' +
       ex.sets.map(function(set, si) {
         return '<tr class="workout-set-row' + (set.completed ? ' completed' : '') + '" id="workout-set-' + ei + '-' + si + '">' +
           '<td style="font-size:13px;font-weight:700;color:var(--muted)">' + set.setNum + '</td>' +
@@ -4099,13 +4172,13 @@ function renderWorkoutScreen() {
     return '<div class="workout-exercise-card">' +
       '<div class="workout-ex-header">' +
         '<div>' +
-          '<div class="workout-ex-title">' + ex.title + (ex.swapped ? ' <span style="font-size:10px;color:var(--accent);background:rgba(126,232,162,0.1);padding:2px 6px;border-radius:4px">swapped</span>' : '') + '</div>' +
+          '<div class="workout-ex-title">' + ex.title + (ex.swapped ? ' <span style="font-size:10px;color:var(--accent);background:rgba(126,232,162,0.1);padding:2px 6px;border-radius:4px">' + t('labelSwapped') + '</span>' : '') + '</div>' +
           '<div class="workout-ex-muscle">' + (ex.muscle||'') + '</div>' +
         '</div>' +
-        '<button class="workout-swap-btn" onclick="openSwapExercise(' + ei + ')"><i class="ti ti-refresh"></i> Swap</button>' +
+        '<button class="workout-swap-btn" onclick="openSwapExercise(' + ei + ')"><i class="ti ti-refresh"></i> ' + t('btnSwap') + '</button>' +
       '</div>' +
       setsHTML +
-      '<button class="workout-add-set-btn" onclick="addWorkoutSet(' + ei + ')"><i class="ti ti-plus"></i> Add Set</button>' +
+      '<button class="workout-add-set-btn" onclick="addWorkoutSet(' + ei + ')"><i class="ti ti-plus"></i> ' + t('btnAdd') + ' ' + t('colSets') + '</button>' +
     '</div>';
   }).join('') +
   '<button onclick="closeWorkout()" style="width:100%;padding:14px;margin-top:8px;border:1px solid rgba(255,107,107,0.3);background:rgba(255,107,107,0.06);color:var(--danger);font-size:14px;font-weight:600;border-radius:12px;cursor:pointer;font-family:inherit"><i class="ti ti-x"></i> End Workout Without Saving</button>';
@@ -4567,6 +4640,7 @@ setInterval(function() {
    FOOD PICKER — trainer picks from food database for menus
 ══════════════════════════════════════════════════════════ */
 var _foodPickerMealId = null;
+var _currentLibTab    = 'master';
 var _foodPickerCat    = 'All'; // reset to translated on open
 
 async function openFoodPicker(mealId) {
@@ -4979,13 +5053,13 @@ function openMenuDetail(id) {
     html += '<div class="meal-section">' +
       '<div class="meal-header">' +
         '<span class="meal-name">' + meal.name + '</span>' +
-        '<span class="meal-total">' + Math.round(mealTot.cal) + ' kcal</span>' +
+        '<span class="meal-total">' + Math.round(mealTot.cal) + ' ' + t('colCalories') + '</span>' +
       '</div>' +
       '<table class="food-table">' +
         '<thead><tr>' +
-          '<th style="text-align:left">Food</th>' +
+          '<th style="text-align:left">' + t('colFoodName') + '</th>' +
           '<th>' + t('colQty') + '</th>' +
-          '<th>Cal</th>' +
+          '<th>' + t('colCalories') + '</th>' +
           '<th style="color:#60A5FA">' + t('colProtein') + '</th>' +
           '<th style="color:#FBBF24">' + t('colCarbs') + '</th>' +
           '<th style="color:#F472B6">' + t('colFat') + '</th>' +
@@ -5085,7 +5159,7 @@ function renderAdminMenuList() {
     return '<div class="admin-menu-row" style="background:' + (goalColors[m.goal]||'var(--surface)') + '">' +
       '<div style="flex:1"><strong>' + m.name + '</strong>' +
       '<div style="font-size:12px;color:var(--muted);margin-top:3px">' +
-        (m.goal||'').toUpperCase() + ' · ' + totals.calories + ' kcal · P:' + totals.protein + 'g C:' + totals.carbs + 'g F:' + totals.fat + 'g' +
+        (m.goal||'').toUpperCase() + ' · ' + totals.calories + ' ' + t('colCalories') + ' · P:' + totals.protein + 'g C:' + totals.carbs + 'g F:' + totals.fat + 'g' +
       '</div></div>' +
       '<div class="admin-actions">' +
         '<button class="admin-action-btn edit" onclick="openAdminMenuModal(\'' + m.id + '\')"><i class="ti ti-edit"></i> ' + t('btnEdit') + '</button>' +
@@ -5129,6 +5203,8 @@ function openAdminMenuModal(id) {
   }
 
   openModal('admin-menu');
+  // Re-apply language so lang-field-en/he visibility is correct
+  try { applyLang(_lang); } catch(e){}
 }
 
 function renderMealEditor(meal) {
@@ -5168,16 +5244,47 @@ function renderMealEditor(meal) {
 
 function foodItemHTML(mealId, item) {
   item = item || {};
-  return '<div class="food-item-row">' +
+  var baseQty = item.qty ? parseFloat(item.qty) : 100;
+  return '<div class="food-item-row"' +
+    ' data-base-qty="' + baseQty + '"' +
+    ' data-base-cal="' + (item.calories||0) + '"' +
+    ' data-base-pro="' + (item.protein||0)  + '"' +
+    ' data-base-car="' + (item.carbs||0)    + '"' +
+    ' data-base-fat="' + (item.fat||0)      + '">' +
     '<input class="form-input food-name" placeholder="e.g. Chicken breast" value="' + (item.name||'') + '" style="flex:2">' +
-    '<input class="form-input food-qty"  placeholder="150"  value="' + (item.qty||'') + '" style="width:60px">' +
+    '<input class="form-input food-qty"  placeholder="150"  value="' + (item.qty||'') + '" style="width:60px" oninput="recalcFoodRow(this)">' +
     '<input class="form-input food-unit" placeholder="g"    value="' + (item.unit||'g') + '" style="width:60px">' +
-    '<input class="form-input food-cal"  type="number" placeholder="0" value="' + (item.calories||'') + '" style="width:65px">' +
-    '<input class="form-input food-pro"  type="number" placeholder="0" value="' + (item.protein||'') + '" style="width:55px">' +
-    '<input class="form-input food-car"  type="number" placeholder="0" value="' + (item.carbs||'') + '" style="width:55px">' +
-    '<input class="form-input food-fat"  type="number" placeholder="0" value="' + (item.fat||'') + '" style="width:55px">' +
-    '<button class="admin-action-btn delete" onclick="this.parentElement.remove()" style="padding:6px 8px"><i class="ti ti-x"></i></button>' +
+    '<input class="form-input food-cal"  type="number" placeholder="0" value="' + (item.calories||'') + '" style="width:65px" oninput="updateAdminMenuPreview()">' +
+    '<input class="form-input food-pro"  type="number" placeholder="0" value="' + (item.protein||'') + '" style="width:55px" oninput="updateAdminMenuPreview()">' +
+    '<input class="form-input food-car"  type="number" placeholder="0" value="' + (item.carbs||'') + '" style="width:55px" oninput="updateAdminMenuPreview()">' +
+    '<input class="form-input food-fat"  type="number" placeholder="0" value="' + (item.fat||'') + '" style="width:55px" oninput="updateAdminMenuPreview()">' +
+    '<button class="admin-action-btn delete" onclick="this.parentElement.remove();updateAdminMenuPreview();" style="padding:6px 8px"><i class="ti ti-x"></i></button>' +
   '</div>';
+}
+
+function recalcFoodRow(qtyInput) {
+  var row = qtyInput.closest('.food-item-row');
+  if (!row) return;
+  var newQty = parseFloat(qtyInput.value);
+  // Don't recalc while user is still typing (empty or just a decimal point)
+  if (isNaN(newQty) || newQty <= 0 || qtyInput.value.trim() === '') {
+    updateAdminMenuPreview();
+    return;
+  }
+  // Always recalculate from the ORIGINAL base (stored once when food was added)
+  var baseQty = parseFloat(row.getAttribute('data-base-qty')) || 100;
+  if (!baseQty) return;
+  var ratio = newQty / baseQty;
+  var baseCal = parseFloat(row.getAttribute('data-base-cal')) || 0;
+  var basePro = parseFloat(row.getAttribute('data-base-pro')) || 0;
+  var baseCar = parseFloat(row.getAttribute('data-base-car')) || 0;
+  var baseFat = parseFloat(row.getAttribute('data-base-fat')) || 0;
+  if (baseCal) row.querySelector('.food-cal').value = Math.round(baseCal * ratio * 10) / 10;
+  if (basePro) row.querySelector('.food-pro').value = Math.round(basePro * ratio * 10) / 10;
+  if (baseCar) row.querySelector('.food-car').value = Math.round(baseCar * ratio * 10) / 10;
+  if (baseFat) row.querySelector('.food-fat').value = Math.round(baseFat * ratio * 10) / 10;
+  // NOTE: do NOT update data-base-* — keep original values so delete+retype always works
+  updateAdminMenuPreview();
 }
 
 function addFoodItem(mealId) {
@@ -5186,32 +5293,61 @@ function addFoodItem(mealId) {
   var div = document.createElement('div');
   div.innerHTML = foodItemHTML(mealId, {});
   container.appendChild(div.firstChild);
+  updateAdminMenuPreview();
 }
 
 function addMealToEditor() {
   renderMealEditor({ name: 'New Meal', items: [] });
+  updateAdminMenuPreview();
 }
 
 /* ── Live macro preview + totals in admin menu editor ─── */
 function updateAdminMenuPreview() {
-  var cal=0, pro=0, car=0, fat=0;
-  document.querySelectorAll('#modal-admin-menu .food-cal').forEach(function(i){ cal += parseFloat(i.value)||0; });
-  document.querySelectorAll('#modal-admin-menu .food-pro').forEach(function(i){ pro += parseFloat(i.value)||0; });
-  document.querySelectorAll('#modal-admin-menu .food-car').forEach(function(i){ car += parseFloat(i.value)||0; });
-  document.querySelectorAll('#modal-admin-menu .food-fat').forEach(function(i){ fat += parseFloat(i.value)||0; });
+  var totalCal=0, totalPro=0, totalCar=0, totalFat=0;
+
+  // ── Per-meal summaries ──
+  document.querySelectorAll('#modal-admin-menu .meal-editor').forEach(function(meal) {
+    var mCal=0, mPro=0, mCar=0, mFat=0;
+    meal.querySelectorAll('.food-cal').forEach(function(i){ mCal += parseFloat(i.value)||0; });
+    meal.querySelectorAll('.food-pro').forEach(function(i){ mPro += parseFloat(i.value)||0; });
+    meal.querySelectorAll('.food-car').forEach(function(i){ mCar += parseFloat(i.value)||0; });
+    meal.querySelectorAll('.food-fat').forEach(function(i){ mFat += parseFloat(i.value)||0; });
+    totalCal += mCal; totalPro += mPro; totalCar += mCar; totalFat += mFat;
+
+    // Show or create per-meal summary strip
+    var strip = meal.querySelector('.meal-summary-strip');
+    if (!strip) {
+      strip = document.createElement('div');
+      strip.className = 'meal-summary-strip';
+      strip.style.cssText = 'display:flex;gap:10px;padding:6px 10px 2px;font-size:12px;color:var(--muted2);flex-wrap:wrap;border-top:1px solid var(--border);margin-top:4px;';
+      meal.appendChild(strip);
+    }
+    if (mCal > 0 || mPro > 0) {
+      strip.innerHTML =
+        '<span style="font-weight:700;color:var(--text)">' + Math.round(mCal) + ' ' + t('colCalories') + '</span>' +
+        '<span style="color:#60A5FA">' + Math.round(mPro) + 'g ' + t('colProtein') + '</span>' +
+        '<span style="color:#FBBF24">' + Math.round(mCar) + 'g ' + t('colCarbs') + '</span>' +
+        '<span style="color:#F472B6">' + Math.round(mFat) + 'g ' + t('colFat') + '</span>';
+      strip.style.display = 'flex';
+    } else {
+      strip.style.display = 'none';
+    }
+  });
+
+  // ── Grand total chart ──
   var el = document.getElementById('admin-menu-preview-chart');
   if (el) el.innerHTML =
-    macroChartHTML(Math.round(pro), Math.round(car), Math.round(fat), Math.round(cal), 140) +
+    macroChartHTML(Math.round(totalPro), Math.round(totalCar), Math.round(totalFat), Math.round(totalCal), 140) +
     '<div class="menu-grand-total" style="margin-top:12px">' +
       '<div class="menu-grand-macros">' +
-        '<div class="menu-grand-macro"><span class="menu-grand-val">' + Math.round(cal) + '</span><em>' + t('colCalories') + '</em></div>' +
-        '<div class="menu-grand-macro" style="color:#60A5FA"><span class="menu-grand-val">' + Math.round(pro) + 'g</span><em>' + t('colProtein') + '</em></div>' +
-        '<div class="menu-grand-macro" style="color:#FBBF24"><span class="menu-grand-val">' + Math.round(car) + 'g</span><em>' + t('colCarbs') + '</em></div>' +
-        '<div class="menu-grand-macro" style="color:#F472B6"><span class="menu-grand-val">' + Math.round(fat) + 'g</span><em>' + t('colFat') + '</em></div>' +
+        '<div class="menu-grand-macro"><span class="menu-grand-val">' + Math.round(totalCal) + '</span><em>' + t('colCalories') + '</em></div>' +
+        '<div class="menu-grand-macro" style="color:#60A5FA"><span class="menu-grand-val">' + Math.round(totalPro) + 'g</span><em>' + t('colProtein') + '</em></div>' +
+        '<div class="menu-grand-macro" style="color:#FBBF24"><span class="menu-grand-val">' + Math.round(totalCar) + 'g</span><em>' + t('colCarbs') + '</em></div>' +
+        '<div class="menu-grand-macro" style="color:#F472B6"><span class="menu-grand-val">' + Math.round(totalFat) + 'g</span><em>' + t('colFat') + '</em></div>' +
       '</div>' +
     '</div>';
   var calEl = document.getElementById('admin-menu-calories');
-  if (calEl) calEl.placeholder = cal > 0 ? 'Auto: ' + Math.round(cal) : '1800';
+  if (calEl) calEl.placeholder = totalCal > 0 ? 'Auto: ' + Math.round(totalCal) : '1800';
 }
 
 /* ── ADMIN: Save menu to Firestore ───────────────────── */
@@ -5278,7 +5414,7 @@ async function saveAdminMenu() {
     }
   }
 
-  var menuColName = (_adminLang && _adminLang['menus'] === 'he') ? 'menus_he' : 'menus';
+  var menuColName = col('menus'); // uses _lang to pick correct collection
   try {
     var editId = document.getElementById('admin-menu-edit-id').value;
     if (editId) {
@@ -5286,18 +5422,16 @@ async function saveAdminMenu() {
         window._firebase.doc(window._db, menuColName, editId),
         menuData, { merge: true }
       );
-      showToast(_adminLang && _adminLang['menus']==='he' ? 'עודכן!' : 'Menu updated!');
+      showToast(_lang === 'he' ? 'עודכן!' : 'Menu updated!');
     } else {
       await window._firebase.addDoc(
         window._firebase.collection(window._db, menuColName),
         menuData
       );
-      showToast(_adminLang && _adminLang['menus']==='he' ? 'נשמר!' : 'Menu saved!');
+      showToast(_lang === 'he' ? 'נשמר!' : 'Menu saved!');
     }
     closeAllModals();
-    await loadMenus();
-    renderAdminMenuList();
-    if (menuColName === 'menus') renderMenuLibrary();
+    await loadMenus(); // reload so trainer sees it immediately in My Menus
   } catch(e) {
     console.error('Save menu error:', e);
     showToast('Save failed: ' + (e.code || e.message));
@@ -5325,15 +5459,13 @@ var programs = [];
 
 async function loadPrograms() {
   if (!window._firebase || !window._db) return;
-  // For clients, re-fetch their assigned programs from their profile
+  // Clients: re-fetch their assigned programs from their profile
   if (state.isClient && state.user) {
     try {
       var cpSnap = await window._firebase.getDoc(window._firebase.doc(window._db, 'clientProfiles', state.user.uid));
       if (cpSnap.exists()) {
         programs = cpSnap.data().assignedPrograms || [];
         window._clientAssignedPrograms = programs;
-    // Cache raw data so language switch can re-filter without re-fetching
-    window._clientRawData = data;
       }
     } catch(e) { console.warn('client loadPrograms:', e.message); }
     renderProgramsView();
@@ -5557,7 +5689,7 @@ function addProgramExercise(dayId) {
 
 function openAdminProgramModal(id) {
   document.getElementById('admin-program-id').value = id || '';
-  ['prog-name','prog-weeks','prog-days','prog-desc','prog-schedule','prog-notes'].forEach(function(x){ document.getElementById(x).value=''; });
+  ['prog-name','prog-name-he','prog-weeks','prog-days','prog-desc','prog-schedule','prog-notes'].forEach(function(x){ var el=document.getElementById(x); if(el) el.value=''; });
   document.getElementById('prog-goal').value  = 'strength';
   document.getElementById('prog-level').value = 'Intermediate';
   document.getElementById('prog-exercises-container').innerHTML = '';
@@ -5623,7 +5755,7 @@ async function saveAdminProgram() {
   try {
     if (editId) { await window._firebase.setDoc(window._firebase.doc(window._db, col('programs'),editId), data, {merge:true}); }
     else { await window._firebase.addDoc(window._firebase.collection(window._db, col('programs')), data); }
-    showToast('Program saved!'); closeAllModals(); renderAdminProgramsList(); renderProgramsView();
+    showToast(_lang === 'he' ? 'התוכנית נשמרה!' : 'Program saved!'); closeAllModals(); renderAdminProgramsList(); renderProgramsView();
   } catch(e) { showToast('Save failed: ' + e.code); }
 }
 
@@ -5768,15 +5900,15 @@ function openRecipeDetail(id) {
   document.getElementById('recipe-detail-body').innerHTML =
     mediaHTML +
     '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px">' +
-      '<div class="bmr-stat accent"><div class="bmr-stat-val">' + (r.calories||0) + '</div><div class="bmr-stat-label">Calories</div></div>' +
+      '<div class="bmr-stat accent"><div class="bmr-stat-val">' + (r.calories||0) + '</div><div class="bmr-stat-label">' + t('colCalories') + '</div></div>' +
       '<div class="bmr-stat"><div class="bmr-stat-val">' + (r.protein||0) + 'g</div><div class="bmr-stat-label">' + t('colProtein') + '</div></div>' +
       '<div class="bmr-stat"><div class="bmr-stat-val">' + (r.carbs||0) + 'g</div><div class="bmr-stat-label">' + t('colCarbs') + '</div></div>' +
       '<div class="bmr-stat"><div class="bmr-stat-val">' + (r.fat||0) + 'g</div><div class="bmr-stat-label">' + t('colFat') + '</div></div>' +
-      '<div class="bmr-stat"><div class="bmr-stat-val">' + (r.prepTime||'?') + '</div><div class="bmr-stat-label">Minutes</div></div>' +
+      '<div class="bmr-stat"><div class="bmr-stat-val">' + (r.prepTime||'?') + '</div><div class="bmr-stat-label">' + t('recipePrepTime') + '</div></div>' +
     '</div>' +
     '<div class="recipe-two-col">' +
-      '<div><h4>Ingredients</h4><ul class="recipe-list">' + ings.map(function(i){ return '<li>' + i + '</li>'; }).join('') + '</ul></div>' +
-      '<div><h4>Instructions</h4><ol class="recipe-list">' + steps.map(function(s){ return '<li>' + s.replace(/^step\s*\d+:\s*/i,'') + '</li>'; }).join('') + '</ol></div>' +
+      '<div><h4>' + t('recipeIngredients') + '</h4><ul class="recipe-list">' + ings.map(function(i){ return '<li>' + i + '</li>'; }).join('') + '</ul></div>' +
+      '<div><h4>' + t('recipeInstructions') + '</h4><ol class="recipe-list">' + steps.map(function(s){ return '<li>' + s.replace(/^step\s*\d+:\s*/i,'') + '</li>'; }).join('') + '</ol></div>' +
     '</div>' +
     (r.tips ? '<div class="recipe-tips"><i class="ti ti-bulb"></i> ' + r.tips + '</div>' : '');
   openModal('recipe-detail');
@@ -5988,7 +6120,7 @@ function addProgExercise(dayData) {
   div.id = dayId;
   div.innerHTML =
     '<div class="meal-editor-header">' +
-      '<input class="form-input meal-name-input" value="' + (dayData.day||'Day 1') + '" placeholder="e.g. Monday — Chest & Triceps" style="flex:1">' +
+      '<input class="form-input meal-name-input" value="' + (dayData.day||'Day 1') + '" placeholder="' + (_lang==='he' ? 'לדוג׳ יום שני — חזה ותלת ראשי' : 'e.g. Monday — Chest & Triceps') + '" style="flex:1">' +
       '<button class="admin-action-btn delete" onclick="this.closest(\'.meal-editor\').remove()"><i class="ti ti-trash"></i></button>' +
     '</div>' +
     '<div class="prog-ex-header"><span>' + ((_lang==='he')?'תרגיל':'Exercise') + '</span><span>' + ((_lang==='he')?'שריר':'Muscle') + '</span><span>' + ((_lang==='he')?'סטים':'Sets') + '</span><span>' + ((_lang==='he')?'חזרות':'Reps') + '</span><span>' + ((_lang==='he')?'מנוחה':'Rest') + '</span><span>' + ((_lang==='he')?'הערות':'Notes') + '</span><span></span></div>' +
@@ -6016,16 +6148,18 @@ function progExRowHTML(dayId, ex) {
         muscleOpts.map(function(m){ return '<option value="' + m + '"' + (m === (ex.muscle||'') ? ' selected' : '') + '>' + (m||allLabel) + '</option>'; }).join('') +
       '</select>' +
       '<input class="form-input prog-ex-name" placeholder="' + searchPlaceholder + '" value="' + (ex.title||ex.name||'') + '" ' +
-        'oninput="filterProgExSearch(this)" onfocus="showProgExDropdown(this)" style="flex:1;min-width:120px">' +
+        'oninput="this._userTouched=true;filterProgExSearch(this)" ' +
+        'onfocus="clearProgExSelection(this);showProgExDropdown(this);" ' +
+        'style="flex:1;min-width:120px">' +
       '<input type="hidden" class="prog-ex-id"    value="' + exId + '">' +
       '<input type="hidden" class="prog-ex-url"   value="' + (ex.videoURL||'') + '">' +
       '<input type="hidden" class="prog-ex-muscle" value="' + (ex.muscle||'') + '">' +
       '<div class="prog-ex-dropdown" style="display:none"></div>' +
     '</div>' +
-    '<input class="form-input" placeholder="' + (isHe?'סטים':'Sets')  + '" value="' + (ex.sets||'')  + '" style="width:52px">' +
-    '<input class="form-input" placeholder="' + (isHe?'חזרות':'Reps') + '" value="' + (ex.reps||'')  + '" style="width:60px">' +
-    '<input class="form-input" placeholder="' + (isHe?'מנוחה':'Rest') + '" value="' + (ex.rest||'')  + '" style="width:60px">' +
-    '<input class="form-input" placeholder="' + (isHe?'הערות':'Notes')+ '" value="' + (ex.notes||'') + '" style="flex:1;min-width:70px">' +
+    '<input class="form-input prog-ex-sets"  data-field="sets"  placeholder="' + (isHe?'סטים':'Sets')  + '" value="' + (ex.sets||'')  + '" style="width:52px">' +
+    '<input class="form-input prog-ex-reps"  data-field="reps"  placeholder="' + (isHe?'חזרות':'Reps') + '" value="' + (ex.reps||'')  + '" style="width:60px">' +
+    '<input class="form-input prog-ex-rest"  data-field="rest"  placeholder="' + (isHe?'מנוחה':'Rest') + '" value="' + (ex.rest||'')  + '" style="width:60px">' +
+    '<input class="form-input prog-ex-notes" data-field="notes" placeholder="' + (isHe?'הערות':'Notes')+ '" value="' + (ex.notes||'') + '" style="flex:1;min-width:70px">' +
     '<button class="admin-action-btn delete" onclick="this.closest(\'.prog-ex-row\').remove()" style="padding:6px 8px"><i class="ti ti-x"></i></button>' +
   '</div>';
 }
@@ -6040,8 +6174,10 @@ function filterProgExSearch(input) {
   if (!q && !muscle) { dd.style.display = 'none'; return; }
   // Don't show dropdown if exercise already selected (exId set) and input unchanged
   var exId = (row.querySelector('.prog-ex-id') || {}).value || '';
-  if (exId && row.querySelector('.prog-ex-name').value.toLowerCase().trim() === q && dd.innerHTML === '') {
-    return; // already selected, dropdown was cleared
+  // If exId is cleared (by clearProgExSelection on focus), always show dropdown
+  // Only bail if exId still set AND dropdown already populated
+  if (exId && dd.innerHTML !== '' && row.querySelector('.prog-ex-name').value.toLowerCase().trim() === q) {
+    return; // already selected and dropdown showing
   }
 
   var all  = MASTER_EXERCISES.concat(customExercises || []);
@@ -6081,6 +6217,20 @@ function pickProgEx(el) {
   selectProgEx(el, exId, title, muscle, url);
 }
 
+function clearProgExSelection(input) {
+  // Only clear if the user is interacting (not auto-focus on render)
+  // Check: if the input has a non-empty value that matches the stored exId title,
+  // we still want to allow re-selection — but don't erase data on first render.
+  // We use a 'user-touched' flag set by the oninput handler.
+  if (!input._userTouched) return;
+  var row = input.closest('.prog-ex-row');
+  if (!row) return;
+  row.querySelector('.prog-ex-id').value     = '';
+  row.querySelector('.prog-ex-url').value    = '';
+  row.querySelector('.prog-ex-muscle').value = '';
+  row.removeAttribute('data-exid');
+}
+
 function showProgExDropdown(input) {
   if (input.value.trim()) filterProgExSearch(input);
 }
@@ -6108,7 +6258,7 @@ function selectProgEx(item, exId, title, muscle, videoURL) {
   if (nameInput) nameInput.blur();
 
   // Focus Sets input after short delay
-  var setsInput = row.querySelector('input[placeholder="Sets"]');
+  var setsInput = row.querySelector('[data-field="sets"]');
   if (setsInput) {
     setTimeout(function(){
       setsInput.focus();
@@ -6134,7 +6284,11 @@ function addProgExRow(dayId) {
 
 /* ── Override saveAdminProgram to include exercise days ── */
 async function saveAdminProgram() {
-  var name = (document.getElementById('prog-name').value||'').trim() || 'My Program';
+  var isHe = (_lang === 'he');
+  var nameEn = (document.getElementById('prog-name')    ||{}).value.trim();
+  var nameHe = (document.getElementById('prog-name-he') ||{}).value.trim();
+  var name = isHe ? (nameHe || nameEn) : (nameEn || nameHe);
+  if (!name) { showToast(isHe ? 'נא להזין שם תוכנית.' : 'Please enter a program name.'); return; }
 
   var days = [];
   document.querySelectorAll('#prog-exercises-container .meal-editor').forEach(function(dayEl) {
@@ -6148,21 +6302,22 @@ async function saveAdminProgram() {
         title:      nameEl.value.trim(),
         muscle:     (row.querySelector('.prog-ex-muscle') || {}).value || '',
         videoURL:   (row.querySelector('.prog-ex-url')    || {}).value || '',
-        sets:  (row.querySelector('input[placeholder="Sets"]')  || {}).value || '',
-        reps:  (row.querySelector('input[placeholder="Reps"]')  || {}).value || '',
-        rest:  (row.querySelector('input[placeholder="Rest"]')  || {}).value || '',
-        notes: (row.querySelector('input[placeholder="Notes"]') || {}).value || '',
+        sets:  (row.querySelector('[data-field="sets"]')  || {}).value || '',
+        reps:  (row.querySelector('[data-field="reps"]')  || {}).value || '',
+        rest:  (row.querySelector('[data-field="rest"]')  || {}).value || '',
+        notes: (row.querySelector('[data-field="notes"]') || {}).value || '',
       });
     });
-    days.push({ day: dayName || 'Workout', exercises: exercises });
+    days.push({ day: dayName || (isHe ? 'אימון' : 'Workout'), exercises: exercises });
   });
 
   var pubEl = document.getElementById('prog-is-public');
-  // Support both checkbox (.checked) and hidden input (.value)
   var isPublic = pubEl ? (pubEl.type === 'checkbox' ? Boolean(pubEl.checked) : pubEl.value !== 'false') : true;
 
   var data = {
-    name, isPublic,
+    name:         isHe ? (nameEn || name) : name,
+    name_he:      isHe ? name : nameHe,
+    isPublic,
     weeks:        parseInt(document.getElementById('prog-weeks').value) || 0,
     days:         parseInt(document.getElementById('prog-days').value)  || 0,
     goal:         document.getElementById('prog-goal').value,
@@ -6170,6 +6325,7 @@ async function saveAdminProgram() {
     desc:         document.getElementById('prog-desc').value.trim(),
     notes:        document.getElementById('prog-notes').value.trim(),
     trainingDays: days,
+    lang:         _lang,
     createdBy:    state.user ? state.user.uid : null,
     trainerName:  state.user ? state.user.fullName : null,
     updatedAt:    new Date().toISOString(),
@@ -6189,17 +6345,17 @@ async function saveAdminProgram() {
       savedId = ref.id;
       programs.push(Object.assign({ id: savedId }, data));
     }
-    showToast('Program saved!');
+    showToast(isHe ? 'התוכנית נשמרה!' : 'Program saved!');
     closeAllModals();
-    renderAdminProgramsList();
-    renderProgramsView();
+    // Reload so trainer sees it immediately in My Programs
+    await loadPrograms();
   } catch(e) { showToast('Save failed: ' + e.code); }
 }
 
 /* ── Override openAdminProgramModal to load days ─────── */
 function openAdminProgramModal(id) {
   document.getElementById('admin-program-id').value = id || '';
-  ['prog-name','prog-weeks','prog-days','prog-desc','prog-schedule','prog-notes'].forEach(function(x){ document.getElementById(x).value=''; });
+  ['prog-name','prog-name-he','prog-weeks','prog-days','prog-desc','prog-schedule','prog-notes'].forEach(function(x){ var el=document.getElementById(x); if(el) el.value=''; });
   document.getElementById('prog-goal').value  = 'strength';
   document.getElementById('prog-level').value = 'Intermediate';
   document.getElementById('prog-exercises-container').innerHTML = '';
@@ -6225,6 +6381,8 @@ function openAdminProgramModal(id) {
     addProgExercise({ day: 'Day 1 — Chest & Triceps', exercises: [] });
   }
   openModal('admin-program');
+  // Re-apply language so lang-field-en/he visibility is correct
+  try { applyLang(_lang); } catch(e){}
 }
 
 function openProgramDetail(id) {
@@ -6255,8 +6413,8 @@ function openProgramDetail(id) {
   var html =
     '<div style="display:flex;gap:8px;flex-wrap:nowrap;margin-bottom:16px;overflow-x:auto">' +
       '<div class="bmr-stat" style="min-width:56px;text-align:center"><div class="bmr-stat-val">' + (p.weeks||'?') + '</div><div class="bmr-stat-label">' + t('lblWeeks') + '</div></div>' +
-      '<div class="bmr-stat" style="min-width:56px;text-align:center"><div class="bmr-stat-val">' + (p.trainingDays&&p.trainingDays.length||p.days||'?') + '</div><div class="bmr-stat-label">Days</div></div>' +
-      '<div class="bmr-stat accent" style="flex:1;text-align:center"><div class="bmr-stat-val" style="font-size:13px">' + goalFull + '</div><div class="bmr-stat-label">Goal</div></div>' +
+      '<div class="bmr-stat" style="min-width:56px;text-align:center"><div class="bmr-stat-val">' + (p.trainingDays&&p.trainingDays.length||p.days||'?') + '</div><div class="bmr-stat-label">' + t('fldProgDays') + '</div></div>' +
+      '<div class="bmr-stat accent" style="flex:1;text-align:center"><div class="bmr-stat-val" style="font-size:13px">' + goalFull + '</div><div class="bmr-stat-label">' + t('fldMenuGoal') + '</div></div>' +
       '<div class="bmr-stat" style="flex:1;text-align:center"><div class="bmr-stat-val" style="font-size:13px">' + (p.level||'?') + '</div><div class="bmr-stat-label">Level</div></div>' +
     '</div>' +
     (p.desc ? '<p style="color:var(--muted);font-size:13px;margin-bottom:16px;line-height:1.5">' + p.desc + '</p>' : '');
@@ -6856,27 +7014,60 @@ async function loadHeExercises() {
   } catch(e) { console.warn('loadHeExercises:', e); return []; }
 }
 
-function renderHeExercisesList() {
+function filterHeExercises() {
+  var q      = (document.getElementById('he-ex-search')?.value || '').trim().toLowerCase();
+  var muscle = document.getElementById('he-ex-muscle')?.value || '';
+  renderHeExercisesList(q, muscle);
+}
+
+function renderHeExercisesList(searchQ, muscleFilter) {
   var el = document.getElementById('admin-exercises-he-list');
   if (!el) return;
-  if (!_heExercises.length) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="ti ti-language"></i></div><h3>' + t('noResearchYet') + '</h3><p>' + t('tapToCreate') + '</p></div>';
+
+  var list = _heExercises;
+
+  // Apply muscle filter
+  if (muscleFilter) {
+    list = list.filter(function(ex){ return (ex.muscle||'') === muscleFilter; });
+  }
+
+  // Apply search
+  if (searchQ) {
+    var q = searchQ.toLowerCase();
+    list = list.filter(function(ex) {
+      return (ex.title||'').toLowerCase().includes(q) ||
+             (ex.title_he||ex.name||'').toLowerCase().includes(q) ||
+             (ex.muscle||'').toLowerCase().includes(q) ||
+             (ex.sub||'').toLowerCase().includes(q) ||
+             (ex.desc||'').toLowerCase().includes(q);
+    });
+  }
+
+  // Update count
+  var countEl = document.getElementById('he-ex-count');
+  if (countEl) countEl.textContent = list.length + ' / ' + _heExercises.length + ' תרגילים';
+
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="ti ti-language"></i></div><h3>' + (searchQ || muscleFilter ? 'לא נמצאו תרגילים' : t('noResearchYet')) + '</h3><p>' + t('tapToCreate') + '</p></div>';
     return;
   }
+
   var muscleColors = {
     'חזה':'#F472B6','גב':'#60A5FA','רגליים':'#7EE8A2','כתפיים':'#FBBF24',
     'ידיים':'#A78BFA','בטן':'#FB923C','גוף מלא':'#3ECFCF','פיזיו':'#818CF8',
     'chest':'#F472B6','back':'#60A5FA','legs':'#7EE8A2','shoulders':'#FBBF24',
     'arms':'#A78BFA','core':'#FB923C','fullbody':'#3ECFCF','physio':'#818CF8'
   };
+
   el.innerHTML =
     '<div style="display:grid;grid-template-columns:3fr 1fr 1fr 1fr 1fr auto;gap:12px;padding:8px 16px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border)">' +
-      '<span>Exercise</span><span>Muscle</span><span>Sub-Category</span><span>Difficulty</span><span>Tier</span><span>Actions</span>' +
+      '<span>' + t('gwExercise') + '</span><span>' + t('exMuscleLabel').split(' ')[0] + '</span><span>' + t('exSubcatLabel').split(' ')[0] + '</span><span>' + t('exDiffLabel') + '</span><span>Tier</span><span>' + (t('colActions')||'Actions') + '</span>' +
     '</div>' +
-    _heExercises.map(function(ex) {
+    list.map(function(ex) {
       var mc = muscleColors[ex.muscle] || '#888';
-      var tier = ex.premium ? 'Premium' : 'Free';
-      var tierColor = ex.premium ? '#FBBF24' : 'var(--muted)';
+      var isPremium = ex.premium;
+      var tierLabel = isPremium ? (t('tierPremium')||'Premium') : (t('tierFree')||'Free');
+      var tierColor = isPremium ? '#FBBF24' : 'var(--muted)';
       return '<div style="display:grid;grid-template-columns:3fr 1fr 1fr 1fr 1fr auto;gap:12px;padding:12px 16px;align-items:center;border-bottom:1px solid var(--border)" ' +
         'onmouseenter="this.style.background=\'var(--surface2)\'" onmouseleave="this.style.background=\'\'">' +
         '<div><div style="font-weight:600;font-size:14px">' + (ex.title||ex.name||'') + '</div>' +
@@ -6885,7 +7076,7 @@ function renderHeExercisesList() {
         '<div><span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;background:' + mc + '22;color:' + mc + ';border:1px solid ' + mc + '44">' + (ex.muscle||'') + '</span></div>' +
         '<div><span style="font-size:11px;padding:3px 8px;border-radius:20px;background:var(--surface2);color:var(--muted)">' + (ex.sub||'—') + '</span></div>' +
         '<div style="font-size:13px;color:var(--muted)">' + (ex.diff||ex.difficulty||'—') + '</div>' +
-        '<div style="font-size:11px;font-weight:700;color:' + tierColor + '">' + tier + '</div>' +
+        '<div style="font-size:11px;font-weight:700;color:' + tierColor + '">' + tierLabel + '</div>' +
         '<div style="display:flex;gap:6px">' +
           '<button class="admin-action-btn edit" onclick="openAdminExerciseModalHe(\'' + ex.id + '\')" title="Edit"><i class="ti ti-edit"></i></button>' +
           '<button class="admin-action-btn delete" onclick="deleteHeItem(\'' + ex.id + '\',\'exercises\')" title="Delete"><i class="ti ti-trash"></i></button>' +
@@ -6902,7 +7093,7 @@ async function updateAdminExercisesTopbar(lang) {
   if (lang === 'he') {
     if (enWrap) enWrap.style.display = 'none';
     if (heWrap) heWrap.style.display = '';
-    if (addBtn) { addBtn.innerHTML = '<i class="ti ti-plus"></i> הוסף תרגיל'; addBtn.onclick = function(){ window._addExToHe=true; openAdminModal('add'); }; }
+    if (addBtn) { addBtn.innerHTML = '<i class="ti ti-plus"></i> הוסף תרגיל'; addBtn.onclick = function(){ openAdminModalHe(); }; }
     if (bulkBtn) { bulkBtn.innerHTML = '<i class="ti ti-file-import"></i> ייבוא עברית'; bulkBtn.onclick = function(){ openModal('bulk-import-he-exercises'); }; }
     await loadHeExercises();
     renderHeExercisesList();
@@ -7536,6 +7727,9 @@ async function loadClientPortal(trainerUid, clientUid) {
     }
     // Strict language filter — Hebrew client sees ONLY Hebrew assignments, English sees only English
     menus    = (data.assignedMenus    || []).filter(matchLang);
+    
+
+    menus    = (data.assignedMenus    || []).filter(matchLang);
     programs = (data.assignedPrograms || []).filter(matchLang);
     recipes  = (data.assignedRecipes  || []).filter(matchLang);
     window._clientAssignedPrograms = programs;
@@ -7724,7 +7918,7 @@ async function renderClientProfileTab(data) {
 
     // Workout history summary
     (sessions.length ?
-      '<h3 style="font-size:15px;font-weight:700;margin:0 0 12px">Recent Workouts</h3>' +
+      '<h3 style="font-size:15px;font-weight:700;margin:0 0 12px">' + t('recentWorkouts') + '</h3>' +
       sessions.slice(0, 8).map(function(s) {
         var d = new Date(s.date);
         var dur = s.durationSeconds ? Math.floor(s.durationSeconds/60) + ' min' : '';
@@ -8013,15 +8207,15 @@ function renderExerciseChart(suffix) {
 
   var summary = '<div style="display:flex;gap:10px;margin-top:12px">' +
     '<div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px;text-align:center">' +
-      '<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:3px">Best</div>' +
+      '<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:3px">' + t('chartBest') + '</div>' +
       '<div style="font-size:17px;font-weight:800">' + maxW + '<span style="font-size:11px;font-weight:500;color:var(--muted)">kg</span></div>' +
     '</div>' +
     '<div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px;text-align:center">' +
-      '<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:3px">Latest</div>' +
+      '<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:3px">' + t('chartLatest') + '</div>' +
       '<div style="font-size:17px;font-weight:800">' + last + '<span style="font-size:11px;font-weight:500;color:var(--muted)">kg</span></div>' +
     '</div>' +
     '<div style="flex:1;background:var(--surface2);border-radius:10px;padding:10px;text-align:center">' +
-      '<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:3px">Progress</div>' +
+      '<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:3px">' + t('chartProgress') + '</div>' +
       '<div style="font-size:17px;font-weight:800;color:' + diffColor + '">' + diffStr + '</div>' +
     '</div>' +
   '</div>';
@@ -8138,7 +8332,7 @@ function renderClientPortal(data) {
               '<div class="client-macro-icon" style="background:rgba(96,165,250,0.12);color:#60A5FA"><i class="ti ti-fish"></i></div>' +
               '<div class="client-macro-info">' +
                 '<div class="client-macro-name">Protein <strong>' + b.proteinG + 'g</strong></div>' +
-                '<div class="client-macro-explain">Builds and repairs muscle. Aim for ' + b.proteinG + 'g (' + Math.round(b.proteinG*4) + ' kcal) spread across your meals — prioritise after training.</div>' +
+                '<div class="client-macro-explain">' + t('macroExplainProtein').replace('{g}',b.proteinG).replace('{kcal}',Math.round(b.proteinG*4)) + '</div>' +
               '</div>' +
               '<div class="macro-bar-track" style="width:60px"><div class="macro-bar protein" style="width:100%"></div></div>' +
             '</div>' +
@@ -8146,7 +8340,7 @@ function renderClientPortal(data) {
               '<div class="client-macro-icon" style="background:rgba(251,191,36,0.12);color:#FBBF24"><i class="ti ti-grain"></i></div>' +
               '<div class="client-macro-info">' +
                 '<div class="client-macro-name">Carbohydrates <strong>' + b.carbsG + 'g</strong></div>' +
-                '<div class="client-macro-explain">Your main energy source for training. ' + b.carbsG + 'g (' + Math.round(b.carbsG*4) + ' kcal) — eat more on training days, less on rest days.</div>' +
+                '<div class="client-macro-explain">' + t('macroExplainCarbs').replace('{g}',b.carbsG).replace('{kcal}',Math.round(b.carbsG*4)) + '</div>' +
               '</div>' +
               '<div class="macro-bar-track" style="width:60px"><div class="macro-bar carbs" style="width:100%"></div></div>' +
             '</div>' +
@@ -8154,7 +8348,7 @@ function renderClientPortal(data) {
               '<div class="client-macro-icon" style="background:rgba(244,114,182,0.12);color:#F472B6"><i class="ti ti-droplet"></i></div>' +
               '<div class="client-macro-info">' +
                 '<div class="client-macro-name">Fat <strong>' + b.fatG + 'g</strong></div>' +
-                '<div class="client-macro-explain">Essential for hormones and vitamin absorption. ' + b.fatG + 'g (' + Math.round(b.fatG*9) + ' kcal) — focus on healthy sources like olive oil, nuts, and avocado.</div>' +
+                '<div class="client-macro-explain">' + t('macroExplainFat').replace('{g}',b.fatG).replace('{kcal}',Math.round(b.fatG*9)) + '</div>' +
               '</div>' +
               '<div class="macro-bar-track" style="width:60px"><div class="macro-bar fat" style="width:100%"></div></div>' +
             '</div>' +
@@ -8526,9 +8720,18 @@ async function switchClientProfileTab(tab) {
   }
 }
 
+function _setTabFooter(footer, html, clientId) {
+  if (!footer) return;
+  footer.innerHTML = html +
+    '<button class="btn btn-ghost" style="color:var(--danger);border-color:rgba(255,107,107,0.3);margin-inline-start:auto" ' +
+      'onclick="deleteClient(\'' + clientId + '\')">' +
+      '<i class="ti ti-trash"></i> ' + (t('btnDeleteClient')||'Delete Client') +
+    '</button>';
+}
+
 function renderClientAssignTab(body, footer, client) {
   var clientId = client.id;
-  footer.innerHTML = '<button class="btn btn-ghost" onclick="closeAllModals()">' + t('close') + '</button>';
+  _setTabFooter(footer, '<button class="btn btn-ghost" onclick="closeAllModals()">' + t('close') + '</button>', clientId);
   var menus2   = (client.assignedMenus    || []);
   var progs    = (client.assignedPrograms || []);
   var routs    = (client.assignedRoutines || []);
@@ -8618,7 +8821,7 @@ function renderClientAssignTab(body, footer, client) {
 }
 
 async function renderClientTrainingTab(body, footer, client) {
-  footer.innerHTML = '<button class="btn btn-ghost" onclick="closeAllModals()">' + t('close') + '</button>';
+  _setTabFooter(footer, '<button class="btn btn-ghost" onclick="closeAllModals()">' + t('close') + '</button>', client.id);
   body.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)"><i class="ti ti-loader" style="font-size:28px;animation:spin 1s linear infinite"></i><div style="margin-top:8px">' + (t('loading')||'Loading...') + '</div></div>';
 
   try {
@@ -8728,11 +8931,12 @@ function _trainerStatCard(value, label, icon, color) {
 }
 
 async function renderClientBodyTab(body, footer, client) {
-  footer.innerHTML =
+  _setTabFooter(footer,
     '<button class="btn btn-ghost" onclick="closeAllModals()">' + t('close') + '</button>' +
     '<button class="btn btn-primary" onclick="openAddMeasurementModal(\'' + client.id + '\')">' +
       '<i class="ti ti-plus"></i> ' + t('addMeasurement') +
-    '</button>';
+    '</button>',
+    client.id);
 
   body.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)"><i class="ti ti-loader" style="font-size:28px;animation:spin 1s linear infinite"></i></div>';
 
@@ -8748,7 +8952,7 @@ async function renderClientBodyTab(body, footer, client) {
     snap.forEach(function(d){ measurements.push(Object.assign({id:d.id}, d.data())); });
 
     if (!measurements.length) {
-      body.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted)"><i class="ti ti-ruler" style="font-size:36px;opacity:0.3;display:block;margin-bottom:10px"></i><div>No measurements yet.<br>Add the first measurement below.</div></div>';
+      body.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted)"><i class="ti ti-ruler" style="font-size:36px;opacity:0.3;display:block;margin-bottom:10px"></i><div>' + t('noMeasurementsYet') + '</div></div>';
       return;
     }
 
@@ -8811,14 +9015,14 @@ async function saveMeasurement(clientId) {
   var date    = document.getElementById('meas-date').value;
   var notes   = document.getElementById('meas-notes').value.trim();
 
-  if (!weight && !bodyFat) { showToast('Enter at least weight or body fat'); return; }
+  if (!weight && !bodyFat) { showToast(t('enterWeightOrFat')||'Enter at least weight or body fat'); return; }
 
   try {
     await window._firebase.addDoc(
       window._firebase.collection(window._db, 'clientMeasurements'),
       { clientUid: clientId, trainerUid: state.user.uid, date, weight, weightUnit: unit, bodyFat, notes, createdAt: new Date().toISOString() }
     );
-    showToast('✓ Measurement saved!');
+    showToast('✓ ' + (t('measSaveBtn')||'Measurement saved'));
     document.getElementById('modal-add-measurement').remove();
     // Refresh body tab
     await renderClientBodyTab(
@@ -8830,7 +9034,7 @@ async function saveMeasurement(clientId) {
 }
 
 async function deleteMeasurement(measurementId, clientId) {
-  if (!confirm('Delete this measurement?')) return;
+  if (!confirm(t('btnYesDelete')+' measurement?')) return;
   try {
     await window._firebase.deleteDoc(window._firebase.doc(window._db, 'clientMeasurements', measurementId));
     showToast('Deleted');
@@ -9254,7 +9458,7 @@ function toggleAssign(itemId) {
     // Tag the item with current language so client portal can filter by lang
     var itemWithLang = Object.assign({}, item, { lang: (typeof _lang !== 'undefined' ? _lang : 'en') });
     arr.push(itemWithLang);
-    item = itemWithLang; // update local ref too
+    item = itemWithLang;
   }
   client[key] = arr;
 
@@ -9530,6 +9734,15 @@ function mobileTab(viewId, btn) {
 
 // Sync mobile tab bar when desktop nav is used
 var _origSetView = setView;
+// Rebuild muscle filter pills for current language when on master tab
+function _rebuildMuscleIfNeeded() {
+  if (typeof buildMuscleFilters === 'function' && typeof state !== 'undefined' && state && state.activeTab === 'master') {
+    try { buildMuscleFilters(); } catch(e){}
+    var _mfB = document.getElementById('muscle-filter-bar');
+    if (_mfB) _mfB.style.display = 'flex';
+  }
+}
+
 setView = function(viewId, navEl) {
   _origSetView(viewId, navEl);
   // Update mobile tab bar
@@ -9540,6 +9753,8 @@ setView = function(viewId, navEl) {
   if (mBtn) mBtn.classList.add('active');
   // Re-apply translations so any blank/static labels in the newly shown view get filled
   try { applyLang(_lang); } catch(e){}
+  // Rebuild muscle filters if on master library
+  if (viewId === 'library') _rebuildMuscleIfNeeded();
 };
 
    /* ══════════════════════════════════════════════════════════
@@ -9895,6 +10110,7 @@ function openCreateGroupWorkout() {
   renderGWExercises();
   renderGWClientPicker();
   openModal('group-workout-modal');
+  try { applyLang(_lang); } catch(e){}
 }
 
 function openEditGroupWorkout(id) {
@@ -9908,6 +10124,7 @@ function openEditGroupWorkout(id) {
   renderGWExercises();
   renderGWClientPicker(gw.assignedClientIds || []);
   openModal('group-workout-modal');
+  try { applyLang(_lang); } catch(e){}
 }
 
 function renderGWExercises() {
@@ -9925,16 +10142,16 @@ function renderGWExercises() {
           muscleOpts.map(function(m){ return '<option value="'+m+'"'+(ex.muscle===m?' selected':'')+'>'+(m||allLabel)+'</option>'; }).join('') +
         '</select>' +
         '<input class="form-input prog-ex-name" placeholder="' + (isHe?'חפש תרגיל...':'Search exercise...') + '" value="' + (ex.title||ex.name||'') + '" ' +
-          'oninput="filterProgExSearch(this)" onfocus="showProgExDropdown(this)" style="flex:1;min-width:120px">' +
+          'oninput="filterProgExSearch(this)" onfocus="clearProgExSelection(this);showProgExDropdown(this);" style="flex:1;min-width:120px">' +
         '<input type="hidden" class="prog-ex-id"    value="' + (ex.id||'') + '">' +
         '<input type="hidden" class="prog-ex-url"   value="' + (ex.videoURL||'') + '">' +
         '<input type="hidden" class="prog-ex-muscle" value="' + (ex.muscle||'') + '">' +
         '<div class="prog-ex-dropdown" style="display:none"></div>' +
       '</div>' +
-      '<input class="form-input" placeholder="' + (isHe?'סטים':'Sets') + '" value="' + (ex.sets||'3') + '" style="width:52px">' +
-      '<input class="form-input" placeholder="' + (isHe?'חזרות':'Reps') + '" value="' + (ex.reps||'') + '" style="width:60px">' +
-      '<input class="form-input" placeholder="' + (isHe?'מנוחה':'Rest') + '" value="' + (ex.rest||'2') + '" style="width:60px">' +
-      '<input class="form-input" placeholder="' + (isHe?'הערות':'Notes') + '" value="' + (ex.notes||'') + '" style="flex:1;min-width:60px">' +
+      '<input class="form-input" data-field="sets"  placeholder="' + t('colSets')  + '" value="' + (ex.sets||'3') + '" style="width:52px">' +
+      '<input class="form-input" data-field="reps"  placeholder="' + t('colReps')  + '" value="' + (ex.reps||'') + '" style="width:60px">' +
+      '<input class="form-input" data-field="rest"  placeholder="' + t('colRest')  + '" value="' + (ex.rest||'2') + '" style="width:60px">' +
+      '<input class="form-input" data-field="notes" placeholder="' + t('measNotes') + '" value="' + (ex.notes||'') + '" style="flex:1;min-width:60px">' +
       '<button class="admin-action-btn delete" onclick="this.closest(\'.prog-ex-row\').remove()" style="padding:6px 8px"><i class="ti ti-x"></i></button>' +
     '</div>';
   }).join('');
@@ -9952,10 +10169,14 @@ function _gwSyncFromDOM() {
     var inputs = row.querySelectorAll('input.form-input:not(.prog-ex-name)');
     if (name)   _groupWorkoutExercises[i].title  = name.value;
     if (muscle) _groupWorkoutExercises[i].muscle = muscle.value || (mfilt ? mfilt.value : '');
-    if (inputs[0]) _groupWorkoutExercises[i].sets  = inputs[0].value;
-    if (inputs[1]) _groupWorkoutExercises[i].reps  = inputs[1].value;
-    if (inputs[2]) _groupWorkoutExercises[i].rest  = inputs[2].value;
-    if (inputs[3]) _groupWorkoutExercises[i].notes = inputs[3].value;
+    var setsI  = row.querySelector('[data-field="sets"]');
+    var repsI  = row.querySelector('[data-field="reps"]');
+    var restI  = row.querySelector('[data-field="rest"]');
+    var notesI = row.querySelector('[data-field="notes"]');
+    if (setsI)  _groupWorkoutExercises[i].sets  = setsI.value;
+    if (repsI)  _groupWorkoutExercises[i].reps  = repsI.value;
+    if (restI)  _groupWorkoutExercises[i].rest  = restI.value;
+    if (notesI) _groupWorkoutExercises[i].notes = notesI.value;
   });
 }
 

@@ -49,7 +49,7 @@ window._i18n_he = {
     /* ── Auth ── */
     signIn:'התחברות', signUp:'הרשמה', signOut:'התנתק',
     colExercise:'תרגיל', colMuscle:'שריר', colSets:'סטים', colReps:'חזרות', colRest:'מנוחה', colNotes:'הערות',
-    filterAll:'הכל', filterCut:'חיטוב', filterMaintain:'מאוזן', filterBulk:'מסה',
+    filterAll:'הכל', filterCut:'חיתוך', filterMaintain:'שמירה', filterBulk:'עלייה',
     navGroupWorkouts:'אימוני קבוצה', groupWorkoutsTitle:'אימוני קבוצה',
     createGroupWorkout:'צור אימון קבוצתי', logWorkout:'תעד אימון',
     todaysWorkout:'אימון היום', freeWorkout:'אימון חופשי',
@@ -285,4 +285,46 @@ window._i18n_he = {
     bmrTooltip:'BMR = קלוריות שהגוף שורף במנוחה',
     assignedTo:'הוקצה ל',
     fillAgeWeightHeight:'מלא גיל, משקל וגובה תחילה.',
+    statusPublic:'ציבורי', statusPrivate:'פרטי',
+    goalStrength:'כוח', goalHypertrophy:'היפרטרופיה', goalFatLoss:'ירידה בשומן',
+    goalEndurance:'סיבולת', goalRehab:'שיקום',
+
+    /* ── Group Workout form ── */
+    gwWorkoutName:'שם האימון', gwWorkoutNamePh:'לדוג׳ פלג גוף עליון, רגליים ראשון...',
+    gwExercises:'תרגילים', gwExercise:'תרגיל',
+    colSets:'סטים', colReps:'חזרות', colRest:'מנוחה',
+    gwNotes:'הערות / הוראות', gwNotesPh:'הוראות חימום, נקודות דגש, וכו׳...',
+
+    /* ── Workout ── */
+    btnSwap:'החלף',
+    labelSwapped:'הוחלף',
+    startWorkout:'התחל אימון',
+    endWorkoutNoSave:'סיים אימון ללא שמירה',
+
+    /* ── Client profile & recipes ── */
+    noMeasurementsYet:'אין מדידות עדיין. הוסף את הראשונה למטה.',
+    enterWeightOrFat:'יש להזין לפחות משקל או אחוז שומן.',
+    recentWorkouts:'אימונים אחרונים',
+    macroExplainProtein:'בונה ומתקן שרירים. כוון ל-{g}ג ({kcal} קל) מחולק על פני הארוחות.',
+    macroExplainCarbs:'מקור האנרגיה העיקרי. {g}ג ({kcal} קל) — יותר בימי אימון.',
+    macroExplainFat:'חיוני להורמונים. {g}ג ({kcal} קל) — שמנים בריאים.',
+
+    /* ── Admin exercise form ── */
+    addExerciseMaster:'הוסף תרגיל לספרייה הראשית',
+    exTitleLabel:'שם תרגיל * (EN)',
+    exMuscleLabel:'קבוצת שריר ראשית *',
+    exSubcatLabel:'תת-קטגוריה *',
+    exDiffLabel:'רמת קושי',
+    exDescLabel:'תיאור / הוראות ביצוע * (EN)',
+    exPremiumLabel:'פרמיום בלבד (מוסתר מחינמיים)',
+    exVideoLabel:'קישור וידאו',
+    exUploadLabel:'— או — העלה וידאו מהמחשב',
+    chooseVideoFile:'בחר קובץ וידאו…',
+    selectGroupFirst:'בחר קבוצה קודם',
+    selectMuscle:'בחר קבוצת שריר…',
+
+    colActions:'פעולות',
+    tierPremium:'פרמיום',
+    tierFree:'חינמי',
+    btnDeleteClient:'מחק לקוח',
 };

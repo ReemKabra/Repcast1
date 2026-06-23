@@ -286,4 +286,46 @@ window._i18n_en = {
     bmrTooltip:'BMR = calories your body burns at rest',
     assignedTo:'Assigned to',
     fillAgeWeightHeight:'Fill in age, weight and height first.',
+    statusPublic:'Public', statusPrivate:'Private',
+    goalStrength:'Strength', goalHypertrophy:'Hypertrophy', goalFatLoss:'Fat Loss',
+    goalEndurance:'Endurance', goalRehab:'Rehab',
+
+    /* ── Group Workout form ── */
+    gwWorkoutName:'Workout Name', gwWorkoutNamePh:'e.g. Upper Body Blast, Monday Legs...',
+    gwExercises:'Exercises', gwExercise:'Exercise',
+    colSets:'Sets', colReps:'Reps', colRest:'Rest',
+    gwNotes:'Notes / Instructions', gwNotesPh:'Warm-up instructions, focus points, etc.',
+
+    /* ── Workout ── */
+    btnSwap:'Swap',
+    labelSwapped:'swapped',
+    startWorkout:'Start This Workout',
+    endWorkoutNoSave:'End Workout Without Saving',
+
+    /* ── Client profile & recipes ── */
+    noMeasurementsYet:'No measurements yet. Add the first one below.',
+    enterWeightOrFat:'Enter at least weight or body fat.',
+    recentWorkouts:'Recent Workouts',
+    macroExplainProtein:'Builds and repairs muscle. Aim for {g}g ({kcal} kcal) spread across meals.',
+    macroExplainCarbs:'Main energy source for training. {g}g ({kcal} kcal) — more on training days.',
+    macroExplainFat:'Essential for hormones. {g}g ({kcal} kcal) — focus on healthy sources.',
+
+    /* ── Admin exercise form ── */
+    addExerciseMaster:'Add Exercise to Master Library',
+    exTitleLabel:'Exercise Title * (EN)',
+    exMuscleLabel:'Primary Muscle Group *',
+    exSubcatLabel:'Sub-category *',
+    exDiffLabel:'Difficulty',
+    exDescLabel:'Description / Coaching Cues * (EN)',
+    exPremiumLabel:'Premium only (hidden from free tier)',
+    exVideoLabel:'Video URL',
+    exUploadLabel:'— or — Upload Video from Computer',
+    chooseVideoFile:'Choose video file…',
+    selectGroupFirst:'Select group first',
+    selectMuscle:'Select muscle…',
+
+    colActions:'Actions',
+    tierPremium:'Premium',
+    tierFree:'Free',
+    btnDeleteClient:'Delete Client',
 };

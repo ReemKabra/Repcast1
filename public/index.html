@@ -525,7 +525,7 @@
         <i class="ti ti-users"></i> <span id="tnav-clients-label">Clients</span>
       </a>
       <a class="topnav-link" id="tnav-billing" onclick="setView('billing',this)" href="#">
-        <i class="ti ti-credit-card"></i> <span data-i18n="navBilling">Billing</span>
+        <i class="ti ti-credit-card"></i> Billing
       </a>
     </div>
     <div class="topnav-right">
@@ -699,7 +699,7 @@
           <div class="topbar-left"><h2 class="view-title"><i class="ti ti-chef-hat" style="color:var(--accent)"></i><span data-i18n="recipeLibrary">Recipe Library</span></h2></div>
           <div class="topbar-right">
             <div class="lib-tabs" style="margin:0">
-              <button class="lib-tab active" id="recipe-tab-all" onclick="filterRecipes('all',this)">All</button>
+              <button class="lib-tab active" id="recipe-tab-all" onclick="filterRecipes('all',this)" data-i18n="allFoodsTab">All</button>
               <button class="lib-tab" onclick="filterRecipes('breakfast',this)" id="meal-tab-breakfast">Breakfast</button>
               <button class="lib-tab" onclick="filterRecipes('lunch',this)" id="meal-tab-lunch">Lunch</button>
               <button class="lib-tab" onclick="filterRecipes('dinner',this)" id="meal-tab-dinner">Dinner</button>
@@ -1105,6 +1105,21 @@
       </div>
       <!-- Hebrew exercises list -->
       <div id="exercises-he-wrap" style="display:none;flex:1;overflow-y:auto;padding:16px">
+        <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+          <input class="form-input" id="he-ex-search" placeholder="חפש תרגיל בעברית..." oninput="filterHeExercises()" style="flex:1;min-width:180px;max-width:320px" dir="rtl">
+          <select class="form-input" id="he-ex-muscle" onchange="filterHeExercises()" style="width:160px" dir="rtl">
+            <option value="">כל הקבוצות</option>
+            <option value="חזה">חזה</option>
+            <option value="גב">גב</option>
+            <option value="רגליים">רגליים</option>
+            <option value="כתפיים">כתפיים</option>
+            <option value="ידיים">ידיים</option>
+            <option value="בטן">בטן</option>
+            <option value="גוף מלא">גוף מלא</option>
+            <option value="פיזיו">פיזיו</option>
+          </select>
+          <span id="he-ex-count" style="font-size:12px;color:var(--muted)"></span>
+        </div>
         <div id="admin-exercises-he-list">
           <div class="empty-state"><div class="empty-icon"><i class="ti ti-language"></i></div><h3>No Hebrew exercises yet</h3><p>Add exercises or bulk import to add Hebrew content.</p></div>
         </div>
@@ -1345,7 +1360,7 @@
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Sub-category *</label>
+        <label class="form-label" data-i18n="exSubcatLabel">Sub-category *</label>
         <select class="form-select" id="upload-subcat"><option value="">Select group first</option></select>
       </div>
     </div>
@@ -1429,20 +1444,20 @@
 
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Close</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="close">Close</button>
   </div>
 </div>
 
 <!-- Admin Add/Edit Modal -->
 <div class="modal modal-wide" id="modal-admin-exercise">
   <div class="modal-header">
-    <h3 id="admin-modal-title"><i class="ti ti-plus"></i> Add Exercise to Master Library</h3>
+    <h3 id="admin-modal-title"><i class="ti ti-plus"></i> <span data-i18n="addExerciseMaster">Add Exercise to Master Library</span></h3>
     <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
   </div>
   <div class="modal-body">
     <input type="hidden" id="admin-edit-id">
     <div class="form-group">
-      <label class="form-label">Exercise Title * <span style="color:var(--muted);font-weight:400">(English)</span></label>
+      <label class="form-label" data-i18n="exTitleLabel">Exercise Title * (EN)</label>
       <input class="form-input" id="admin-ex-title" placeholder="e.g. Incline Dumbbell Press">
     </div>
     <div class="form-group">
@@ -1451,7 +1466,7 @@
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Primary Muscle Group *</label>
+        <label class="form-label" data-i18n="exMuscleLabel">Primary Muscle Group *</label>
         <select class="form-select" id="admin-ex-muscle" onchange="populateSubcats('admin-ex-muscle','admin-ex-subcat')">
           <option value="">Select muscle…</option>
           <option value="chest">Chest</option>
@@ -1471,18 +1486,18 @@
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Difficulty</label>
+        <label class="form-label" data-i18n="exDiffLabel">Difficulty</label>
         <select class="form-select" id="admin-ex-diff">
-          <option>Beginner</option>
-          <option>Intermediate</option>
-          <option>Advanced</option>
+          <option data-i18n-opt="lvlBeginner">Beginner</option>
+          <option data-i18n-opt="lvlIntermediate">Intermediate</option>
+          <option data-i18n-opt="lvlAdvanced">Advanced</option>
         </select>
       </div>
       <!-- Duration is auto-detected from video metadata, not manually entered -->
       <input type="hidden" id="admin-ex-duration" value="">
     </div>
     <div class="form-group">
-      <label class="form-label">Description / Coaching Cues * <span style="color:var(--muted);font-weight:400">(English)</span></label>
+      <label class="form-label" data-i18n="exDescLabel">Description / Coaching Cues * (EN)</label>
       <textarea class="form-textarea" id="admin-ex-desc" rows="3" placeholder="Step-by-step instructions and coaching cues…"></textarea>
     </div>
     <div class="form-group">
@@ -1492,18 +1507,18 @@
     <div class="form-group">
       <label class="form-label" style="display:flex;align-items:center;gap:8px;cursor:pointer">
         <input type="checkbox" id="admin-ex-premium" style="width:16px;height:16px;accent-color:var(--warn)">
-        Premium only (hidden from free tier)
+        <span data-i18n="exPremiumLabel">Premium only (hidden from free tier)</span>
       </label>
     </div>
     <div class="form-group">
-      <label class="form-label">Video URL (Firebase Storage, YouTube, or paste direct link)</label>
+      <label class="form-label" data-i18n="exVideoLabel">Video URL</label>
       <input class="form-input" id="admin-ex-video" placeholder="https://… or leave blank to upload a file below">
     </div>
     <div class="form-group">
-      <label class="form-label">— or — Upload Video from Computer</label>
+      <label class="form-label" data-i18n="exUploadLabel">— or — Upload Video from Computer</label>
       <div class="admin-file-upload-zone" onclick="document.getElementById('admin-ex-file').click()">
         <i class="ti ti-cloud-upload"></i>
-        <span id="admin-file-label">Choose video file…</span>
+        <span id="admin-file-label" data-i18n="chooseVideoFile">Choose video file…</span>
         <small>MP4, MOV, WebM · max 500 MB · overwrites URL field above</small>
         <input type="file" id="admin-ex-file" accept="video/mp4,video/quicktime,video/webm"
           style="display:none" onchange="handleAdminFileSelect(this)">
@@ -1799,7 +1814,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
   </div>
   <div class="modal-body" id="recipe-detail-body"></div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Close</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="close">Close</button>
   </div>
 </div>
 
@@ -3097,7 +3112,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
   <!-- Tab content -->
   <div id="client-profile-modal-body" style="flex:1;overflow-y:auto;padding:0"></div>
   <div class="modal-footer" id="client-profile-modal-footer" style="flex-shrink:0">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Close</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="close">Close</button>
   </div>
 </div>
 
@@ -3136,27 +3151,27 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
 <!-- ══ GROUP WORKOUT CREATOR MODAL ══ -->
 <div class="modal modal-wide" id="modal-group-workout-modal" style="max-width:700px">
   <div class="modal-header">
-    <h3><i class="ti ti-users-group" style="color:var(--accent)"></i> Create Group Workout</h3>
+    <h3><i class="ti ti-users-group" style="color:var(--accent)"></i> <span data-i18n="createGroupWorkout">Create Group Workout</span></h3>
     <button class="modal-close" onclick="closeAllModals()"><i class="ti ti-x"></i></button>
   </div>
   <div class="modal-body" style="overflow-y:auto;max-height:70vh">
     <div class="form-row" style="gap:12px">
       <div class="form-group" style="flex:2">
-        <label class="form-label">Workout Name</label>
-        <input class="form-input" id="gw-name" placeholder="e.g. Upper Body Blast, Monday Legs...">
+        <label class="form-label" data-i18n="gwWorkoutName">Workout Name</label>
+        <input class="form-input" id="gw-name" placeholder="e.g. Upper Body Blast, Monday Legs..." data-i18n="gwWorkoutNamePh" data-i18n-attr="placeholder">
       </div>
       <div class="form-group" style="flex:1">
-        <label class="form-label">Date</label>
+        <label class="form-label" data-i18n="measDate">Date</label>
         <input class="form-input" type="date" id="gw-date">
       </div>
     </div>
 
     <div class="form-group" style="margin-top:16px">
-      <label class="form-label">Exercises</label>
-      <div class="prog-ex-header" style="margin-bottom:4px"><span>Exercise</span><span>Sets</span><span>Reps</span><span>Rest</span><span>Notes</span><span></span></div>
+      <label class="form-label" data-i18n="gwExercises">Exercises</label>
+      <div class="prog-ex-header" style="margin-bottom:4px"><span data-i18n="gwExercise">Exercise</span><span data-i18n="colSets">Sets</span><span data-i18n="colReps">Reps</span><span data-i18n="colRest">Rest</span><span data-i18n="measNotes">Notes</span><span></span></div>
       <div id="gw-exercises-body"></div>
       <button class="btn btn-ghost btn-sm" onclick="addGWExercise()" style="margin-top:8px">
-        <i class="ti ti-plus"></i> Add Exercise
+        <i class="ti ti-plus"></i> <span data-i18n="addExercise">Add Exercise</span>
       </button>
     </div>
 
@@ -3166,8 +3181,8 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     </div>
 
     <div class="form-group" style="margin-top:16px">
-      <label class="form-label">Notes / Instructions</label>
-      <textarea class="form-input" id="gw-notes" rows="3" placeholder="Warm-up instructions, focus points, etc."></textarea>
+      <label class="form-label" data-i18n="gwNotes">Notes / Instructions</label>
+      <textarea class="form-input" id="gw-notes" rows="3" placeholder="Warm-up instructions, focus points, etc." data-i18n="gwNotesPh" data-i18n-attr="placeholder"></textarea>
     </div>
   </div>
   <div class="modal-footer">
@@ -3190,7 +3205,7 @@ Face Pull | shoulders | Rear Deltoid | Cable at head height, pull to face</pre>
     <div id="gw-detail-body"></div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-ghost" onclick="closeAllModals()">Close</button>
+    <button class="btn btn-ghost" onclick="closeAllModals()" data-i18n="close">Close</button>
   </div>
 </div>
 
